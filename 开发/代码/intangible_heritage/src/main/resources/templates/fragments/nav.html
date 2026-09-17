@@ -67,7 +67,7 @@
     <a th:href="@{/tutorial/list}">手作教程</a>
 
     <!--头像+下拉菜单-->
-    <div class="avatar-wrap">
+    <div th:fragment="nav" class="avatar-wrap">
         <!--默认头像，未登录使用默认图；已登录显示用户头像，无头像也使用默认占位图-->
         <img class="avatar-img"
              th:src="${session.loginUser != null && session.loginUser.avatar != null ? session.loginUser.avatar : '/images/default_avatar.png'}"
@@ -84,6 +84,7 @@
             <div th:if="${session.loginUser != null && session.loginUser.role == '0'}">
                 <a th:href="@{/userWork/publish}">我的作品</a>
                 <a th:href="@{/customOrder/myApply}">我的定制</a>
+                <a th:href="@{/craftsman/apply}">申请成为匠人</a>
                 <a th:href="@{/user/userCenter}">个人中心</a>
                 <a th:href="@{/logout}">退出登录</a>
             </div>
