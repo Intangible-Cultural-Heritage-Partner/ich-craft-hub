@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${work != null} ? '编辑非遗展品' : '发布非遗展品'">发布非遗展品</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft Yahei", sans-serif;
+            background-color: #f8f5f0;
+        }
+        .wrap { padding: 30px 60px; max-width: 720px; }
+        h2 { color:#784b2a; }
+        .box { background:#fff; padding:26px 30px; border-radius:10px; }
+        .field { margin-bottom:18px; }
+        .field label { display:block; margin-bottom:6px; color:#444; font-weight:bold; }
+        .field input[type=text], .field textarea {
+            width:100%; box-sizing:border-box; padding:9px 12px;
+            border:1px solid #ccc; border-radius:6px; font-size:14px;
+        }
+        .field textarea { min-height:90px; resize:vertical; }
+        .hint { color:#999; font-size:12px; margin-top:4px; }
+        .cur { color:#666; font-size:12px; margin-top:4px; }
+        .msg { color:#c0392b; margin-bottom:14px; }
+        button {
+            background:#784b2a; color:#fff; border:none; padding:11px 26px;
+            border-radius:6px; font-size:15px; cursor:pointer;
+        }
+        button:hover { background:#5d3a20; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <h2 th:text="${work != null} ? '编辑非遗展品' : '发布非遗展品'">发布非遗展品</h2>
+    <div class="box">
+        <p class="msg" th:if="${msg}" th:text="${msg}"></p>
+
+        <!-- 发布走 /heritageWork/publish，编辑走 /heritageWork/edit/{id}；两者共用本表单 -->
+        <form th:action="${work != null} ? @{'/heritageWork/edit/' + ${work.id}} : @{/heritageWork/publish}"
+              method="post" enctype="multipart/form-data">
+
+            <div class="field">
+                <label>作品标题 *</label>
+                <input type="text" name="title" required th:value="${work != null} ? ${work.title} : ''">
+            </div>
+
+            <div class="field">
+                <label>非遗分类 *</label>
+                <input type="text" name="category" required placeholder="如：剪纸、木雕、苏绣"
+                       th:value="${work != null} ? ${work.category} : ''">
+            </div>
+
+            <div class="field">
+                <label>封面图</label>
+                <input type="file" name="coverImgFile" accept="image/*">
+                <div class="hint">jpg / png / webp / gif</div>
+                <div class="cur" th:if="${work != null and work.coverImg != null}">
+                    当前封面已存在，不选则保留原图
+                </div>
+            </div>
+
+            <div class="field">
+                <label>作品图片（可多选）</label>
+                <input type="file" name="imageFiles" accept="image/*" multiple>
+                <div class="hint">可一次选择多张，无3D模型时用于图片画廊</div>
+                <div class="cur" th:if="${work != null and work.imageList != null}">
+                    已有作品图，重新上传将覆盖
+                </div>
+            </div>
+
+            <div class="field">
+                <label>3D模型文件</label>
+                <input type="file" name="modelFile" accept=".glb,.gltf">
+                <div class="hint">.glb / .gltf，上传后详情页可旋转查看（可选）</div>
+                <div class="cur" th:if="${work != null and work.modelUrl != null}">
+                    已有3D模型，不选则保留
+                </div>
+            </div>
+
+            <div class="field">
+                <label>技艺背景</label>
+                <textarea name="skillBackground" th:text="${work != null} ? ${work.skillBackground} : ''"></textarea>
+            </div>
+
+            <div class="field">
+                <label>作品描述</label>
+                <textarea name="description" th:text="${work != null} ? ${work.description} : ''"></textarea>
+            </div>
+
+            <button type="submit" th:text="${work != null} ? '保存修改' : '提交发布'">提交发布</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

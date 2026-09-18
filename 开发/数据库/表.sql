@@ -28,6 +28,7 @@ CREATE TABLE `heritage_work` (
   `category` VARCHAR(50) NOT NULL COMMENT '非遗分类，如剪纸、木雕、苏绣',
   `cover_img` VARCHAR(255) DEFAULT NULL COMMENT '封面图',
   `image_list` TEXT DEFAULT NULL COMMENT '多张作品图片，逗号分隔存储url',
+  `model_url` VARCHAR(255) DEFAULT NULL COMMENT '3D模型文件地址（.glb/.gltf），可为空',
   `skill_background` TEXT DEFAULT NULL COMMENT '技艺背景介绍',
   `description` TEXT DEFAULT NULL COMMENT '作品描述',
   `audit_status` TINYINT NOT NULL DEFAULT 0 COMMENT '0待审核 1审核通过 2驳回',

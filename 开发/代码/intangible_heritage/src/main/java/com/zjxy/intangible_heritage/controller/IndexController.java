@@ -11,11 +11,7 @@ public class IndexController {
         return "index";
     }
 
-    //非遗展品列表页
-    @GetMapping("/work/list")
-    public String workList(){
-        return "work/list";
-    }
+    //非遗展品列表页 /work/list 由 HeritageWorkController 接管（带数据），此处不再重复映射
 
     //手作教程列表页
     @GetMapping("/tutorial/list")

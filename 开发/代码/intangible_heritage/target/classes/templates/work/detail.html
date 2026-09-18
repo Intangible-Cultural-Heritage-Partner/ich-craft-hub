@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${work.title} + ' - 非遗展品详情'">非遗展品详情</title>
+    <!-- Google model-viewer：用于展示 3D 模型（.glb/.gltf），支持旋转缩放 -->
+    <script type="module"
+            src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft Yahei", sans-serif;
+            background-color: #f8f5f0;
+        }
+        .wrap { padding: 30px 60px; max-width: 1000px; }
+        h1 { color:#784b2a; margin-bottom: 6px; }
+        .cat {
+            display:inline-block; font-size:13px; color:#784b2a;
+            background:#f3ece3; padding:3px 12px; border-radius:12px;
+        }
+        .viewer, .gallery { margin-top: 20px; }
+        model-viewer {
+            width: 100%;
+            height: 460px;
+            background: #efeae3;
+            border-radius: 10px;
+        }
+        .gallery img {
+            width: 180px; height: 180px; object-fit: cover;
+            border-radius: 8px; margin: 6px; box-shadow: 0 1px 4px #ccc;
+        }
+        .cover-single {
+            max-width: 100%; border-radius: 10px; margin-top: 20px;
+        }
+        .section { background:#fff; padding:20px 24px; border-radius:10px; margin-top:22px; }
+        .section h3 { color:#784b2a; margin-top:0; }
+        .section p { color:#444; line-height:1.7; white-space:pre-wrap; }
+        .jump-bar { margin-top:26px; }
+        .jump-bar a {
+            display:inline-block; margin-right:14px; padding:10px 18px;
+            background:#784b2a; color:#fff; text-decoration:none; border-radius:6px;
+        }
+        .jump-bar a:hover { background:#5d3a20; }
+        .back { display:inline-block; margin-top:20px; color:#784b2a; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <h1 th:text="${work.title}">作品标题</h1>
+    <span class="cat" th:text="${work.category}">分类</span>
+
+    <!-- 有3D模型：优先用 model-viewer 展示 -->
+    <div class="viewer" th:if="${work.modelUrl != null}">
+        <model-viewer th:attr="src=${work.modelUrl}"
+                      alt="3D模型"
+                      camera-controls
+                      auto-rotate
+                      shadow-intensity="1"
+                      ar>
+        </model-viewer>
+        <p style="color:#888;font-size:13px;">拖动可旋转，滚轮缩放</p>
+    </div>
+
+    <!-- 无3D模型：展示图片画廊（多图优先，否则封面图） -->
+    <div class="gallery" th:if="${work.modelUrl == null and !#lists.isEmpty(images)}">
+        <img th:each="img : ${images}" th:src="${img}" alt="作品图片">
+    </div>
+    <img class="cover-single"
+         th:if="${work.modelUrl == null and #lists.isEmpty(images) and work.coverImg != null}"
+         th:src="${work.coverImg}" alt="封面图">
+
+    <div class="section" th:if="${work.skillBackground != null and !work.skillBackground.isBlank()}">
+        <h3>技艺背景</h3>
+        <p th:text="${work.skillBackground}">技艺背景介绍</p>
+    </div>
+
+    <div class="section" th:if="${work.description != null and !work.description.isBlank()}">
+        <h3>作品描述</h3>
+        <p th:text="${work.description}">作品描述</p>
+    </div>
+
+    <!-- 预留跳转：手作教程 / 用户作品（教程模块C、用户作品模块E，最后汇总时接入真实链接） -->
+    <div class="jump-bar">
+        <a th:href="@{/tutorial/list}">相关手作教程</a>
+        <a th:href="@{/userWork/share}">看看用户作品</a>
+    </div>
+
+    <a class="back" th:href="@{/work/list}">← 返回展品列表</a>
+</div>
+</body>
+</html>
