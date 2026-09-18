@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>申请成为匠人 - 非遗手作共创平台</title>
+
+    <!-- 如果有全局 CSS，请在这里引入 -->
+    <!-- <link rel="stylesheet" th:href="@{/css/style.css}"> -->
+
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #f7f5f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #444;
+        }
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        .form-group input[type="file"] {
+            padding: 5px 0;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-submit:hover {
+            background-color: #1a252f;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-warning { background-color: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+
+<!-- 引入导航栏，注意 fragment 名字用的是 navbar -->
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container">
+    <h2>申请成为匠人</h2>
+
+    <div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>
+
+    <div th:if="${hasPending}" class="alert alert-warning">
+        您已提交过申请，正在审核中，请勿重复提交。
+    </div>
+
+    <!-- 表单 -->
+    <form th:action="@{/craftsman/apply}" method="post" enctype="multipart/form-data" th:unless="${hasPending}">
+
+        <div class="form-group">
+            <label>真实姓名：</label>
+            <input type="text" name="realName" required placeholder="请输入您的真实姓名">
+        </div>
+
+        <!-- 新增：匠人简介与经历 -->
+        <div class="form-group">
+            <label>匠人简介与经历：</label>
+            <textarea name="introduce" required placeholder="请简述您的从艺经历、传承脉络等..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>擅长技艺介绍：</label>
+            <textarea name="skillIntroduction" required placeholder="请详细介绍您的擅长技艺、从事年限、获得过的荣誉等..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>佐证资料图片（可多选，如作品图、证书等）：</label>
+            <input type="file" name="files" multiple accept="image/*">
+        </div>
+
+        <button type="submit" class="btn-submit">提交申请</button>
+    </form>
+</div>
+
+</body>
+</html>

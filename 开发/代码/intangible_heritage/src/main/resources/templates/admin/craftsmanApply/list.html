@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>匠人申请管理 - 管理员</title>
+    <style>
+        body { margin: 0; font-family: "Microsoft YaHei", sans-serif; background: #f4f6f9; }
+        .wrap { padding: 30px 50px; }
+        .box { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        h2 { margin-top: 0; color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border-bottom: 1px solid #e0e0e0; padding: 12px; text-align: left; }
+        th { background: #f8f9fa; font-weight: bold; color: #555; }
+        tr:hover { background: #f1f5f9; }
+        .avatar-sm { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
+        .btn-view { padding: 6px 12px; background: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-view:hover { background: #2980b9; }
+        .status-0 { color: #e67e22; font-weight: bold; }
+        .status-1 { color: #27ae60; font-weight: bold; }
+        .status-2 { color: #c0392b; font-weight: bold; }
+
+        /* 弹窗样式 */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: #fff; margin: 5% auto; padding: 25px; border-radius: 8px; width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }
+        .close { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; color: #888; }
+        .close:hover { color: #333; }
+        .info-row { margin-bottom: 12px; line-height: 1.6; }
+        .info-row strong { display: inline-block; width: 100px; color: #555; }
+        .img-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .img-list img { width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+        .audit-area { margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px; }
+        .audit-area textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; height: 60px; }
+        .btn-pass { padding: 10px 20px; background: #27ae60; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        .btn-reject { padding: 10px 20px; background: #c0392b; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <div class="box">
+        <h2>匠人申请管理</h2>
+        <p style="color:#888;">在此审核普通用户提交的匠人申请，审核通过后该用户将拥有发布展品与教程的权限。</p>
+
+        <table>
+            <thead>
+            <tr>
+                <th>申请人</th>
+                <th>昵称</th>
+                <th>真实姓名</th>
+                <th>申请时间</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(applyList)}">
+                <td colspan="6" style="text-align: center; color: #999;">暂无申请记录</td>
+            </tr>
+            <tr th:each="apply : ${applyList}">
+                <!-- 使用 userMap 获取用户信息 -->
+                <td>
+                    <img class="avatar-sm"
+                         th:src="${userMap[apply.userId] != null && userMap[apply.userId].avatar != null && !userMap[apply.userId].avatar.isEmpty()} ? @{${userMap[apply.userId].avatar}} : @{/images/default_avatar.png}"
+                         alt="头像">
+                    <span th:text="${userMap[apply.userId] != null ? userMap[apply.userId].username : '未知'}"></span>
+                </td>
+                <td th:text="${userMap[apply.userId] != null ? userMap[apply.userId].nickname : '未知'}"></td>
+                <td th:text="${apply.realName}"></td>
+                <td th:text="${#temporals.format(apply.createTime, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <span th:if="${apply.auditStatus == 0}" class="status-0">待审核</span>
+                    <span th:if="${apply.auditStatus == 1}" class="status-1">已通过</span>
+                    <span th:if="${apply.auditStatus == 2}" class="status-2">已驳回</span>
+                </td>
+                <td>
+                    <button class="btn-view"
+                            th:attr="data-id=${apply.id},
+                                         data-realname=${apply.realName},
+                                         data-introduce=${apply.introduce},
+                                         data-skill=${apply.skillIntroduction},
+                                         data-images=${apply.proofImages},
+                                         data-remark=${apply.auditRemark},
+                                         data-status=${apply.auditStatus}"
+                            onclick="openModal(this)">查看详情/审核</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 弹窗结构 -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>申请详情</h3>
+        <hr/>
+        <div class="info-row"><strong>真实姓名：</strong><span id="m-realname"></span></div>
+        <div class="info-row"><strong>匠人简介：</strong><p id="m-introduce" style="margin: 5px 0 0 100px; white-space: pre-wrap;"></p></div>
+        <div class="info-row"><strong>擅长技艺：</strong><p id="m-skill" style="margin: 5px 0 0 100px; white-space: pre-wrap;"></p></div>
+        <div class="info-row"><strong>佐证资料：</strong><div id="m-images" class="img-list"></div></div>
+        <div class="info-row" id="m-remark-row" style="display:none;"><strong>驳回理由：</strong><span id="m-remark" style="color: #c0392b;"></span></div>
+
+        <!-- 审核操作区（仅待审核状态显示） -->
+        <div class="audit-area" id="auditArea">
+            <form id="auditForm" th:action="@{/admin/craftsmanApply/audit}" method="post">
+                <input type="hidden" name="applyId" id="m-applyId">
+                <div class="info-row">
+                    <strong>审核备注：</strong>
+                    <textarea name="auditRemark" id="m-auditRemark" placeholder="驳回时必填驳回理由，通过时可不填..."></textarea>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button type="submit" name="status" value="1" class="btn-pass" onclick="return confirm('确定通过该申请吗？')">审核通过</button>
+                    <button type="submit" name="status" value="2" class="btn-reject" onclick="return confirm('确定驳回该申请吗？')">驳回申请</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal(btn) {
+        // 获取 data 属性
+        let id = btn.getAttribute('data-id');
+        let realname = btn.getAttribute('data-realname');
+        let introduce = btn.getAttribute('data-introduce');
+        let skill = btn.getAttribute('data-skill');
+        let images = btn.getAttribute('data-images');
+        let remark = btn.getAttribute('data-remark');
+        let status = btn.getAttribute('data-status');
+
+        // 填充文本
+        document.getElementById('m-applyId').value = id;
+        document.getElementById('m-realname').innerText = realname;
+        document.getElementById('m-introduce').innerText = introduce || '未填写';
+        document.getElementById('m-skill').innerText = skill || '未填写';
+
+        // 处理图片
+        let imgContainer = document.getElementById('m-images');
+        imgContainer.innerHTML = '';
+        if (images && images.trim() !== '') {
+            let imgArr = images.split(',');
+            imgArr.forEach(src => {
+                if(src.trim() !== '') {
+                    let img = document.createElement('img');
+                    img.src = src.trim();
+                    imgContainer.appendChild(img);
+                }
+            });
+        } else {
+            imgContainer.innerHTML = '<span style="color:#999;">无佐证图片</span>';
+        }
+
+        // 状态控制
+        let auditArea = document.getElementById('auditArea');
+        let remarkRow = document.getElementById('m-remark-row');
+        if (status == '0') {
+            auditArea.style.display = 'block';
+            remarkRow.style.display = 'none';
+        } else {
+            auditArea.style.display = 'none';
+            if (status == '2') {
+                remarkRow.style.display = 'block';
+                document.getElementById('m-remark').innerText = remark || '无';
+            } else {
+                remarkRow.style.display = 'none';
+            }
+        }
+
+        document.getElementById('myModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('myModal').style.display = 'none';
+    }
+
+    // 点击弹窗外部关闭
+    window.onclick = function(event) {
+        let modal = document.getElementById('myModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
