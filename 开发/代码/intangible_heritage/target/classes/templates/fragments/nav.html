@@ -2,27 +2,111 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body th:fragment="navbar">
 <style>
-    .nav-bar { background: #2c3e50; color: #fff; padding: 1rem 2rem; display: flex; gap: 1.5rem; align-items: center; }
-    .nav-bar a { color: #fff; text-decoration: none; }
-    .nav-bar a:hover { text-decoration: underline; }
-    .nav-title { font-weight: bold; margin-right: 1rem; }
-    .nav-user { margin-left: auto; }
+    /*导航整体样式*/
+    .nav-bar{
+        background:#2c3e50;
+        color:#ffffff;
+        padding:1rem 2rem;
+        display:flex;
+        gap:2rem;
+        align-items:center;
+    }
+    .nav-bar a{
+        color:#fff;
+        text-decoration:none;
+        font-size:16px;
+    }
+    .nav-bar a:hover{
+        text-decoration:underline;
+    }
+    /*头像下拉容器*/
+    .avatar-wrap{
+        margin-left:auto;
+        position:relative;
+        /*向下扩展hover热区，鼠标移向下拉菜单不会消失*/
+        padding-bottom:10px;
+    }
+    .avatar-img{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      cursor:pointer;
+      border:2px solid #fff;
+      object-fit: cover;
+      display:block;
+  }
+    /*下拉菜单*/
+    .dropdown-menu{
+        display:none;
+        position:absolute;
+        right:0;
+        top:48px;
+        background:#ffffff;
+        min-width:160px;
+        box-shadow:0 2px 8px #00000033;
+        z-index:999;
+    }
+    .dropdown-menu a{
+        display:block;
+        color:#333;
+        padding:10px 14px;
+    }
+    .dropdown-menu a:hover{
+        background:#f0f0f0;
+        text-decoration:none;
+    }
+    .avatar-wrap:hover .dropdown-menu{
+        display:block;
+    }
 </style>
+
 <div class="nav-bar">
-    <span class="nav-title">非遗手作共创平台</span>
+    <div style="font-size:20px;font-weight:bold;">非遗手作共创平台</div>
     <a th:href="@{/}">首页</a>
     <a th:href="@{/work/list}">非遗展品</a>
     <a th:href="@{/tutorial/list}">手作教程</a>
-    <a th:href="@{/userWork/share}">用户作品</a>
-    <span class="nav-user" th:if="${session.loginUser == null}">
-        <a th:href="@{/login}">登录</a> · <a th:href="@{/register}">注册</a>
-    </span>
-    <span class="nav-user" th:if="${session.loginUser != null}">
-        <a th:if="${session.loginUser.role == 'CRAFTSMAN' or session.loginUser.role == '1'}" th:href="@{/work/create}">发布展品</a>
-        <a th:if="${session.loginUser.role == 'CRAFTSMAN' or session.loginUser.role == '1'}" th:href="@{/work/mine}">我的展品</a>
-        <a th:href="@{/user/userCenter}">个人中心</a>
-        <a th:href="@{/logout}">退出登录</a>
-    </span>
+
+    <!--头像+下拉菜单-->
+    <div th:fragment="nav" class="avatar-wrap">
+        <!--默认头像，未登录使用默认图；已登录显示用户头像，无头像也使用默认占位图-->
+        <img class="avatar-img"
+             th:src="${session.loginUser != null && session.loginUser.avatar != null ? session.loginUser.avatar : '/images/default_avatar.png'}"
+             alt="头像">
+
+        <div class="dropdown-menu">
+            <!-- ==========未登录下拉========== -->
+            <div th:if="${session.loginUser == null}">
+                <a th:href="@{/login}">登录</a>
+                <a th:href="@{/register}">注册</a>
+            </div>
+
+            <!-- ==========普通用户 role=0 下拉========== -->
+            <div th:if="${session.loginUser != null && session.loginUser.role == '0'}">
+                <a th:href="@{/userWork/publish}">我的作品</a>
+                <a th:href="@{/customOrder/myApply}">我的定制</a>
+                <a th:href="@{/craftsman/apply}">申请成为匠人</a>
+                <a th:href="@{/user/userCenter}">个人中心</a>
+                <a th:href="@{/logout}">退出登录</a>
+            </div>
+
+            <!-- ==========匠人 role=1 下拉========== -->
+            <div th:if="${session.loginUser != null && session.loginUser.role == '1'}">
+                <a th:href="@{/heritageWork/publish}">发布展品</a>
+                <a th:href="@{/tutorial/publish}">发布教程</a>
+                <a th:href="@{/qpply}">我的定制申请</a>
+                <a th:href="@{/user/userCenter}">个人中心</a>
+                <a th:href="@{/logout}">退出登录</a>
+            </div>
+
+            <!-- ==========管理员 role=2 下拉========== -->
+            <div th:if="${session.loginUser != null && session.loginUser.role == '2'}">
+                <a th:href="@{/audit/list}">内容审核</a>
+                <a th:href="@{/admin/stat}">数据概览</a>
+                <a th:href="@{/user/userCenter}">个人中心</a>
+                <a th:href="@{/logout}">退出登录</a>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

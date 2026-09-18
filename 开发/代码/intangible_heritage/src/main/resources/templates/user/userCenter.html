@@ -20,7 +20,12 @@
         <hr>
         <p>用户名：<span th:text="${user?.username}"></span></p>
         <p>昵称：<span th:text="${user?.nickname}"></span></p>
-        <p>身份：<span th:text="${user?.role}"></span></p>
+        <p>身份：
+            <span th:switch="${user?.role}">
+                <span th:case="'0'">普通爱好者</span>
+                <span th:case="'1'">手作匠人</span>
+                <span th:case="'2'">平台管理员</span>
+            </span>
 
         <div th:if="${user != null and (user.role == 'CRAFTSMAN' or user.role == '1')}">
             <h3>我的非遗展品</h3>
@@ -37,6 +42,9 @@
 
         <h3>其他功能</h3>
         <ul>
+            <li th:if="${session.loginUser?.role == '2' or session.loginUser?.role == 'ADMIN'}">
+                <a th:href="@{/admin/craftsmanApply/list}" style="font-weight: bold; color: #c0392b;">匠人申请管理</a>
+            </li>
             <li><a th:href="@{/custom/myApply}">我的定制申请</a></li>
             <li><a th:href="@{/userWork/myPublish}">我发布的手作作品</a></li>
             <li><a th:href="@{/tutorial/myCollect}">我收藏的教程</a></li>
