@@ -1,3 +1,0 @@
-1、先用数据库中表.sql语句创=创建库和表
-2、拉取代码，用Intellij IDEA打开，JDK17
-3、修改intangible_heritage\src\main\resources\application.properties中的数据库MySQL的用户名和密码
