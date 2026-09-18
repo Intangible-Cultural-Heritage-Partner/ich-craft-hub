@@ -1,7 +1,10 @@
 package com.zjxy.intangible_heritage.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Table(name = "user")
 public class User {
