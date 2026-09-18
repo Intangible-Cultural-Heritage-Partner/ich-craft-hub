@@ -1,43 +1,52 @@
 package com.zjxy.intangible_heritage.controller;
 
+import com.zjxy.intangible_heritage.entity.User;
+import com.zjxy.intangible_heritage.service.HeritageWorkService;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@RequiredArgsConstructor
 public class IndexController {
 
+    private final HeritageWorkService heritageWorkService;
+
     @GetMapping("/")
-    public String index(){
+    public String index() {
         return "index";
     }
 
-    //非遗展品列表页
-    @GetMapping("/work/list")
-    public String workList(){
-        return "work/list";
-    }
-
-    //手作教程列表页
     @GetMapping("/tutorial/list")
-    public String tutorialList(){
+    public String tutorialList() {
         return "tutorial/list";
     }
 
-    //定制对接页面
     @GetMapping("/custom/apply")
-    public String customApply(){
+    public String customApply() {
         return "apply";
     }
 
-    //用户作品分享页
     @GetMapping("/userWork/share")
-    public String userWorkShare(){
+    public String userWorkShare() {
         return "share";
     }
 
-    //用户中心
     @GetMapping("/user/userCenter")
-    public String userUserCenter(){
+    public String userUserCenter(HttpSession session, Model model) {
+        Object value = session.getAttribute("loginUser");
+        if (value instanceof User user) {
+            model.addAttribute("user", user);
+            if (user.getId() != null && isCraftsman(user)) {
+                model.addAttribute("myWorks", heritageWorkService.findByCraftsman(user.getId()));
+            }
+        }
         return "user/userCenter";
+    }
+
+    private boolean isCraftsman(User user) {
+        return "CRAFTSMAN".equalsIgnoreCase(user.getRole()) || "1".equals(user.getRole());
     }
 }

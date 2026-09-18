@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF‑8">
+    <meta charset="UTF-8">
     <title>个人中心</title>
     <style>
-        body{margin:0;font‑family:Microsoft Yahei;background:#f8f5f0;}
-        .wrap{padding:30px 50px;}
-        .box{background:#fff;padding:25px;border‑radius:8px;max‑width:600px;}
+        body { margin: 0; font-family: "Microsoft Yahei", sans-serif; background: #f8f5f0; color: #333; }
+        .wrap { padding: 30px 6%; }
+        .box { background: #fff; padding: 25px; border-radius: 8px; max-width: 900px; }
+        a { color: #784b2a; }
+        .works { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
+        .work { padding: 14px; background: #f8f5f0; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -14,35 +17,31 @@
 <div class="wrap">
     <div class="box">
         <h2>个人中心</h2>
-        <hr/>
-        <div>
-            <p>用户名：<span th:text="${user?.username}"></span></p>
-            <p>昵称：<span th:text="${user?.nickname}"></span></p>
-            <p>身份角色：
-                <span th:switch="${user?.role}">
-                    <span th:case="'0'">普通爱好者</span>
-                    <span th:case="'1'">手作匠人</span>
-                    <span th:case="'2'">平台管理员</span>
-                    <span th:case="'USER'">普通爱好者</span>
-                    <span th:case="'CRAFTSMAN'">手作匠人</span>
-                    <span th:case="'ADMIN'">平台管理员</span>
-                </span>
-            </p>
+        <hr>
+        <p>用户名：<span th:text="${user?.username}"></span></p>
+        <p>昵称：<span th:text="${user?.nickname}"></span></p>
+        <p>身份：<span th:text="${user?.role}"></span></p>
+
+        <div th:if="${user != null and (user.role == 'CRAFTSMAN' or user.role == '1')}">
+            <h3>我的非遗展品</h3>
+            <p><a th:href="@{/work/create}">发布新的非遗展品</a> · <a th:href="@{/work/mine}">查看全部</a></p>
+            <div class="works" th:if="${myWorks != null and !myWorks.isEmpty()}">
+                <div class="work" th:each="work : ${myWorks}">
+                    <strong th:text="${work.title}">展品标题</strong>
+                    <p th:text="${work.description != null ? work.description : '暂无作品介绍'}">作品介绍</p>
+                    <a th:href="@{/work/{id}(id=${work.id})}">查看详情</a>
+                </div>
+            </div>
+            <p th:unless="${myWorks != null and !myWorks.isEmpty()}">你还没有发布非遗展品。</p>
         </div>
-        <div style="margin‑top:25px;">
-            <h4>我的功能入口</h4>
-            <ul>
-                <li th:if="${session.loginUser?.role == '2' or session.loginUser?.role == 'ADMIN'}">
-                    <a th:href="@{/admin/craftsmanApply/list}" style="font-weight: bold; color: #c0392b;">匠人申请管理</a>
-                </li>
-                <li><a th:href="@{/custom/myApply}">我的定制申请</a></li>
-                <li><a th:href="@{/userWork/myPublish}">我发布的手作作品</a></li>
-                <li><a th:href="@{/tutorial/myCollect}">我收藏的教程</a></li>
-            </ul>
-        </div>
-        <div style="margin‑top:20px;">
-            <a th:href="@{/logout}">退出登录</a>
-        </div>
+
+        <h3>其他功能</h3>
+        <ul>
+            <li><a th:href="@{/custom/myApply}">我的定制申请</a></li>
+            <li><a th:href="@{/userWork/myPublish}">我发布的手作作品</a></li>
+            <li><a th:href="@{/tutorial/myCollect}">我收藏的教程</a></li>
+        </ul>
+        <a th:href="@{/logout}">退出登录</a>
     </div>
 </div>
 </body>

@@ -1,0 +1,13 @@
+com\zjxy\intangible_heritage\repository\HeritageWorkRepository.class
+com\zjxy\intangible_heritage\entity\HeritageWork.class
+com\zjxy\intangible_heritage\controller\HeritageWorkController.class
+com\zjxy\intangible_heritage\service\UserServiceImpl.class
+com\zjxy\intangible_heritage\entity\User.class
+com\zjxy\intangible_heritage\service\HeritageWorkService.class
+com\zjxy\intangible_heritage\config\WebConfig.class
+com\zjxy\intangible_heritage\repository\UserRepository.class
+com\zjxy\intangible_heritage\service\HeritageWorkServiceImpl.class
+com\zjxy\intangible_heritage\controller\IndexController.class
+com\zjxy\intangible_heritage\controller\UserController.class
+com\zjxy\intangible_heritage\IntangibleHeritageApplication.class
+com\zjxy\intangible_heritage\service\UserService.class

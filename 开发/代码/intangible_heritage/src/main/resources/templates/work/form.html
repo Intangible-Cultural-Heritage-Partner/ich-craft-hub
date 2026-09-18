@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>展品发布</title>
+    <style>
+        body { margin: 0; font-family: "Microsoft Yahei", sans-serif; background: #f8f5f0; color: #333; }
+        .wrap { max-width: 760px; margin: 32px auto; padding: 0 20px; }
+        .panel { background: #fff; padding: 28px; border-radius: 8px; }
+        label { display: block; margin-top: 16px; color: #784b2a; }
+        input, textarea { width: 100%; box-sizing: border-box; margin-top: 6px; padding: 10px; border: 1px solid #d8cbbd; border-radius: 4px; }
+        textarea { min-height: 120px; resize: vertical; }
+        button, a { display: inline-block; margin-top: 20px; padding: 10px 16px; border: 0; border-radius: 4px; text-decoration: none; }
+        button { color: #fff; background: #784b2a; cursor: pointer; }
+        a { color: #784b2a; }
+        .message { color: #b42318; }
+        .hint { color: #777; font-size: 13px; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<main class="wrap">
+    <section class="panel">
+        <h1 th:text="${work.id == null ? '发布非遗展品' : '编辑非遗展品'}">发布非遗展品</h1>
+        <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
+        <form th:action="${formAction}" method="post" enctype="multipart/form-data">
+            <label>展品标题
+                <input type="text" name="title" required maxlength="100" th:value="${work.title}">
+            </label>
+            <label>封面图片文件
+                <input type="file" name="coverFile" accept="image/*">
+            </label>
+            <label>封面图片 URL
+                <input type="url" name="coverUrl" placeholder="未上传文件时使用此地址">
+            </label>
+            <label>展品图片文件
+                <input type="file" name="imageFiles" accept="image/*" multiple>
+            </label>
+            <label>展品图片 URL
+                <textarea name="imageUrls" placeholder="多个地址使用逗号或换行分隔"></textarea>
+            </label>
+            <p class="hint">同时填写文件和 URL 时，上传文件优先保存。</p>
+            <label>作品介绍
+                <textarea name="description" th:text="${work.description}"></textarea>
+            </label>
+            <label>技艺背景
+                <textarea name="skillBackground" th:text="${work.skillBackground}"></textarea>
+            </label>
+            <button type="submit">保存展品</button>
+            <a th:href="@{/work/list}">取消</a>
+        </form>
+    </section>
+</main>
+</body>
+</html>
