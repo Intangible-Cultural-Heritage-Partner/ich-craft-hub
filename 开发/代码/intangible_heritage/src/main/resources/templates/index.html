@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>非遗手作数字展示与共创平台</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft Yahei", sans‑serif;
+            background-color: #f8f5f0;
+        }
+        .main-container {
+            padding: 40px 60px;
+        }
+        h1 {
+            color:#784b2a;
+        }
+        .func-card{
+            background:#fff;
+            width:220px;
+            padding:20px;
+            margin:10px;
+            border‑radius:8px;
+            display:inline‑block;
+            box‑shadow: 0 1px 4px #ccc;
+        }
+    </style>
+</head>
+<body>
+<!--公共导航栏-->
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="main-container">
+    <h1>欢迎来到非遗手作数字展示与共创平台</h1>
+    <p style="font‑size:17px;color:#555;">非遗作品展示 · 手作教程 · 定制对接 · 用户作品分享共创</p>
+
+    <div style="margin‑top:40px;">
+        <div class="func-card">
+            <h3>非遗作品展示</h3>
+            <p>浏览匠人非遗手作，查看技艺背景介绍</p>
+            <a th:href="@{/work/list}">前往浏览</a>
+        </div>
+        <div class="func-card">
+            <h3>手作教程</h3>
+            <p>学习手工技艺，收藏感兴趣教程</p>
+            <a th:href="@{/tutorial/list}">前往学习</a>
+        </div>
+        <div class="func-card">
+            <h3>手作定制对接</h3>
+            <p>向匠人发起定制，线上沟通需求</p>
+            <a th:href="@{/custom/apply}">发起定制</a>
+        </div>
+        <div class="func-card">
+            <h3>用户作品分享</h3>
+            <p>分享练习作品，点赞评论交流</p>
+            <a th:href="@{/userWork/share}">查看分享</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

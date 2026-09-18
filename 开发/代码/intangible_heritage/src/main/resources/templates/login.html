@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft Yahei", sans‑serif;
+            background-color: #f8f5f0;
+        }
+        .main-container {
+            padding: 40px 60px;
+        }
+        h1 {
+            color:#784b2a;
+        }
+        .func-card{
+            background:#fff;
+            width:220px;
+            padding:20px;
+            margin:10px;
+            border‑radius:8px;
+            display:inline‑block;
+            box‑shadow: 0 1px 4px #ccc;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div style="padding:30px;max-width:400px;">
+    <h2>用户登录</h2>
+    <p th:text="${msg}" style="color:red"></p>
+    <form th:action="@{/login}" method="post">
+        <div>账号：<input type="text" name="username" required></div>
+        <div style="margin:10px 0">密码：<input type="password" name="password" required></div>
+        <button type="submit">登录</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>内容审核 - 管理员</title>
+    <style>
+        body { margin: 0; font-family: "Microsoft YaHei", sans-serif; background: #f4f6f9; }
+        .wrap { padding: 30px 50px; }
+        .box { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        h2 { margin-top: 0; color: #333; }
+
+        /* 选项卡样式 */
+        .tabs { display: flex; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px; }
+        .tab-btn { padding: 12px 24px; cursor: pointer; font-size: 16px; border: none; background: none; color: #666; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tab-btn.active { color: #2c3e50; border-bottom: 2px solid #2c3e50; }
+
+        /* 表格样式 */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border-bottom: 1px solid #e0e0e0; padding: 12px; text-align: left; }
+        th { background: #f8f9fa; font-weight: bold; color: #555; }
+        tr:hover { background: #f1f5f9; }
+        .avatar-sm { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
+        .btn-view { padding: 6px 12px; background: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-view:hover { background: #2980b9; }
+        .status-0 { color: #e67e22; font-weight: bold; }
+        .status-1 { color: #27ae60; font-weight: bold; }
+        .status-2 { color: #c0392b; font-weight: bold; }
+
+        /* 弹窗样式 */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: #fff; margin: 5% auto; padding: 25px; border-radius: 8px; width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }
+        .close { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; color: #888; }
+        .info-row { margin-bottom: 12px; line-height: 1.6; }
+        .info-row strong { display: inline-block; width: 100px; color: #555; }
+        .audit-area { margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px; }
+        .audit-area textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; height: 60px; }
+        .btn-pass { padding: 10px 20px; background: #27ae60; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        .btn-reject { padding: 10px 20px; background: #c0392b; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <div class="box">
+        <h2>内容审核中心</h2>
+        <p style="color:#888;">在此审核平台上的各类上传内容。驳回时请务必填写理由。</p>
+
+        <!-- 选项卡按钮 -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'tab-heritage')">非遗展品</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-tutorial')">手作教程</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-userwork')">用户分享作品</button>
+        </div>
+
+        <!-- Tab 1: 非遗展品 -->
+        <div id="tab-heritage" class="tab-content active">
+            <table>
+                <thead><tr><th>ID</th><th>封面</th><th>标题</th><th>提交时间</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(heritageList)}"><td colspan="6" style="text-align:center;color:#999;">暂无数据</td></tr>
+                <tr th:each="item : ${heritageList}">
+                    <td th:text="${item.id}"></td>
+                    <td><img class="avatar-sm" th:src="${item.coverImg != null && !item.coverImg.isEmpty()} ? @{${item.coverImg}} : @{/images/default_avatar.png}"></td>
+                    <td th:text="${item.title}"></td>
+                    <td th:text="${#temporals.format(item.createTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td>
+                        <span th:if="${item.auditStatus == 0}" class="status-0">待审核</span>
+                        <span th:if="${item.auditStatus == 1}" class="status-1">已通过</span>
+                        <span th:if="${item.auditStatus == 2}" class="status-2">已驳回</span>
+                    </td>
+                    <td><button class="btn-view" th:attr="data-id=${item.id},data-type=1,data-title=${item.title},data-desc=${item.description},data-img=${item.coverImg},data-status=${item.auditStatus},data-remark=${item.auditRemark}" onclick="openModal(this)">查看/审核</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab 2: 手作教程 -->
+        <div id="tab-tutorial" class="tab-content">
+            <table>
+                <thead><tr><th>ID</th><th>封面</th><th>标题</th><th>提交时间</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(tutorialList)}"><td colspan="6" style="text-align:center;color:#999;">暂无数据</td></tr>
+                <tr th:each="item : ${tutorialList}">
+                    <td th:text="${item.id}"></td>
+                    <td><img class="avatar-sm" th:src="${item.coverImg != null && !item.coverImg.isEmpty()} ? @{${item.coverImg}} : @{/images/default_avatar.png}"></td>
+                    <td th:text="${item.title}"></td>
+                    <td th:text="${#temporals.format(item.createTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td>
+                        <span th:if="${item.auditStatus == 0}" class="status-0">待审核</span>
+                        <span th:if="${item.auditStatus == 1}" class="status-1">已通过</span>
+                        <span th:if="${item.auditStatus == 2}" class="status-2">已驳回</span>
+                    </td>
+                    <td><button class="btn-view" th:attr="data-id=${item.id},data-type=2,data-title=${item.title},data-desc=${item.content},data-img=${item.coverImg},data-status=${item.auditStatus},data-remark=${item.auditRemark}" onclick="openModal(this)">查看/审核</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab 3: 用户分享作品 -->
+        <div id="tab-userwork" class="tab-content">
+            <table>
+                <thead><tr><th>ID</th><th>封面</th><th>标题</th><th>提交时间</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(userWorkList)}"><td colspan="6" style="text-align:center;color:#999;">暂无数据</td></tr>
+                <tr th:each="item : ${userWorkList}">
+                    <td th:text="${item.id}"></td>
+                    <td><img class="avatar-sm" th:src="${item.coverImg != null && !item.coverImg.isEmpty()} ? @{${item.coverImg}} : @{/images/default_avatar.png}"></td>
+                    <td th:text="${item.title}"></td>
+                    <td th:text="${#temporals.format(item.createTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td>
+                        <span th:if="${item.auditStatus == 0}" class="status-0">待审核</span>
+                        <span th:if="${item.auditStatus == 1}" class="status-1">已通过</span>
+                        <span th:if="${item.auditStatus == 2}" class="status-2">已驳回</span>
+                    </td>
+                    <td><button class="btn-view" th:attr="data-id=${item.id},data-type=3,data-title=${item.title},data-desc=${item.description},data-img=${item.coverImg},data-status=${item.auditStatus},data-remark=${item.auditRemark}" onclick="openModal(this)">查看/审核</button></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 弹窗结构 -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>内容详情</h3>
+        <hr/>
+        <div class="info-row"><strong>标题：</strong><span id="m-title"></span></div>
+        <div class="info-row"><strong>描述/正文：</strong><p id="m-desc" style="margin: 5px 0 0 100px; white-space: pre-wrap;"></p></div>
+        <div class="info-row"><strong>封面图：</strong><div id="m-img-container" style="margin-left:100px; margin-top:5px;"></div></div>
+        <div class="info-row" id="m-remark-row" style="display:none;"><strong>驳回理由：</strong><span id="m-remark" style="color: #c0392b;"></span></div>
+
+        <div class="audit-area" id="auditArea">
+            <form id="auditForm" th:action="@{/audit/doAudit}" method="post">
+                <input type="hidden" name="id" id="m-id">
+                <input type="hidden" name="type" id="m-type">
+                <div class="info-row">
+                    <strong>审核备注：</strong>
+                    <textarea name="auditRemark" id="m-auditRemark" placeholder="驳回时必填驳回理由，通过时可不填..."></textarea>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button type="submit" name="status" value="1" class="btn-pass" onclick="return confirm('确定通过该内容吗？')">审核通过</button>
+                    <button type="submit" name="status" value="2" class="btn-reject" onclick="return confirm('确定驳回该内容吗？')">驳回内容</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 选项卡切换逻辑
+    function switchTab(evt, tabId) {
+        let i, tabContent, tabBtn;
+        tabContent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabContent.length; i++) tabContent[i].style.display = "none";
+        tabBtn = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tabBtn.length; i++) tabBtn[i].className = tabBtn[i].className.replace(" active", "");
+        document.getElementById(tabId).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+    // 弹窗逻辑
+    function openModal(btn) {
+        let id = btn.getAttribute('data-id');
+        let type = btn.getAttribute('data-type'); // 1展品 2教程 3用户作品
+        let title = btn.getAttribute('data-title');
+        let desc = btn.getAttribute('data-desc');
+        let img = btn.getAttribute('data-img');
+        let remark = btn.getAttribute('data-remark');
+        let status = btn.getAttribute('data-status');
+
+        document.getElementById('m-id').value = id;
+        document.getElementById('m-type').value = type;
+        document.getElementById('m-title').innerText = title;
+        document.getElementById('m-desc').innerText = desc || '无描述';
+
+        // 图片渲染
+        let imgContainer = document.getElementById('m-img-container');
+        imgContainer.innerHTML = '';
+        if (img && img.trim() !== '') {
+            let imgEl = document.createElement('img');
+            imgEl.src = img;
+            imgEl.style.width = '150px'; imgEl.style.height = '150px';
+            imgEl.style.objectFit = 'cover'; imgEl.style.borderRadius = '4px';
+            imgContainer.appendChild(imgEl);
+        } else {
+            imgContainer.innerHTML = '<span style="color:#999;">无封面图</span>';
+        }
+
+        // 审核状态控制
+        let auditArea = document.getElementById('auditArea');
+        let remarkRow = document.getElementById('m-remark-row');
+        if (status == '0') {
+            auditArea.style.display = 'block';
+            remarkRow.style.display = 'none';
+        } else {
+            auditArea.style.display = 'none';
+            if (status == '2') {
+                remarkRow.style.display = 'block';
+                document.getElementById('m-remark').innerText = remark || '无';
+            } else {
+                remarkRow.style.display = 'none';
+            }
+        }
+        document.getElementById('myModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('myModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        let modal = document.getElementById('myModal');
+        if (event.target == modal) modal.style.display = 'none';
+    }
+</script>
+</body>
+</html>
