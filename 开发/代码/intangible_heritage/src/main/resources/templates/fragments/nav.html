@@ -80,25 +80,25 @@
                 <a th:href="@{/register}">注册</a>
             </div>
 
-            <!-- ==========普通用户 role=0 下拉========== -->
-            <div th:if="${session.loginUser != null && session.loginUser.role == '0'}">
+            <!-- ==========普通用户 USER 下拉========== -->
+            <div th:if="${session.loginUser != null && session.loginUser.role == 'USER'}">
                 <a th:href="@{/userWork/publish}">我的作品</a>
-                <a th:href="@{/customOrder/myApply}">我的定制</a>
+                <a th:href="@{/custom/myApply}">我的定制</a>
                 <a th:href="@{/user/userCenter}">个人中心</a>
                 <a th:href="@{/logout}">退出登录</a>
             </div>
 
-            <!-- ==========匠人 role=1 下拉========== -->
-            <div th:if="${session.loginUser != null && session.loginUser.role == '1'}">
+            <!-- ==========匠人 CRAFTSMAN 下拉========== -->
+            <div th:if="${session.loginUser != null && session.loginUser.role == 'CRAFTSMAN'}">
                 <a th:href="@{/heritageWork/publish}">发布展品</a>
                 <a th:href="@{/tutorial/publish}">发布教程</a>
-                <a th:href="@{/qpply}">我的定制申请</a>
+                <a th:href="@{/custom/myCraft}">发给我的定制</a>
                 <a th:href="@{/user/userCenter}">个人中心</a>
                 <a th:href="@{/logout}">退出登录</a>
             </div>
 
-            <!-- ==========管理员 role=2 下拉========== -->
-            <div th:if="${session.loginUser != null && session.loginUser.role == '2'}">
+            <!-- ==========管理员 ADMIN 下拉========== -->
+            <div th:if="${session.loginUser != null && session.loginUser.role == 'ADMIN'}">
                 <a th:href="@{/audit/list}">内容审核</a>
                 <a th:href="@{/admin/stat}">数据概览</a>
                 <a th:href="@{/user/userCenter}">个人中心</a>
