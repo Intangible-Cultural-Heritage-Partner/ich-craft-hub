@@ -4,40 +4,40 @@
     <meta charset="UTF-8">
     <title>内容审核 - 管理员</title>
     <style>
-        body { margin: 0; font-family: "Microsoft YaHei", sans-serif; background: #f4f6f9; }
-        .wrap { padding: 30px 50px; }
-        .box { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        h2 { margin-top: 0; color: #333; }
-
-        /* 选项卡样式 */
-        .tabs { display: flex; border-bottom: 2px solid #e0e0e0; margin-bottom: 20px; }
-        .tab-btn { padding: 12px 24px; cursor: pointer; font-size: 16px; border: none; background: none; color: #666; font-weight: bold; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-        .tab-btn.active { color: #2c3e50; border-bottom: 2px solid #2c3e50; }
-
-        /* 表格样式 */
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f8f5f0; }
+        .wrap { padding: 36px 5%; }
+        .box { background: #fff; padding: 28px; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border: 1px solid #f0e6d8; }
+        h2 { margin: 0 0 6px; color: #784b2a; font-size: 24px; }
+        .box > p { color: #888; margin: 0 0 24px; }
+        .tabs { display: flex; border-bottom: 2px solid #f0e6d8; margin-bottom: 20px; gap: 4px; }
+        .tab-btn { padding: 12px 24px; cursor: pointer; font-size: 15px; border: none; background: none; color: #888; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -2px; border-radius: 6px 6px 0 0; transition: all 0.2s; }
+        .tab-btn.active { color: #784b2a; border-bottom: 2px solid #784b2a; background: #faf7f2; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { border-bottom: 1px solid #e0e0e0; padding: 12px; text-align: left; }
-        th { background: #f8f9fa; font-weight: bold; color: #555; }
-        tr:hover { background: #f1f5f9; }
-        .avatar-sm { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
-        .btn-view { padding: 6px 12px; background: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
-        .btn-view:hover { background: #2980b9; }
-        .status-0 { color: #e67e22; font-weight: bold; }
-        .status-1 { color: #27ae60; font-weight: bold; }
-        .status-2 { color: #c0392b; font-weight: bold; }
-
-        /* 弹窗样式 */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: #fff; margin: 5% auto; padding: 25px; border-radius: 8px; width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }
-        .close { position: absolute; right: 20px; top: 15px; font-size: 24px; cursor: pointer; color: #888; }
-        .info-row { margin-bottom: 12px; line-height: 1.6; }
-        .info-row strong { display: inline-block; width: 100px; color: #555; }
-        .audit-area { margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px; }
-        .audit-area textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; height: 60px; }
-        .btn-pass { padding: 10px 20px; background: #27ae60; color: #fff; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
-        .btn-reject { padding: 10px 20px; background: #c0392b; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+        th, td { border-bottom: 1px solid #f0e6d8; padding: 14px 12px; text-align: left; font-size: 14px; }
+        th { background: #faf7f2; font-weight: 600; color: #784b2a; }
+        tr:hover { background: #faf7f2; }
+        .avatar-sm { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
+        .btn-view { padding: 7px 16px; background: #784b2a; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; transition: background 0.2s; }
+        .btn-view:hover { background: #5e3a20; }
+        .status-0 { color: #e67e22; font-weight: 600; }
+        .status-1 { color: #27ae60; font-weight: 600; }
+        .status-2 { color: #c0392b; font-weight: 600; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
+        .modal-content { background: #fff; margin: 5% auto; padding: 30px; border-radius: 16px; width: 620px; max-width: 90%; max-height: 82vh; overflow-y: auto; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .close { position: absolute; right: 20px; top: 16px; font-size: 26px; cursor: pointer; color: #aaa; transition: color 0.2s; }
+        .close:hover { color: #333; }
+        .info-row { margin-bottom: 14px; line-height: 1.7; }
+        .info-row strong { display: inline-block; width: 100px; color: #784b2a; }
+        .audit-area { margin-top: 24px; border-top: 1px dashed #d8cbbd; padding-top: 18px; }
+        .audit-area textarea { width: 100%; padding: 11px 14px; border: 1px solid #d8cbbd; border-radius: 8px; resize: vertical; height: 70px; font-size: 14px; outline: none; }
+        .audit-area textarea:focus { border-color: #784b2a; box-shadow: 0 0 0 3px rgba(120,75,42,0.1); }
+        .btn-pass { padding: 11px 24px; background: #27ae60; color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-right: 10px; font-size: 14px; transition: all 0.2s; }
+        .btn-pass:hover { background: #219a52; transform: translateY(-1px); }
+        .btn-reject { padding: 11px 24px; background: #c0392b; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .btn-reject:hover { background: #a93226; transform: translateY(-1px); }
     </style>
 </head>
 <body>

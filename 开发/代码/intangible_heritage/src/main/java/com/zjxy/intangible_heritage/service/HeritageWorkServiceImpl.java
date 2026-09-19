@@ -31,7 +31,7 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
 
     @Override
     public List<HeritageWork> findAll() {
-        return heritageWorkRepository.findAllByOrderByCreateTimeDesc();
+        return heritageWorkRepository.findByAuditStatusOrderByCreateTimeDesc(1);
     }
 
     @Override
@@ -85,7 +85,8 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
     }
 
     private void requireCraftsman(User user) {
-        if (user == null || !"CRAFTSMAN".equalsIgnoreCase(user.getRole())) {
+        String role = user.getRole();
+        if (user == null || (!"CRAFTSMAN".equalsIgnoreCase(role) && !"1".equals(role))) {
             throw new IllegalStateException("只有匠人可以管理非遗展品");
         }
     }

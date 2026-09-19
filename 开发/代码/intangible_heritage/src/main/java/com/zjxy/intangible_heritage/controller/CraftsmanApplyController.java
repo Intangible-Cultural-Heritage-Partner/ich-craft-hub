@@ -3,6 +3,7 @@ package com.zjxy.intangible_heritage.controller;
 import com.zjxy.intangible_heritage.entity.CraftsmanApply;
 import com.zjxy.intangible_heritage.entity.User;
 import com.zjxy.intangible_heritage.repository.CraftsmanApplyRepository;
+import com.zjxy.intangible_heritage.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,9 @@ public class CraftsmanApplyController {
 
     @Autowired
     private CraftsmanApplyRepository craftsmanApplyRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * 跳转到申请页面
@@ -51,16 +55,23 @@ public class CraftsmanApplyController {
             return "redirect:/login";
         }
 
+        // 从数据库重新查询用户，确保 id 正确
+        User dbUser = userRepository.findById(loginUser.getId()).orElse(null);
+        if (dbUser == null || dbUser.getId() == null) {
+            model.addAttribute("msg", "用户信息异常，请重新登录");
+            return "craftsman/apply";
+        }
+
         // 防止重复提交
-        if (craftsmanApplyRepository.existsByUserIdAndAuditStatus(loginUser.getId(), 0)) {
+        if (craftsmanApplyRepository.existsByUserIdAndAuditStatus(dbUser.getId(), 0)) {
             model.addAttribute("msg", "您已有待审核的申请，请耐心等待！");
             return "craftsman/apply";
         }
 
         // ====== 处理图片上传 ======
         List<String> imageUrls = new ArrayList<>();
-        // 上传目录：项目根目录下的 src/main/resources/static/uploads/craftsman/
-        String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/craftsman/";
+        // 上传目录：项目根目录下的 uploads/craftsman/（与 WebConfig 的 /uploads/** 映射一致）
+        String uploadDir = System.getProperty("user.dir") + "/uploads/craftsman/";
         File dir = new File(uploadDir);
         if (!dir.exists()) {
             dir.mkdirs(); // 创建目录
@@ -96,7 +107,7 @@ public class CraftsmanApplyController {
         }
 
         // 设置申请人信息与初始状态
-        apply.setUserId(loginUser.getId());
+        apply.setUserId(dbUser.getId());
         apply.setAuditStatus(0); // 待审核
 
         craftsmanApplyRepository.save(apply);

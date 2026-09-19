@@ -3,12 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>定制对接</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
+        .wrap { padding: 40px 6%; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { margin: 0 0 6px; color: #784b2a; font-size: 26px; }
+        .page-header p { margin: 0; color: #888; font-size: 14px; }
+        .empty-card {
+            background: #fff; padding: 60px 24px; border-radius: 16px;
+            text-align: center; color: #999;
+            border: 1px dashed #d8cbbd;
+        }
+        .empty-card .icon { font-size: 48px; margin-bottom: 12px; }
+    </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
-<div style="padding:30px">
-    <h2>手作定制申请页面</h2>
-    <p>发起定制、双向消息沟通</p>
+<div class="wrap">
+    <div class="page-header">
+        <h1>手作定制对接</h1>
+        <p>向心仪的匠人发起定制需求，线上沟通细节</p>
+    </div>
+    <div class="empty-card">
+        <div class="icon">✋</div>
+        <p>定制功能开发中，敬请期待</p>
+    </div>
 </div>
 </body>
 </html>

@@ -4,53 +4,357 @@
     <meta charset="UTF-8">
     <title>个人中心</title>
     <style>
+        * { box-sizing: border-box; }
         body { margin: 0; font-family: "Microsoft Yahei", sans-serif; background: #f8f5f0; color: #333; }
-        .wrap { padding: 30px 6%; }
-        .box { background: #fff; padding: 25px; border-radius: 8px; max-width: 900px; }
-        a { color: #784b2a; }
-        .works { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
-        .work { padding: 14px; background: #f8f5f0; border-radius: 6px; }
+        .container { padding: 30px 6%; }
+        .layout { display: grid; grid-template-columns: 300px 1fr; gap: 24px; max-width: 1100px; margin: 0 auto; }
+
+        /* 左侧个人信息卡片 */
+        .profile-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            height: fit-content;
+        }
+        .avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f0e6d8;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+        }
+        .username { font-size: 22px; font-weight: bold; color: #333; margin: 0 0 8px; }
+        .role-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .role-0 { background: #eaf3ff; color: #2a7ae2; }
+        .role-1 { background: #fff3e0; color: #e67e22; }
+        .role-2 { background: #fde8e8; color: #c0392b; }
+        .info-row {
+            text-align: left;
+            padding: 10px 0;
+            border-top: 1px solid #f0ece5;
+        }
+        .info-label { font-size: 13px; color: #999; margin-bottom: 4px; }
+        .info-value { font-size: 15px; color: #444; word-break: break-all; }
+        .intro-text { font-size: 14px; color: #666; line-height: 1.6; white-space: pre-wrap; }
+
+        /* 右侧内容区 */
+        .content { display: flex; flex-direction: column; gap: 24px; }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .card h3 {
+            margin: 0 0 20px;
+            color: #784b2a;
+            font-size: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0e6d8;
+        }
+
+        /* 展品网格 */
+        .works { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+        .work {
+            padding: 16px;
+            background: #faf7f2;
+            border-radius: 8px;
+            border: 1px solid #f0e6d8;
+            transition: transform 0.2s;
+        }
+        .work:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .work strong { color: #784b2a; display: block; margin-bottom: 8px; }
+        .work p { color: #777; font-size: 13px; margin: 0 0 12px; line-height: 1.5; min-height: 40px; }
+        .work a { color: #784b2a; text-decoration: none; font-size: 14px; }
+        .work a:hover { text-decoration: underline; }
+        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-bottom: 6px; }
+        .status-0 { background: #fff3cd; color: #856404; }
+        .status-1 { background: #d4edda; color: #155724; }
+        .status-2 { background: #f8d7da; color: #721c24; }
+        .empty { color: #999; text-align: center; padding: 24px; }
+
+        /* 功能链接列表 */
+        .func-list { list-style: none; padding: 0; margin: 0; }
+        .func-list li { margin-bottom: 12px; }
+        .func-list a {
+            display: block;
+            padding: 12px 18px;
+            background: #faf7f2;
+            border: 1px solid #f0e6d8;
+            border-radius: 8px;
+            color: #784b2a;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .func-list a:hover { background: #784b2a; color: #fff; border-color: #784b2a; }
+        .func-list .admin a { color: #c0392b; border-color: #fde8e8; background: #fff5f5; }
+        .func-list .admin a:hover { background: #c0392b; color: #fff; border-color: #c0392b; }
+
+        .logout-btn {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 10px 24px;
+            background: #c0392b;
+            color: #fff;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: #a93226; }
+
+        .work-links { margin-bottom: 16px; }
+        .work-links a { color: #784b2a; text-decoration: none; margin-right: 16px; }
+        .work-links a:hover { text-decoration: underline; }
+
+        /* 编辑按钮 */
+        .edit-btn {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 8px 20px;
+            background: #784b2a;
+            color: #fff;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+        .edit-btn:hover { background: #5e3a20; }
+
+        /* 编辑模态框 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            width: 460px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .modal h3 {
+            margin: 0 0 20px;
+            color: #784b2a;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0e6d8;
+        }
+        .modal .field { margin-bottom: 16px; }
+        .modal label { display: block; margin-bottom: 6px; color: #555; font-size: 14px; }
+        .modal input, .modal textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #d8cbbd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .modal input:focus, .modal textarea:focus { border-color: #784b2a; }
+        .modal textarea { min-height: 80px; resize: vertical; }
+        .modal .avatar-preview {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #f0e6d8;
+        }
+        .modal .role-readonly {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+        .modal .btn-group { display: flex; gap: 12px; margin-top: 20px; }
+        .modal .btn-save {
+            flex: 1;
+            padding: 11px;
+            background: #784b2a;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .modal .btn-save:hover { background: #5e3a20; }
+        .modal .btn-cancel {
+            flex: 1;
+            padding: 11px;
+            background: #f0e6d8;
+            color: #784b2a;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .modal .btn-cancel:hover { background: #e0d0b8; }
+        .modal .hint { font-size: 12px; color: #999; margin-top: 4px; }
+        .profile-msg { color: #27ae60; font-size: 14px; margin-bottom: 10px; text-align: center; }
+
+        @media (max-width: 768px) {
+            .layout { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
-<div class="wrap">
-    <div class="box">
-        <h2>个人中心</h2>
-        <hr>
-        <p>用户名：<span th:text="${user?.username}"></span></p>
-        <p>昵称：<span th:text="${user?.nickname}"></span></p>
-        <p>身份：
-            <span th:switch="${user?.role}">
-                <span th:case="'0'">普通爱好者</span>
-                <span th:case="'1'">手作匠人</span>
-                <span th:case="'2'">平台管理员</span>
+<div class="container">
+    <div class="layout">
+        <!-- 左侧：个人信息卡片 -->
+        <aside class="profile-card">
+            <img class="avatar"
+                 th:src="${user != null && user.avatar != null && !user.avatar.isEmpty()} ? ${user.avatar} : '/images/default_avatar.png'"
+                 alt="头像">
+            <h2 class="username" th:text="${user?.username}">用户名</h2>
+            <span class="role-badge" th:classappend="'role-' + ${user?.role}">
+                <span th:switch="${user?.role}">
+                    <span th:case="'0'">普通爱好者</span>
+                    <span th:case="'1'">手作匠人</span>
+                    <span th:case="'2'">平台管理员</span>
+                </span>
             </span>
 
-        <div th:if="${user != null and (user.role == 'CRAFTSMAN' or user.role == '1')}">
-            <h3>我的非遗展品</h3>
-            <p><a th:href="@{/work/create}">发布新的非遗展品</a> · <a th:href="@{/work/mine}">查看全部</a></p>
-            <div class="works" th:if="${myWorks != null and !myWorks.isEmpty()}">
-                <div class="work" th:each="work : ${myWorks}">
-                    <strong th:text="${work.title}">展品标题</strong>
-                    <p th:text="${work.description != null ? work.description : '暂无作品介绍'}">作品介绍</p>
-                    <a th:href="@{/work/{id}(id=${work.id})}">查看详情</a>
-                </div>
+            <div class="info-row">
+                <div class="info-label">手机号</div>
+                <div class="info-value" th:text="${user?.phone}">-</div>
             </div>
-            <p th:unless="${myWorks != null and !myWorks.isEmpty()}">你还没有发布非遗展品。</p>
-        </div>
 
-        <h3>其他功能</h3>
-        <ul>
-            <li th:if="${session.loginUser?.role == '2' or session.loginUser?.role == 'ADMIN'}">
-                <a th:href="@{/admin/craftsmanApply/list}" style="font-weight: bold; color: #c0392b;">匠人申请管理</a>
-            </li>
-            <li><a th:href="@{/custom/myApply}">我的定制申请</a></li>
-            <li><a th:href="@{/userWork/myPublish}">我发布的手作作品</a></li>
-            <li><a th:href="@{/tutorial/myCollect}">我收藏的教程</a></li>
-        </ul>
-        <a th:href="@{/logout}">退出登录</a>
+            <div class="info-row">
+                <div class="info-label">个人介绍</div>
+                <div class="intro-text" th:text="${user?.intro != null && !user.intro.isEmpty()} ? ${user.intro} : '暂无介绍'">暂无介绍</div>
+            </div>
+
+            <p class="profile-msg" th:if="${profileMsg != null}" th:text="${profileMsg}"></p>
+            <button class="edit-btn" onclick="document.getElementById('editModal').classList.add('active')">编辑资料</button>
+        </aside>
+
+        <!-- 右侧：功能区 -->
+        <main class="content">
+            <!-- 我的非遗展品（仅匠人可见） -->
+            <section class="card" th:if="${user != null and (user.role == 'CRAFTSMAN' or user.role == '1')}">
+                <h3>我的非遗展品</h3>
+                <div class="work-links">
+                    <a th:href="@{/work/create}">+ 发布新展品</a>
+                    <a th:href="@{/work/mine}">查看全部</a>
+                </div>
+                <div class="works" th:if="${myWorks != null and !myWorks.isEmpty()}">
+                    <div class="work" th:each="work : ${myWorks}">
+                        <span class="status-badge" th:classappend="'status-' + ${work.auditStatus}">
+                            <span th:switch="${work.auditStatus}">
+                                <span th:case="0">审核中</span>
+                                <span th:case="1">已通过</span>
+                                <span th:case="2">已驳回</span>
+                            </span>
+                        </span>
+                        <strong th:text="${work.title}">展品标题</strong>
+                        <p th:text="${work.description != null && !work.description.isEmpty()} ? ${work.description} : '暂无作品介绍'">作品介绍</p>
+                        <a th:href="@{/work/{id}(id=${work.id})}">查看详情 →</a>
+                    </div>
+                </div>
+                <p class="empty" th:unless="${myWorks != null and !myWorks.isEmpty()}">你还没有发布非遗展品，点击上方链接开始创作吧。</p>
+            </section>
+
+            <!-- 其他功能 -->
+            <section class="card">
+                <h3>快捷功能</h3>
+                <ul class="func-list">
+                    <li th:if="${user != null and (user.role == '2' or user.role == 'ADMIN')}" class="admin">
+                        <a th:href="@{/admin/craftsmanApply/list}">🛠 匠人申请管理</a>
+                    </li>
+                    <li th:if="${user != null and (user.role == '2' or user.role == 'ADMIN')}" class="admin">
+                        <a th:href="@{/audit/list}">📋 内容审核</a>
+                    </li>
+                    <li><a th:href="@{/custom/myApply}">🎨 我的定制申请</a></li>
+                    <li><a th:href="@{/userWork/myPublish}">✋ 我发布的手作作品</a></li>
+                    <li><a th:href="@{/tutorial/myCollect}">📚 我收藏的教程</a></li>
+                </ul>
+                <a class="logout-btn" th:href="@{/logout}">退出登录</a>
+            </section>
+        </main>
     </div>
 </div>
+
+<!-- 编辑资料模态框 -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <h3>编辑个人资料</h3>
+        <form th:action="@{/user/updateProfile}" method="post" enctype="multipart/form-data">
+            <div class="field" style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+                <div style="position:relative;cursor:pointer;" onclick="document.getElementById('avatarInput').click()">
+                    <img id="avatarPreview" class="avatar-preview"
+                         th:src="${user != null && user.avatar != null && !user.avatar.isEmpty()} ? ${user.avatar} : '/images/default_avatar.png'"
+                         alt="点击更换头像">
+                    <div style="position:absolute;bottom:0;left:0;width:100%;background:rgba(0,0,0,0.5);color:#fff;font-size:13px;text-align:center;padding:6px 0;border-radius:0 0 50% 50%;">更换</div>
+                </div>
+                <span class="role-readonly" th:classappend="'role-' + ${user?.role}">
+                    <span th:switch="${user?.role}">
+                        <span th:case="'0'">普通爱好者</span>
+                        <span th:case="'1'">手作匠人</span>
+                        <span th:case="'2'">平台管理员</span>
+                    </span>
+                </span>
+                <input type="file" id="avatarInput" name="avatarFile" accept="image/*" style="display:none;" onchange="previewAvatar(this)">
+            </div>
+            <div class="field">
+                <label>用户名</label>
+                <input type="text" name="username" required th:value="${user?.username}">
+            </div>
+            <div class="field">
+                <label>手机号</label>
+                <input type="tel" name="phone" required pattern="\d{11}" maxlength="11" th:value="${user?.phone}">
+            </div>
+            <div class="field">
+                <label>新密码</label>
+                <input type="password" name="password" placeholder="不修改请留空">
+                <div class="hint">留空则不修改密码</div>
+            </div>
+            <div class="field">
+                <label>个人介绍</label>
+                <textarea name="intro" maxlength="500" th:text="${user?.intro}"></textarea>
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn-save">保存修改</button>
+                <button type="button" class="btn-cancel" onclick="document.getElementById('editModal').classList.remove('active')">取消</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // 点击遮罩关闭模态框
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+    });
+    // 选择头像后实时预览
+    function previewAvatar(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('avatarPreview').src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 </body>
 </html>

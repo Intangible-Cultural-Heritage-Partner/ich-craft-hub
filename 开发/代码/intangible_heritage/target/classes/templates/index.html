@@ -4,25 +4,110 @@
     <meta charset="UTF-8">
     <title>非遗手作数字展示与共创平台</title>
     <style>
+        * { box-sizing: border-box; }
         body {
             margin: 0;
-            font-family: "Microsoft Yahei", sans‑serif;
-            background-color: #f8f5f0;
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+            background: #f8f5f0;
+            color: #333;
+        }
+        .hero {
+            background: linear-gradient(135deg, #a0673f 0%, #b87a4a 50%, #c89060 100%);
+            color: #fff;
+            padding: 64px 8% 72px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            right: -80px;
+            top: -80px;
+            width: 320px;
+            height: 320px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            left: 10%;
+            bottom: -120px;
+            width: 260px;
+            height: 260px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+        .hero h1 {
+            margin: 0 0 14px;
+            font-size: 34px;
+            letter-spacing: 3px;
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        .hero p {
+            margin: 0;
+            font-size: 16px;
+            color: #f5ebe0;
+            letter-spacing: 1px;
         }
         .main-container {
-            padding: 40px 60px;
+            padding: 50px 8%;
         }
-        h1 {
-            color:#784b2a;
+        .section-title {
+            font-size: 22px;
+            color: #784b2a;
+            margin: 0 0 8px;
+            font-weight: bold;
         }
-        .func-card{
-            background:#fff;
-            width:220px;
-            padding:20px;
-            margin:10px;
-            border‑radius:8px;
-            display:inline‑block;
-            box‑shadow: 0 1px 4px #ccc;
+        .section-sub {
+            color: #888;
+            margin: 0 0 28px;
+            font-size: 14px;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 24px;
+        }
+        .func-card {
+            background: #fff;
+            padding: 28px 24px;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: transform 0.25s, box-shadow 0.25s;
+            border: 1px solid #f0e6d8;
+        }
+        .func-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 28px rgba(120,75,42,0.18);
+        }
+        .func-card .icon {
+            font-size: 36px;
+            margin-bottom: 14px;
+        }
+        .func-card h3 {
+            margin: 0 0 8px;
+            color: #784b2a;
+            font-size: 18px;
+        }
+        .func-card p {
+            margin: 0 0 16px;
+            color: #777;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .func-card a {
+            color: #784b2a;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .func-card a:hover {
+            border-bottom-color: #784b2a;
         }
     </style>
 </head>
@@ -30,30 +115,38 @@
 <!--公共导航栏-->
 <div th:replace="~{fragments/nav :: navbar}"></div>
 
-<div class="main-container">
-    <h1>欢迎来到非遗手作数字展示与共创平台</h1>
-    <p style="font‑size:17px;color:#555;">非遗作品展示 · 手作教程 · 定制对接 · 用户作品分享共创</p>
+<div class="hero">
+    <h1>非遗手作数字展示与共创平台</h1>
+    <p>非遗作品展示 · 手作教程 · 定制对接 · 用户作品分享共创</p>
+</div>
 
-    <div style="margin‑top:40px;">
+<div class="main-container">
+    <h2 class="section-title">平台功能</h2>
+    <p class="section-sub">探索非遗技艺，开启手作之旅</p>
+    <div class="cards">
         <div class="func-card">
+            <div class="icon">🏺</div>
             <h3>非遗作品展示</h3>
             <p>浏览匠人非遗手作，查看技艺背景介绍</p>
-            <a th:href="@{/work/list}">前往浏览</a>
+            <a th:href="@{/work/list}">前往浏览 →</a>
         </div>
         <div class="func-card">
+            <div class="icon">📚</div>
             <h3>手作教程</h3>
             <p>学习手工技艺，收藏感兴趣教程</p>
-            <a th:href="@{/tutorial/list}">前往学习</a>
+            <a th:href="@{/tutorial/list}">前往学习 →</a>
         </div>
         <div class="func-card">
+            <div class="icon">✋</div>
             <h3>手作定制对接</h3>
             <p>向匠人发起定制，线上沟通需求</p>
-            <a th:href="@{/custom/apply}">发起定制</a>
+            <a th:href="@{/custom/apply}">发起定制 →</a>
         </div>
         <div class="func-card">
+            <div class="icon">💝</div>
             <h3>用户作品分享</h3>
             <p>分享练习作品，点赞评论交流</p>
-            <a th:href="@{/userWork/share}">查看分享</a>
+            <a th:href="@{/userWork/share}">查看分享 →</a>
         </div>
     </div>
 </div>

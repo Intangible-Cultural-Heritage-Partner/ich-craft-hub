@@ -27,9 +27,16 @@ public class HeritageWorkController {
     }
 
     @GetMapping("/work/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id, Model model, HttpSession session) {
         return heritageWorkService.findById(id)
                 .map(work -> {
+                    User loginUser = (User) session.getAttribute("loginUser");
+                    boolean isOwner = work.getCraftsman() != null && loginUser != null
+                            && work.getCraftsman().getId().equals(loginUser.getId());
+                    boolean isAdmin = loginUser != null && "2".equals(loginUser.getRole());
+                    if (work.getAuditStatus() != null && work.getAuditStatus() != 1 && !isOwner && !isAdmin) {
+                        return "redirect:/work/list?msg=展品暂未审核通过";
+                    }
                     model.addAttribute("work", work);
                     return "work/detail";
                 })

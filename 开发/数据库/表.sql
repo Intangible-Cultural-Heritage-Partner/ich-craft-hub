@@ -6,14 +6,14 @@ DEFAULT COLLATE utf8mb4_unicode_ci;
 USE intangible_heritage_platform;
 
 -- 1.用户表 user
--- 角色：0普通用户，1匠人，2管理员
+-- 角色：USER普通用户 ｜ CRAFTSMAN匠人 ｜ ADMIN管理员
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '用户主键id',
   `username` VARCHAR(50) NOT NULL UNIQUE COMMENT '登录账号',
-  `password` VARCHAR(100) NOT NULL COMMENT '密码（加密存储）',
+  `password` VARCHAR(100) NOT NULL COMMENT '密码（明文，待后续加密）',
   `nickname` VARCHAR(50) NOT NULL COMMENT '昵称',
-  `role` TINYINT NOT NULL DEFAULT 0 COMMENT '0普通用户 1匠人 2管理员',
+  `role` VARCHAR(20) NOT NULL DEFAULT 'USER' COMMENT 'USER普通用户 CRAFTSMAN匠人 ADMIN管理员',
   `avatar` VARCHAR(255) DEFAULT NULL COMMENT '头像图片地址',
   `introduce` TEXT DEFAULT NULL COMMENT '匠人简介，普通用户可为空',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间'

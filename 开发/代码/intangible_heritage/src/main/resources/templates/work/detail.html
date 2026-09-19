@@ -4,16 +4,27 @@
     <meta charset="UTF-8">
     <title th:text="${work.title} + ' - 非遗展品'">非遗展品详情</title>
     <style>
-        body { margin: 0; font-family: "Microsoft Yahei", sans-serif; background: #f8f5f0; color: #333; }
-        .wrap { max-width: 980px; margin: 32px auto; padding: 0 20px; }
-        .panel { background: #fff; padding: 28px; border-radius: 8px; box-shadow: 0 1px 5px #0000001a; }
-        .hero { max-width: 100%; max-height: 420px; display: block; margin: 18px auto; object-fit: contain; background: #eadfce; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
+        .wrap { max-width: 980px; margin: 36px auto; padding: 0 20px; }
+        .panel { background: #fff; padding: 36px; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border: 1px solid #f0e6d8; }
+        h1 { color: #784b2a; margin: 0 0 8px; font-size: 26px; }
+        .craftsman-info { color: #999; font-size: 14px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #f0e6d8; }
+        .hero { width: 100%; max-height: 460px; object-fit: cover; border-radius: 12px; margin-bottom: 20px; background: #eadfce; }
         .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-top: 16px; }
-        .gallery img { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; }
-        h1, h2 { color: #784b2a; }
-        .section { margin-top: 26px; line-height: 1.8; white-space: pre-wrap; }
-        .links { display: flex; gap: 14px; margin-top: 28px; }
-        .links a { color: #784b2a; }
+        .gallery img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; cursor: pointer; transition: transform 0.2s; }
+        .gallery img:hover { transform: scale(1.03); }
+        .section { margin-top: 28px; line-height: 1.8; white-space: pre-wrap; }
+        .section h2 { color: #784b2a; font-size: 19px; margin: 0 0 12px; padding-left: 12px; border-left: 4px solid #784b2a; }
+        .section div { color: #555; font-size: 15px; }
+        .links { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+        .links a {
+            color: #784b2a; text-decoration: none;
+            padding: 8px 18px; border: 1px solid #784b2a;
+            border-radius: 8px; font-size: 14px;
+            transition: all 0.2s;
+        }
+        .links a:hover { background: #784b2a; color: #fff; }
     </style>
 </head>
 <body>
@@ -21,7 +32,7 @@
 <main class="wrap">
     <article class="panel">
         <h1 th:text="${work.title}">展品标题</h1>
-        <p th:text="${work.craftsman != null ? '发布匠人：' + work.craftsman.nickname : ''}">发布匠人</p>
+        <p class="craftsman-info" th:text="${work.craftsman != null ? '发布匠人：' + work.craftsman.username : ''}">发布匠人</p>
         <img class="hero" th:if="${work.coverImg != null and !work.coverImg.isBlank()}" th:src="${work.coverImg}" th:alt="${work.title}">
         <div class="section">
             <h2>作品介绍</h2>
@@ -36,7 +47,7 @@
         </div>
         <div class="links">
             <a th:href="@{/tutorial/list}">查看手作教程</a>
-            <a th:href="@{/userWork/share}">查看用户作品</a>
+            <a th:href="@{/work/mine}">查看用户作品</a>
             <a th:if="${session.loginUser != null and work.craftsman != null and session.loginUser.id == work.craftsman.id}"
                th:href="@{/work/{id}/edit(id=${work.id})}">编辑展品</a>
             <a th:href="@{/work/list}">返回展品列表</a>

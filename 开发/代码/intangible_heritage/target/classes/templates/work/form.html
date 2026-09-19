@@ -4,17 +4,31 @@
     <meta charset="UTF-8">
     <title>展品发布</title>
     <style>
-        body { margin: 0; font-family: "Microsoft Yahei", sans-serif; background: #f8f5f0; color: #333; }
-        .wrap { max-width: 760px; margin: 32px auto; padding: 0 20px; }
-        .panel { background: #fff; padding: 28px; border-radius: 8px; }
-        label { display: block; margin-top: 16px; color: #784b2a; }
-        input, textarea { width: 100%; box-sizing: border-box; margin-top: 6px; padding: 10px; border: 1px solid #d8cbbd; border-radius: 4px; }
-        textarea { min-height: 120px; resize: vertical; }
-        button, a { display: inline-block; margin-top: 20px; padding: 10px 16px; border: 0; border-radius: 4px; text-decoration: none; }
-        button { color: #fff; background: #784b2a; cursor: pointer; }
-        a { color: #784b2a; }
-        .message { color: #b42318; }
-        .hint { color: #777; font-size: 13px; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
+        .wrap { max-width: 760px; margin: 36px auto; padding: 0 20px; }
+        .panel { background: #fff; padding: 32px; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border: 1px solid #f0e6d8; }
+        .panel h1 { color: #784b2a; margin: 0 0 6px; font-size: 24px; }
+        .panel .subtitle { color: #999; font-size: 14px; margin: 0 0 24px; padding-bottom: 18px; border-bottom: 1px solid #f0e6d8; }
+        .panel label { display: block; margin-top: 18px; color: #784b2a; font-weight: 500; font-size: 15px; }
+        .panel input, .panel textarea {
+            width: 100%; box-sizing: border-box; margin-top: 8px;
+            padding: 11px 14px; border: 1px solid #d8cbbd; border-radius: 8px;
+            font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .panel input:focus, .panel textarea:focus { border-color: #784b2a; box-shadow: 0 0 0 3px rgba(120,75,42,0.1); }
+        .panel textarea { min-height: 120px; resize: vertical; }
+        .panel button, .panel a {
+            display: inline-block; margin-top: 24px; padding: 12px 28px;
+            border: 0; border-radius: 8px; text-decoration: none;
+            font-size: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .panel button { color: #fff; background: linear-gradient(135deg, #784b2a, #a0673f); box-shadow: 0 4px 12px rgba(120,75,42,0.3); }
+        .panel button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.4); }
+        .panel a { color: #784b2a; border: 1px solid #784b2a; background: #fff; }
+        .panel a:hover { background: #784b2a; color: #fff; }
+        .message { color: #b42318; background: #fef0f0; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; }
+        .hint { color: #999; font-size: 13px; margin-top: 6px; }
     </style>
 </head>
 <body>
@@ -22,6 +36,7 @@
 <main class="wrap">
     <section class="panel">
         <h1 th:text="${work.id == null ? '发布非遗展品' : '编辑非遗展品'}">发布非遗展品</h1>
+        <p class="subtitle">分享你的非遗手作作品，传承传统技艺</p>
         <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
         <form th:action="${formAction}" method="post" enctype="multipart/form-data">
             <label>展品标题

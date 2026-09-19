@@ -10,6 +10,8 @@ public interface HeritageWorkRepository extends JpaRepository<HeritageWork, Long
 
     List<HeritageWork> findAllByOrderByCreateTimeDesc();
 
+    List<HeritageWork> findByAuditStatusOrderByCreateTimeDesc(Integer auditStatus);
+
     List<HeritageWork> findByCraftsmanIdOrderByCreateTimeDesc(Long craftsmanId);
 
     Optional<HeritageWork> findByIdAndCraftsmanId(Long id, Long craftsmanId);
