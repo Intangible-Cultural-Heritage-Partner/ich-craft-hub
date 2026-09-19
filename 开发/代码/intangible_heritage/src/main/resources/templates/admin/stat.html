@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>平台数据概览</title>
+    <style>
+        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
+        .wrap{padding:30px 50px;}
+        h2{color:#784b2a;}
+        .cards{display:flex;flex-wrap:wrap;gap:18px;margin-top:20px;}
+        .card{background:#fff;padding:22px 28px;border-radius:8px;box-shadow:0 1px 4px #ccc;min-width:180px;}
+        .card .label{color:#888;font-size:14px;}
+        .card .value{color:#784b2a;font-size:32px;font-weight:bold;margin-top:8px;}
+        .status-list{margin-top:24px;background:#fff;border-radius:8px;box-shadow:0 1px 4px #ccc;padding:22px 28px;}
+        .status-list h3{color:#5c3a1f;margin-top:0;}
+        .status-list .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e0d8c8;}
+        .status-list .row:last-child{border-bottom:none;}
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <h2>平台数据概览</h2>
+
+    <div class="cards">
+        <div class="card">
+            <div class="label">用户总数</div>
+            <div class="value" th:text="${stat.userCount}">0</div>
+        </div>
+        <div class="card">
+            <div class="label">匠人数</div>
+            <div class="value" th:text="${stat.craftsmanCount}">0</div>
+        </div>
+        <div class="card">
+            <div class="label">定制申请总数</div>
+            <div class="value" th:text="${stat.orderCount}">0</div>
+        </div>
+        <div class="card">
+            <div class="label">沟通消息总数</div>
+            <div class="value" th:text="${stat.messageCount}">0</div>
+        </div>
+    </div>
+
+    <div class="status-list">
+        <h3>定制申请状态分布</h3>
+        <div class="row" th:each="entry : ${stat.orderStatusStat}">
+            <span th:text="${entry.key}"></span>
+            <span th:text="${entry.value + ' 件'}"></span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

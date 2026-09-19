@@ -10,4 +10,7 @@ public interface CraftsmanApplyRepository extends JpaRepository<CraftsmanApply, 
 
     // 查询所有申请，按时间倒序
     List<CraftsmanApply> findAllByOrderByCreateTimeDesc();
+
+    // 查询用户最新的一条申请（按创建时间倒序取第一条）
+    CraftsmanApply findFirstByUserIdOrderByCreateTimeDesc(Long userId);
 }

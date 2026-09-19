@@ -146,8 +146,9 @@
 
             <!-- ==========普通用户 role=0 下拉========== -->
             <div th:if="${session.loginUser != null && session.loginUser.role == '0'}">
+                <a th:href="@{/custom/apply}">定制申请</a>
+                <a th:href="@{/custom/myApply}">我的定制</a>
                 <a th:href="@{/userWork/publish}">我的作品</a>
-                <a th:href="@{/customOrder/myApply}">我的定制</a>
                 <a th:href="@{/craftsman/apply}">申请成为匠人</a>
                 <a th:href="@{/user/userCenter}">个人中心</a>
                 <a th:href="@{/logout}">退出登录</a>
@@ -157,7 +158,7 @@
             <div th:if="${session.loginUser != null && session.loginUser.role == '1'}">
                 <a th:href="@{/work/create}">发布展品</a>
                 <a th:href="@{/tutorial/publish}">发布教程</a>
-                <a th:href="@{/customOrder/myApply}">我的定制申请</a>
+                <a th:href="@{/custom/myCraft}">定制订单</a>
                 <a th:href="@{/user/userCenter}">个人中心</a>
                 <a th:href="@{/logout}">退出登录</a>
             </div>

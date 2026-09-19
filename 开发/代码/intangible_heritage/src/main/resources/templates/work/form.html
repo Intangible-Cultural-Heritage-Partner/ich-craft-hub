@@ -28,6 +28,8 @@
         .panel a { color: #784b2a; border: 1px solid #784b2a; background: #fff; }
         .panel a:hover { background: #784b2a; color: #fff; }
         .message { color: #b42318; background: #fef0f0; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; }
+        .reject-notice { color: #842029; background: #f8d7da; padding: 14px 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #dc3545; }
+        .reject-notice strong { display: block; margin-bottom: 4px; }
         .hint { color: #999; font-size: 13px; margin-top: 6px; }
     </style>
 </head>
@@ -38,6 +40,11 @@
         <h1 th:text="${work.id == null ? '发布非遗展品' : '编辑非遗展品'}">发布非遗展品</h1>
         <p class="subtitle">分享你的非遗手作作品，传承传统技艺</p>
         <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
+        <!-- 被驳回或重新提交审核中，显示驳回理由 -->
+        <div class="reject-notice" th:if="${work != null && work.id != null && (work.auditStatus == 2 or (work.auditStatus == 0 and work.auditRemark != null))}">
+            <strong th:text="${work.auditStatus == 2 ? '该展品被审核驳回：' : '上次驳回理由（已重新提交，等待再次审核）：'}"></strong>
+            <span th:text="${work.auditRemark != null ? work.auditRemark : '审核未通过，请修改后重新提交'}"></span>
+        </div>
         <form th:action="${formAction}" method="post" enctype="multipart/form-data">
             <label>展品标题
                 <input type="text" name="title" required maxlength="100" th:value="${work.title}">
@@ -61,6 +68,7 @@
             <label>技艺背景
                 <textarea name="skillBackground" th:text="${work.skillBackground}"></textarea>
             </label>
+            <p class="hint" th:if="${work.id != null}" style="color: #b45309;">注意：编辑保存后，展品将重新进入审核流程，审核通过前不会在公开列表展示。</p>
             <button type="submit">保存展品</button>
             <a th:href="@{/work/list}">取消</a>
         </form>

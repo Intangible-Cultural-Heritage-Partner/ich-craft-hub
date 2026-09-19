@@ -35,11 +35,10 @@ public class IndexController {
         return "tutorial/list";
     }
 
-    @GetMapping("/custom/apply")
-    public String customApply() {
-        return "apply";
-    }
+    //定制对接页面：已迁移到 CustomOrderController.applyForm()
+    // /custom/apply 由 CustomOrderController 处理（同时列出可选匠人）
 
+    //用户作品分享页
     @GetMapping("/userWork/share")
     public String userWorkShare() {
         return "share";

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的定制申请</title>
+    <style>
+        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
+        .wrap{padding:30px 50px;}
+        h2{color:#784b2a;}
+        .msg{color:#2e7d32;margin-bottom:10px;}
+        table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 4px #ccc;}
+        th,td{border:1px solid #e0d8c8;padding:10px;text-align:left;}
+        th{background:#784b2a;color:#fff;}
+        tr:hover{background:#faf6ee;}
+        .badge{padding:3px 10px;border-radius:10px;font-size:13px;}
+        .s0{background:#fff3cd;color:#8a6d3b;}
+        .s1{background:#f8d7da;color:#842029;}
+        .s2{background:#d1e7dd;color:#0f5132;}
+        .s3{background:#cfe2ff;color:#084298;}
+        a.btn{color:#784b2a;}
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <h2>我发起的定制申请</h2>
+    <p class="msg" th:text="${msg}"></p>
+
+    <p><a th:href="@{/custom/apply}" class="btn">+ 发起新申请</a></p>
+
+    <div th:if="${orders != null && !orders.isEmpty()}">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>匠人</th>
+                <th>作品描述</th>
+                <th>预算</th>
+                <th>期望时间</th>
+                <th>状态</th>
+                <th>提交时间</th>
+                <th>操作</th>
+            </tr>
+            <tr th:each="o : ${orders}">
+                <td th:text="${o.id}"></td>
+                <td th:text="${partyNames.get(o.craftsmanId)}"></td>
+                <td th:text="${o.workDesc}"></td>
+                <td th:text="${o.budget}"></td>
+                <td th:text="${o.expectFinishTime}"></td>
+                <td>
+                    <span class="badge"
+                          th:classappend="'s' + ${o.orderStatus}"
+                          th:text="${o.statusText}"></span>
+                </td>
+                <td th:text="${o.createTime}"></td>
+                <td>
+                    <a th:href="@{'/custom/chat/' + ${o.id}}" class="btn">沟通/查看</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <p th:if="${orders == null || orders.isEmpty()}">暂无申请记录。</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>定制沟通</title>
+    <style>
+        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
+        .wrap{padding:30px 50px;max-width:880px;}
+        h2{color:#784b2a;}
+        .head{background:#fff;padding:18px 24px;border-radius:8px;box-shadow:0 1px 4px #ccc;margin-bottom:16px;}
+        .head h3{margin:0 0 8px 0;color:#5c3a1f;}
+        .head .row{color:#555;font-size:14px;margin:4px 0;}
+        .badge{padding:3px 10px;border-radius:10px;font-size:13px;}
+        .s0{background:#fff3cd;color:#8a6d3b;}
+        .s1{background:#f8d7da;color:#842029;}
+        .s2{background:#d1e7dd;color:#0f5132;}
+        .s3{background:#cfe2ff;color:#084298;}
+        .chat-box{background:#fff;border-radius:8px;box-shadow:0 1px 4px #ccc;height:380px;overflow-y:auto;padding:18px;}
+        .msg{margin:10px 0;padding:8px 14px;border-radius:8px;max-width:70%;word-wrap:break-word;}
+        .mine{margin-left:auto;background:#d1e7dd;}
+        .others{margin-right:auto;background:#f0f0f0;}
+        .sender{font-size:12px;color:#888;margin-bottom:2px;}
+        .time{font-size:11px;color:#aaa;text-align:right;}
+        .input-row{display:flex;gap:10px;margin-top:14px;}
+        input[type=text]{flex:1;padding:8px;border:1px solid #ccc;border-radius:4px;}
+        button{padding:8px 24px;background:#784b2a;color:#fff;border:none;border-radius:4px;cursor:pointer;}
+        button:hover{background:#5c3a1f;}
+        button:disabled{background:#aaa;cursor:not-allowed;}
+        .notice{color:#842029;margin-top:8px;}
+        a.btn{color:#784b2a;}
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <div class="head">
+        <h3>定制沟通 · 单号 #<span th:text="${order.id}"></span></h3>
+        <div class="row">对方：<span th:text="${other?.username}"></span></div>
+        <div class="row">作品描述：<span th:text="${order.workDesc}"></span></div>
+        <div class="row">状态：
+            <span class="badge"
+                  th:classappend="'s' + ${order.orderStatus}"
+                  th:text="${order.statusText}"></span>
+        </div>
+    </div>
+
+    <p class="notice" th:text="${msg}"></p>
+
+    <!-- 消息列表 -->
+    <div class="chat-box" id="chatBox">
+        <div th:each="m : ${messages}"
+             th:classappend="${m.senderId == loginUserId ? 'msg mine' : 'msg others'}">
+            <div class="sender" th:text="${m.senderId == loginUserId ? '我' : (other?.username != null ? other.username : '对方')}"></div>
+            <div th:text="${m.content}"></div>
+            <div class="time" th:text="${m.sendTime}"></div>
+        </div>
+        <div th:if="${messages == null || messages.isEmpty()}" style="color:#aaa;text-align:center;">暂无消息</div>
+    </div>
+
+    <!-- 输入区：仅状态=2 沟通中 时可发 -->
+    <form class="input-row" th:action="@{'/custom/chat/' + ${order.id}}" method="post"
+          th:if="${order.orderStatus == 2}">
+        <input type="text" name="content" placeholder="输入消息..." required>
+        <button type="submit">发送</button>
+    </form>
+    <div class="notice" th:if="${order.orderStatus != 2}">
+        当前状态【<span th:text="${order.statusText}"></span>】，不可发送消息。
+    </div>
+
+    <!-- 完结按钮：状态=2 时双方可见 -->
+    <div th:if="${order.orderStatus == 2}" style="margin-top:14px;">
+        <form th:action="@{'/custom/finish/' + ${order.id}}" method="post"
+              onsubmit="return confirm('确认完结此定制需求？完结后将无法再发消息。');">
+            <button type="submit" style="background:#084298;">完结需求</button>
+        </form>
+    </div>
+
+    <p style="margin-top:18px;">
+        <a class="btn" th:href="@{/custom/myApply}" th:if="${session.loginUser != null && (session.loginUser.role == '0' || session.loginUser.role == 'USER')}">返回我的申请</a>
+        <a class="btn" th:href="@{/custom/myCraft}" th:if="${session.loginUser != null && (session.loginUser.role == '1' || session.loginUser.role == 'CRAFTSMAN')}">返回发给我的</a>
+    </p>
+</div>
+
+<!-- AJAX 轮询刷新消息列表，5秒一次 -->
+<script th:inline="javascript">
+    const orderId = /*[[${order.id}]]*/ 0;
+    const loginUserId = /*[[${loginUserId}]]*/ 0;
+    const otherName = /*[[${other?.username}]]*/ '对方';
+
+    function renderMessages(list) {
+        const box = document.getElementById('chatBox');
+        if (!list || list.length === 0) {
+            box.innerHTML = '<div style="color:#aaa;text-align:center;">暂无消息</div>';
+            return;
+        }
+        box.innerHTML = list.map(m => {
+            const mine = m.senderId === loginUserId;
+            const senderName = mine ? '我' : (otherName || '对方');
+            // 简易 XSS 转义
+            const esc = s => (s || '').replace(/[<>&"']/g, c => ({
+                '<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'
+            })[c]);
+            return `<div class="msg ${mine ? 'mine' : 'others'}">
+                <div class="sender">${senderName}</div>
+                <div>${esc(m.content)}</div>
+                <div class="time">${m.sendTime || ''}</div>
+            </div>`;
+        }).join('');
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function poll() {
+        try {
+            const res = await fetch(`/custom/messages/${orderId}`);
+            if (res.ok) {
+                const data = await res.json();
+                renderMessages(data);
+            }
+        } catch (e) { /* 静默 */ }
+    }
+    setInterval(poll, 5000);
+</script>
+</body>
+</html>

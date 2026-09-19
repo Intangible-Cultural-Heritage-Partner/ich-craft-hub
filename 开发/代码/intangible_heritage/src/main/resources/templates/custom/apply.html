@@ -2,32 +2,72 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>定制对接</title>
+    <title>定制申请</title>
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
-        .wrap { padding: 40px 6%; }
-        .page-header { margin-bottom: 30px; }
-        .page-header h1 { margin: 0 0 6px; color: #784b2a; font-size: 26px; }
-        .page-header p { margin: 0; color: #888; font-size: 14px; }
-        .empty-card {
-            background: #fff; padding: 60px 24px; border-radius: 16px;
-            text-align: center; color: #999;
-            border: 1px dashed #d8cbbd;
+        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
+        .wrap{padding:30px 50px;max-width:680px;}
+        h2{color:#784b2a;}
+        .box{background:#fff;padding:25px;border-radius:8px;box-shadow:0 1px 4px #ccc;}
+        .form-row{margin:12px 0;}
+        label{display:inline-block;width:110px;color:#555;}
+        input[type=text],input[type=password],textarea,select{
+            width:320px;padding:6px;border:1px solid #ccc;border-radius:4px;
         }
-        .empty-card .icon { font-size: 48px; margin-bottom: 12px; }
+        textarea{height:80px;resize:vertical;}
+        button{padding:8px 22px;background:#784b2a;color:#fff;border:none;border-radius:4px;cursor:pointer;}
+        button:hover{background:#5c3a1f;}
+        .msg{color:#2e7d32;margin-bottom:10px;}
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
+
 <div class="wrap">
-    <div class="page-header">
-        <h1>手作定制对接</h1>
-        <p>向心仪的匠人发起定制需求，线上沟通细节</p>
-    </div>
-    <div class="empty-card">
-        <div class="icon">✋</div>
-        <p>定制功能开发中，敬请期待</p>
+    <div class="box">
+        <h2>发起手作定制申请</h2>
+        <p class="msg" th:text="${msg}"></p>
+
+        <form th:action="@{/custom/apply}" method="post">
+            <div class="form-row">
+                <label>选择匠人：</label>
+                <select name="craftsmanId" required>
+                    <option value="">--请选择匠人--</option>
+                    <option th:each="c : ${craftsmen}"
+                            th:value="${c.id}"
+                            th:text="${c.username + (c.intro != null ? ' · ' + c.intro : '')}"></option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label>作品描述：</label>
+                <textarea name="workDesc" required placeholder="你想定制的作品内容、主题、风格..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <label>材质要求：</label>
+                <input type="text" name="materialRequire" placeholder="如：紫檀木、苏绣丝线"/>
+            </div>
+
+            <div class="form-row">
+                <label>心理预算：</label>
+                <input type="text" name="budget" placeholder="如：500-1000元"/>
+            </div>
+
+            <div class="form-row">
+                <label>期望完成时间：</label>
+                <input type="text" name="expectFinishTime" placeholder="如：2026年12月前"/>
+            </div>
+
+            <div class="form-row">
+                <label>备注留言：</label>
+                <textarea name="remark" placeholder="给匠人的其他说明"></textarea>
+            </div>
+
+            <div class="form-row" style="margin-top:20px;">
+                <button type="submit">提交申请</button>
+                <a th:href="@{/custom/myApply}" style="margin-left:14px;color:#784b2a;">查看我的申请</a>
+            </div>
+        </form>
     </div>
 </div>
 </body>

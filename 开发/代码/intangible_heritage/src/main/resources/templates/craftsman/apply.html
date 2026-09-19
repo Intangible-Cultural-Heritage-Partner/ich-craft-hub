@@ -73,6 +73,7 @@
         }
         .alert-success { background-color: #d4edda; color: #155724; }
         .alert-warning { background-color: #fff3cd; color: #856404; }
+        .alert-danger { background-color: #f8d7da; color: #842029; }
     </style>
 </head>
 <body>
@@ -85,6 +86,12 @@
     <p class="subtitle">传承非遗技艺，分享你的手作故事</p>
 
     <div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>
+
+    <!-- 上次申请被驳回，显示拒绝理由 -->
+    <div th:if="${rejected}" class="alert alert-danger">
+        <strong>您上次的匠人申请已被驳回：</strong><br>
+        <span th:text="${rejectReason != null ? rejectReason : '审核未通过，请完善资料后重新提交'}"></span>
+    </div>
 
     <div th:if="${hasPending}" class="alert alert-warning">
         您已提交过申请，正在审核中，请勿重复提交。

@@ -39,6 +39,7 @@
         .content .actions a { color: #784b2a; text-decoration: none; font-size: 14px; font-weight: 500; }
         .content .actions a:hover { text-decoration: underline; }
         .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-bottom: 8px; align-self: flex-start; }
+        .content .reject-reason { color: #842029; background: #f8d7da; padding: 8px 10px; border-radius: 6px; font-size: 13px; margin: 0 0 10px; }
         .status-0 { background: #fff3cd; color: #856404; }
         .status-1 { background: #d4edda; color: #155724; }
         .status-2 { background: #f8d7da; color: #721c24; }
@@ -71,6 +72,8 @@
                         <span th:case="2">已驳回</span>
                     </span>
                 </span>
+                <p class="reject-reason" th:if="${mine == true and work.auditStatus == 2 and work.auditRemark != null}"
+                   th:text="'驳回理由：' + ${work.auditRemark}"></p>
                 <h3 th:text="${work.title}">展品标题</h3>
                 <small th:text="${work.craftsman != null ? '匠人：' + work.craftsman.username : '匠人作品'}">匠人作品</small>
                 <p th:text="${work.description != null ? work.description : '暂无作品介绍'}">作品介绍</p>

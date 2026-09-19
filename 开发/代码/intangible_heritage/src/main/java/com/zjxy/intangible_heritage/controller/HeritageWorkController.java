@@ -22,6 +22,7 @@ public class HeritageWorkController {
     @GetMapping("/work/list")
     public String list(Model model, @RequestParam(required = false) String msg) {
         model.addAttribute("works", heritageWorkService.findAll());
+        model.addAttribute("mine", false);
         model.addAttribute("msg", msg);
         return "work/list";
     }

@@ -40,6 +40,13 @@ public class CraftsmanApplyController {
         // 检查是否已有待审核的申请（auditStatus = 0）
         boolean hasPending = craftsmanApplyRepository.existsByUserIdAndAuditStatus(loginUser.getId(), 0);
         model.addAttribute("hasPending", hasPending);
+
+        // 查询用户最新申请，若被驳回则传递拒绝理由
+        CraftsmanApply latestApply = craftsmanApplyRepository.findFirstByUserIdOrderByCreateTimeDesc(loginUser.getId());
+        if (latestApply != null && latestApply.getAuditStatus() != null && latestApply.getAuditStatus() == 2) {
+            model.addAttribute("rejected", true);
+            model.addAttribute("rejectReason", latestApply.getAuditRemark());
+        }
         return "craftsman/apply";
     }
 

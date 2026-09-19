@@ -31,7 +31,7 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
 
     @Override
     public List<HeritageWork> findAll() {
-        return heritageWorkRepository.findByAuditStatusOrderByCreateTimeDesc(1);
+        return heritageWorkRepository.findByAuditStatusWithCraftsman(1);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
 
     @Override
     public List<HeritageWork> findByCraftsman(Long craftsmanId) {
-        return heritageWorkRepository.findByCraftsmanIdOrderByCreateTimeDesc(craftsmanId);
+        return heritageWorkRepository.findByCraftsmanIdWithCraftsman(craftsmanId);
     }
 
     @Override
@@ -60,6 +60,9 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
         work.setCraftsman(craftsman);
         work.setAuditStatus(0);
         applyFields(work, title, description, skillBackground, coverFile, coverUrl, imageFiles, imageUrls);
+        // 编辑后重新进入审核流程
+        work.setAuditStatus(0);
+        work.setAuditRemark(null);
         return heritageWorkRepository.save(work);
     }
 
@@ -81,6 +84,8 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
             throw new IllegalStateException("只能编辑自己发布的展品");
         }
         applyFields(work, title, description, skillBackground, coverFile, coverUrl, imageFiles, imageUrls);
+        // 编辑保存后重新进入审核流程（已通过/已驳回/审核中 → 待审核）
+        work.setAuditStatus(0);
         return heritageWorkRepository.save(work);
     }
 
