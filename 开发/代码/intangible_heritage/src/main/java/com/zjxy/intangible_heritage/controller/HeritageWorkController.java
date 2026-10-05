@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class HeritageWorkController {
@@ -38,12 +42,25 @@ public class HeritageWorkController {
                     if (work.getAuditStatus() != null && work.getAuditStatus() != 1 && !isOwner && !isAdmin) {
                         return "redirect:/work/list?msg=展品暂未审核通过";
                     }
-                    model.addAttribute("work", work);
-                    return "work/detail";
+                    List<String> galleryImages = new ArrayList<>();
+                     addImageIfPresent(galleryImages, work.getCoverImg());
+                     if (work.getImageList() != null) {
+                         Arrays.stream(work.getImageList().split("[,\\r\\n]+"))
+                                 .map(String::trim)
+                                 .forEach(image -> addImageIfPresent(galleryImages, image));
+                     }
+                     model.addAttribute("work", work);
+                     model.addAttribute("galleryImages", galleryImages);
+                     return "work/detail";
                 })
                 .orElseGet(() -> "redirect:/work/list?msg=展品不存在");
     }
 
+    private void addImageIfPresent(List<String> images, String image) {
+        if (image != null && !image.isBlank() && !images.contains(image.trim())) {
+            images.add(image.trim());
+        }
+    }
     @GetMapping("/work/create")
     public String createPage(HttpSession session, Model model) {
         if (currentCraftsman(session) == null) {
@@ -58,6 +75,8 @@ public class HeritageWorkController {
     public String create(@RequestParam String title,
                          @RequestParam(required = false) String description,
                          @RequestParam(required = false) String skillBackground,
+                         @RequestParam(required = false) String modelUrl,
+                         @RequestParam(required = false) MultipartFile modelFile,
                          @RequestParam(required = false) MultipartFile coverFile,
                          @RequestParam(required = false) String coverUrl,
                          @RequestParam(required = false) MultipartFile[] imageFiles,
@@ -70,13 +89,14 @@ public class HeritageWorkController {
         }
         try {
             HeritageWork work = heritageWorkService.create(user, title, description, skillBackground,
-                    coverFile, coverUrl, imageFiles, imageUrls);
+                    modelUrl, modelFile, coverFile, coverUrl, imageFiles, imageUrls);
             return "redirect:/work/" + work.getId();
         } catch (RuntimeException exception) {
             HeritageWork formWork = new HeritageWork();
             formWork.setTitle(title);
             formWork.setDescription(description);
             formWork.setSkillBackground(skillBackground);
+            formWork.setModelUrl(modelUrl);
             model.addAttribute("work", formWork);
             model.addAttribute("formAction", "/work/create");
             model.addAttribute("msg", exception.getMessage());
@@ -104,6 +124,8 @@ public class HeritageWorkController {
                        @RequestParam String title,
                        @RequestParam(required = false) String description,
                        @RequestParam(required = false) String skillBackground,
+                       @RequestParam(required = false) String modelUrl,
+                       @RequestParam(required = false) MultipartFile modelFile,
                        @RequestParam(required = false) MultipartFile coverFile,
                        @RequestParam(required = false) String coverUrl,
                        @RequestParam(required = false) MultipartFile[] imageFiles,
@@ -116,13 +138,16 @@ public class HeritageWorkController {
         }
         try {
             HeritageWork work = heritageWorkService.update(id, user, title, description, skillBackground,
-                    coverFile, coverUrl, imageFiles, imageUrls);
+                    modelUrl, modelFile, coverFile, coverUrl, imageFiles, imageUrls);
             return "redirect:/work/" + id;
         } catch (RuntimeException exception) {
             HeritageWork formWork = heritageWorkService.findById(id).orElse(new HeritageWork());
             formWork.setTitle(title);
             formWork.setDescription(description);
             formWork.setSkillBackground(skillBackground);
+            if (modelUrl != null && !modelUrl.isBlank()) {
+                formWork.setModelUrl(modelUrl);
+            }
             model.addAttribute("work", formWork);
             model.addAttribute("formAction", "/work/" + id + "/edit");
             model.addAttribute("msg", exception.getMessage());

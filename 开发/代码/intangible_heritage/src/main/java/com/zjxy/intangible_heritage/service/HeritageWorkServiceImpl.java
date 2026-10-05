@@ -23,10 +23,12 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
 
     private final HeritageWorkRepository heritageWorkRepository;
     private final Path uploadDirectory;
+    private final Path modelUploadDirectory;
 
     public HeritageWorkServiceImpl(HeritageWorkRepository heritageWorkRepository) {
         this.heritageWorkRepository = heritageWorkRepository;
         this.uploadDirectory = Paths.get(System.getProperty("user.dir"), "uploads", "heritage");
+        this.modelUploadDirectory = uploadDirectory.resolve("models");
     }
 
     @Override
@@ -48,18 +50,29 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
     public HeritageWork create(User craftsman, String title, String description,
                                MultipartFile coverFile, String coverUrl,
                                MultipartFile[] imageFiles, String imageUrls) {
-        return create(craftsman, title, description, null, coverFile, coverUrl, imageFiles, imageUrls);
+        return create(craftsman, title, description, null, null, null,
+                coverFile, coverUrl, imageFiles, imageUrls);
     }
 
     @Override
     public HeritageWork create(User craftsman, String title, String description, String skillBackground,
                                MultipartFile coverFile, String coverUrl,
                                MultipartFile[] imageFiles, String imageUrls) {
+        return create(craftsman, title, description, skillBackground, null, null,
+                coverFile, coverUrl, imageFiles, imageUrls);
+    }
+
+    @Override
+    public HeritageWork create(User craftsman, String title, String description, String skillBackground,
+                               String modelUrl, MultipartFile modelFile,
+                               MultipartFile coverFile, String coverUrl,
+                               MultipartFile[] imageFiles, String imageUrls) {
         requireCraftsman(craftsman);
         HeritageWork work = new HeritageWork();
         work.setCraftsman(craftsman);
         work.setAuditStatus(0);
-        applyFields(work, title, description, skillBackground, coverFile, coverUrl, imageFiles, imageUrls);
+        applyFields(work, title, description, skillBackground, modelUrl, modelFile,
+                coverFile, coverUrl, imageFiles, imageUrls);
         // 编辑后重新进入审核流程
         work.setAuditStatus(0);
         work.setAuditRemark(null);
@@ -70,11 +83,21 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
     public HeritageWork update(Long id, User craftsman, String title, String description,
                                MultipartFile coverFile, String coverUrl,
                                MultipartFile[] imageFiles, String imageUrls) {
-        return update(id, craftsman, title, description, null, coverFile, coverUrl, imageFiles, imageUrls);
+        return update(id, craftsman, title, description, null, null, null,
+                coverFile, coverUrl, imageFiles, imageUrls);
     }
 
     @Override
     public HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                               MultipartFile coverFile, String coverUrl,
+                               MultipartFile[] imageFiles, String imageUrls) {
+        return update(id, craftsman, title, description, skillBackground, null, null,
+                coverFile, coverUrl, imageFiles, imageUrls);
+    }
+
+    @Override
+    public HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                               String modelUrl, MultipartFile modelFile,
                                MultipartFile coverFile, String coverUrl,
                                MultipartFile[] imageFiles, String imageUrls) {
         requireCraftsman(craftsman);
@@ -83,20 +106,22 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
         if (work.getCraftsman() == null || !Objects.equals(work.getCraftsman().getId(), craftsman.getId())) {
             throw new IllegalStateException("只能编辑自己发布的展品");
         }
-        applyFields(work, title, description, skillBackground, coverFile, coverUrl, imageFiles, imageUrls);
+        applyFields(work, title, description, skillBackground, modelUrl, modelFile,
+                coverFile, coverUrl, imageFiles, imageUrls);
         // 编辑保存后重新进入审核流程（已通过/已驳回/审核中 → 待审核）
         work.setAuditStatus(0);
         return heritageWorkRepository.save(work);
     }
 
     private void requireCraftsman(User user) {
-        String role = user.getRole();
+        String role = user == null ? null : user.getRole();
         if (user == null || (!"CRAFTSMAN".equalsIgnoreCase(role) && !"1".equals(role))) {
             throw new IllegalStateException("只有匠人可以管理非遗展品");
         }
     }
 
     private void applyFields(HeritageWork work, String title, String description, String skillBackground,
+                             String modelUrl, MultipartFile modelFile,
                              MultipartFile coverFile, String coverUrl,
                              MultipartFile[] imageFiles, String imageUrls) {
         if (title == null || title.isBlank()) {
@@ -106,6 +131,12 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
         work.setDescription(trimToNull(description));
         work.setSkillBackground(trimToNull(skillBackground));
         work.setCategory("其他");
+        String uploadedModel = saveModelFile(modelFile);
+        if (uploadedModel != null) {
+            work.setModelUrl(uploadedModel);
+        } else if (modelUrl != null && !modelUrl.isBlank()) {
+            work.setModelUrl(modelUrl.trim());
+        }
         String uploadedCover = saveFile(coverFile);
         String submittedCoverUrl = trimToNull(coverUrl);
         if (uploadedCover != null) {
@@ -151,6 +182,29 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
             return "/uploads/heritage/" + fileName;
         } catch (IOException exception) {
             throw new IllegalStateException("图片保存失败", exception);
+        }
+    }
+
+    private String saveModelFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+        String originalName = file.getOriginalFilename() == null ? "" : file.getOriginalFilename();
+        int extensionIndex = originalName.lastIndexOf('.');
+        if (extensionIndex < 0 || extensionIndex == originalName.length() - 1) {
+            throw new IllegalArgumentException("3D模型文件必须是 .glb 或 .gltf 格式");
+        }
+        String extension = originalName.substring(extensionIndex).toLowerCase();
+        if (!".glb".equals(extension) && !".gltf".equals(extension)) {
+            throw new IllegalArgumentException("仅支持 .glb 或 .gltf 格式的3D模型");
+        }
+        String fileName = UUID.randomUUID() + extension;
+        try {
+            Files.createDirectories(modelUploadDirectory);
+            Files.copy(file.getInputStream(), modelUploadDirectory.resolve(fileName));
+            return "/uploads/heritage/models/" + fileName;
+        } catch (IOException exception) {
+            throw new IllegalStateException("3D模型保存失败", exception);
         }
     }
 

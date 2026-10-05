@@ -23,11 +23,21 @@ public interface HeritageWorkService {
                         MultipartFile coverFile, String coverUrl,
                         MultipartFile[] imageFiles, String imageUrls);
 
+    HeritageWork create(User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile,
+                        MultipartFile coverFile, String coverUrl,
+                        MultipartFile[] imageFiles, String imageUrls);
+
     HeritageWork update(Long id, User craftsman, String title, String description,
                         MultipartFile coverFile, String coverUrl,
                         MultipartFile[] imageFiles, String imageUrls);
 
     HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                        MultipartFile coverFile, String coverUrl,
+                        MultipartFile[] imageFiles, String imageUrls);
+
+    HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile,
                         MultipartFile coverFile, String coverUrl,
                         MultipartFile[] imageFiles, String imageUrls);
 }

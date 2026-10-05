@@ -162,6 +162,104 @@ class HeritageWorkServiceTest {
         assertEquals("https://example.com/fallback.png", saved.getCoverImg());
     }
 
+    @Test
+    void modelUrlIsTrimmedWhenCreatingWork() {
+        User craftsman = user(10L, "CRAFTSMAN");
+        when(heritageWorkRepository.save(any(HeritageWork.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        HeritageWork saved = heritageWorkService.create(
+                craftsman,
+                "Wood carving",
+                "A traditional carving",
+                null,
+                " https://example.com/model.glb ",
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        assertEquals("https://example.com/model.glb", saved.getModelUrl());
+    }
+
+    @Test
+    void blankModelUrlIsStoredAsNull() {
+        User craftsman = user(10L, "CRAFTSMAN");
+        when(heritageWorkRepository.save(any(HeritageWork.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        HeritageWork saved = heritageWorkService.create(
+                craftsman,
+                "Wood carving",
+                "A traditional carving",
+                null,
+                "  ",
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        assertEquals(null, saved.getModelUrl());
+    }
+
+    @Test
+    void glbModelFileUsesGeneratedModelUploadPath() {
+        User craftsman = user(10L, "CRAFTSMAN");
+        MockMultipartFile model = new MockMultipartFile(
+                "model",
+                "carving.glb",
+                "model/gltf-binary",
+                "model-bytes".getBytes()
+        );
+        when(heritageWorkRepository.save(any(HeritageWork.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        HeritageWork saved = heritageWorkService.create(
+                craftsman,
+                "Wood carving",
+                "A traditional carving",
+                null,
+                null,
+                model,
+                null,
+                null,
+                null,
+                null
+        );
+
+        assertTrue(saved.getModelUrl().startsWith("/uploads/heritage/models/"));
+        assertTrue(saved.getModelUrl().endsWith(".glb"));
+    }
+
+    @Test
+    void unsupportedModelFileIsRejectedBeforeSaving() {
+        User craftsman = user(10L, "CRAFTSMAN");
+        MockMultipartFile model = new MockMultipartFile(
+                "model",
+                "carving.fbx",
+                "application/octet-stream",
+                "model-bytes".getBytes()
+        );
+
+        assertThrows(IllegalArgumentException.class, () -> heritageWorkService.create(
+                craftsman,
+                "Wood carving",
+                "A traditional carving",
+                null,
+                null,
+                model,
+                null,
+                null,
+                null,
+                null
+        ));
+        verify(heritageWorkRepository, org.mockito.Mockito.never()).save(any(HeritageWork.class));
+    }
+
     private User user(Long id, String role) {
         User user = new User();
         user.setId(id);

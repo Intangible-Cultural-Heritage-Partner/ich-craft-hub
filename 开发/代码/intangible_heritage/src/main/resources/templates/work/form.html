@@ -62,6 +62,14 @@
                 <textarea name="imageUrls" placeholder="多个地址使用逗号或换行分隔"></textarea>
             </label>
             <p class="hint">同时填写文件和 URL 时，上传文件优先保存。</p>
+            <label>3D 模型文件（GLB / GLTF）
+                <input type="file" name="modelFile" accept=".glb,.gltf,model/gltf-binary,model/gltf+json">
+            </label>
+            <label>3D 模型 URL
+                <input type="url" name="modelUrl" placeholder="例如：https://example.com/exhibit.glb" th:value="${work.modelUrl}">
+            </label>
+            <p class="hint">优先使用单文件 GLB；同时填写文件和 URL 时，上传文件优先保存。GLTF 的 .bin 和纹理文件必须保持相对路径可访问。</p>
+            <p class="hint" th:if="${work.modelUrl != null and !work.modelUrl.isBlank()}">当前模型地址：<span th:text="${work.modelUrl}"></span></p>
             <label>作品介绍
                 <textarea name="description" th:text="${work.description}"></textarea>
             </label>
