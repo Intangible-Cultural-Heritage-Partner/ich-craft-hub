@@ -2,23 +2,63 @@ package com.zjxy.intangible_heritage.service;
 
 import com.zjxy.intangible_heritage.entity.HeritageWork;
 import com.zjxy.intangible_heritage.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface HeritageWorkService {
 
-    //审核通过的展品列表（前台展示）
-    List<HeritageWork> listPublished();
+    List<String> DEFAULT_CATEGORIES = List.of("剪纸", "木雕", "苏绣", "陶瓷", "竹编", "其他");
 
-    //某匠人发布的全部展品（个人中心）
-    List<HeritageWork> listByCraftsman(Long craftsmanId);
+    List<HeritageWork> findAll(String category);
+
+    List<HeritageWork> findByCraftsman(Long craftsmanId, String category);
+
+    List<String> findCategories(Long craftsmanId);
+
+    HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile, MultipartFile coverFile,
+                        String coverUrl, MultipartFile[] imageFiles, String imageUrls, String category,
+                        boolean removeModel);
+
+    HeritageWork create(User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile, MultipartFile coverFile,
+                        String coverUrl, MultipartFile[] imageFiles, String imageUrls, String category);
+
+    HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile, MultipartFile coverFile,
+                        String coverUrl, MultipartFile[] imageFiles, String imageUrls, String category);
+
+    List<HeritageWork> findAll();
 
     Optional<HeritageWork> findById(Long id);
 
-    //匠人发布新展品，默认待审核
-    HeritageWork publish(HeritageWork work, User craftsman);
+    List<HeritageWork> findByCraftsman(Long craftsmanId);
 
-    //匠人编辑本人展品；越权返回 null。编辑后重置为待审核
-    HeritageWork update(Long id, HeritageWork form, User craftsman);
+    HeritageWork create(User craftsman, String title, String description,
+                        MultipartFile coverFile, String coverUrl,
+                        MultipartFile[] imageFiles, String imageUrls);
+
+    HeritageWork create(User craftsman, String title, String description, String skillBackground,
+                        MultipartFile coverFile, String coverUrl,
+                        MultipartFile[] imageFiles, String imageUrls);
+
+    HeritageWork create(User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile,
+                        MultipartFile coverFile, String coverUrl,
+                        MultipartFile[] imageFiles, String imageUrls);
+
+    HeritageWork update(Long id, User craftsman, String title, String description,
+                        MultipartFile coverFile, String coverUrl,
+                        MultipartFile[] imageFiles, String imageUrls);
+
+    HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                        MultipartFile coverFile, String coverUrl,
+                        MultipartFile[] imageFiles, String imageUrls);
+
+    HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile,
+                        MultipartFile coverFile, String coverUrl,
+                        MultipartFile[] imageFiles, String imageUrls);
 }

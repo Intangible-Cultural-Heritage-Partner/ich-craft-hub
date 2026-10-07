@@ -1,7 +1,10 @@
 package com.zjxy.intangible_heritage.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Table(name = "user")
 public class User {
@@ -16,7 +19,8 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private String nickname;
+    @Column(unique = true, nullable = false)
+    private String phone;
 
     //角色：USER普通用户 ｜ CRAFTSMAN匠人 ｜ ADMIN管理员
     private String role;
@@ -31,11 +35,11 @@ public class User {
     public User(){}
 
     //全参构造
-    public User(Long id, String username, String password, String nickname, String role, String intro, String avatar) {
+    public User(Long id, String username, String password, String phone, String role, String intro, String avatar) {
         this.id = id;
         this.username = username;
         this.password = password;
-        this.nickname = nickname;
+        this.phone = phone;
         this.role = role;
         this.intro = intro;
         this.avatar = avatar;
@@ -51,8 +55,8 @@ public class User {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getNickname() { return nickname; }
-    public void setNickname(String nickname) { this.nickname = nickname; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }

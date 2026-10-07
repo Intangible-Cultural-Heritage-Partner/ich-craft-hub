@@ -3,27 +3,60 @@ package com.zjxy.intangible_heritage.service;
 import com.zjxy.intangible_heritage.entity.HeritageWork;
 import com.zjxy.intangible_heritage.entity.User;
 import com.zjxy.intangible_heritage.repository.HeritageWorkRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class HeritageWorkServiceImpl implements HeritageWorkService {
 
     private final HeritageWorkRepository heritageWorkRepository;
+    private final Path uploadDirectory;
+    private final Path modelUploadDirectory;
 
-    @Override
-    public List<HeritageWork> listPublished() {
-        //audit_status = 1 审核通过
-        return heritageWorkRepository.findByAuditStatusOrderByCreateTimeDesc(1);
+    public HeritageWorkServiceImpl(HeritageWorkRepository heritageWorkRepository) {
+        this.heritageWorkRepository = heritageWorkRepository;
+        this.uploadDirectory = Paths.get(System.getProperty("user.dir"), "uploads", "heritage");
+        this.modelUploadDirectory = uploadDirectory.resolve("models");
     }
 
     @Override
-    public List<HeritageWork> listByCraftsman(Long craftsmanId) {
-        return heritageWorkRepository.findByCraftsmanIdOrderByCreateTimeDesc(craftsmanId);
+    public List<HeritageWork> findAll() {
+        return heritageWorkRepository.findByAuditStatusWithCraftsman(1);
+    }
+
+    @Override
+    public List<HeritageWork> findAll(String category) {
+        return heritageWorkRepository.findPublicByCategory(1, trimToNull(category));
+    }
+
+    @Override
+    public List<HeritageWork> findByCraftsman(Long craftsmanId, String category) {
+        return heritageWorkRepository.findOwnedByCategory(craftsmanId, trimToNull(category));
+    }
+
+    @Override
+    public List<String> findCategories(Long craftsmanId) {
+        List<String> categories = new ArrayList<>(DEFAULT_CATEGORIES);
+        List<String> existing = craftsmanId == null ? heritageWorkRepository.findPublicCategories()
+                : heritageWorkRepository.findOwnedCategories(craftsmanId);
+        for (String category : existing) {
+            if (category != null && !category.isBlank() && !categories.contains(category)) {
+                categories.add(category);
+            }
+        }
+        return categories;
     }
 
     @Override
@@ -32,39 +65,220 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
     }
 
     @Override
-    public HeritageWork publish(HeritageWork work, User craftsman) {
+    public List<HeritageWork> findByCraftsman(Long craftsmanId) {
+        return heritageWorkRepository.findByCraftsmanIdWithCraftsman(craftsmanId);
+    }
+
+    @Override
+    public HeritageWork create(User craftsman, String title, String description,
+                               MultipartFile coverFile, String coverUrl,
+                               MultipartFile[] imageFiles, String imageUrls) {
+        return create(craftsman, title, description, null, null, null,
+                coverFile, coverUrl, imageFiles, imageUrls);
+    }
+
+    @Override
+    public HeritageWork create(User craftsman, String title, String description, String skillBackground,
+                               MultipartFile coverFile, String coverUrl,
+                               MultipartFile[] imageFiles, String imageUrls) {
+        return create(craftsman, title, description, skillBackground, null, null,
+                coverFile, coverUrl, imageFiles, imageUrls);
+    }
+
+    @Override
+    public HeritageWork create(User craftsman, String title, String description, String skillBackground,
+                               String modelUrl, MultipartFile modelFile,
+                               MultipartFile coverFile, String coverUrl,
+                               MultipartFile[] imageFiles, String imageUrls) {
+        return create(craftsman, title, description, skillBackground, modelUrl, modelFile,
+                coverFile, coverUrl, imageFiles, imageUrls, null);
+    }
+
+    @Override
+    public HeritageWork create(User craftsman, String title, String description, String skillBackground,
+                               String modelUrl, MultipartFile modelFile, MultipartFile coverFile,
+                               String coverUrl, MultipartFile[] imageFiles, String imageUrls, String category) {
+        requireCraftsman(craftsman);
+        HeritageWork work = new HeritageWork();
+        applyCategory(work, category);
         work.setCraftsman(craftsman);
+        work.setAuditStatus(0);
+        applyFields(work, title, description, skillBackground, modelUrl, modelFile,
+                coverFile, coverUrl, imageFiles, imageUrls);
+        // 编辑后重新进入审核流程
         work.setAuditStatus(0);
         work.setAuditRemark(null);
         return heritageWorkRepository.save(work);
     }
 
     @Override
-    public HeritageWork update(Long id, HeritageWork form, User craftsman) {
-        HeritageWork existing = heritageWorkRepository.findById(id).orElse(null);
-        if (existing == null || craftsman == null
-                || existing.getCraftsman() == null
-                || !existing.getCraftsman().getId().equals(craftsman.getId())) {
-            //不存在或非本人，越权保护
+    public HeritageWork update(Long id, User craftsman, String title, String description,
+                               MultipartFile coverFile, String coverUrl,
+                               MultipartFile[] imageFiles, String imageUrls) {
+        return update(id, craftsman, title, description, null, null, null,
+                coverFile, coverUrl, imageFiles, imageUrls);
+    }
+
+    @Override
+    public HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                               MultipartFile coverFile, String coverUrl,
+                               MultipartFile[] imageFiles, String imageUrls) {
+        return update(id, craftsman, title, description, skillBackground, null, null,
+                coverFile, coverUrl, imageFiles, imageUrls);
+    }
+
+    @Override
+    public HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                               String modelUrl, MultipartFile modelFile,
+                               MultipartFile coverFile, String coverUrl,
+                               MultipartFile[] imageFiles, String imageUrls) {
+        return update(id, craftsman, title, description, skillBackground, modelUrl, modelFile,
+                coverFile, coverUrl, imageFiles, imageUrls, null);
+    }
+
+    @Override
+    public HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                               String modelUrl, MultipartFile modelFile, MultipartFile coverFile,
+                               String coverUrl, MultipartFile[] imageFiles, String imageUrls, String category) {
+        return update(id, craftsman, title, description, skillBackground, modelUrl, modelFile,
+                coverFile, coverUrl, imageFiles, imageUrls, category, false);
+    }
+
+    @Override
+    public HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                               String modelUrl, MultipartFile modelFile, MultipartFile coverFile,
+                               String coverUrl, MultipartFile[] imageFiles, String imageUrls, String category,
+                               boolean removeModel) {
+        requireCraftsman(craftsman);
+        HeritageWork work = heritageWorkRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("展品不存在"));
+        if (work.getCraftsman() == null || !Objects.equals(work.getCraftsman().getId(), craftsman.getId())) {
+            throw new IllegalStateException("只能编辑自己发布的展品");
+        }
+        if (removeModel && modelFile != null && !modelFile.isEmpty()) {
+            throw new IllegalArgumentException("不能同时移除模型和上传新模型，请选择一种操作");
+        }
+        applyCategory(work, category);
+        applyFields(work, title, description, skillBackground, removeModel ? null : modelUrl, modelFile,
+                coverFile, coverUrl, imageFiles, imageUrls);
+        if (removeModel) {
+            work.setModelUrl(null);
+        }
+        // 编辑保存后重新进入审核流程（已通过/已驳回/审核中 → 待审核）
+        work.setAuditStatus(0);
+        return heritageWorkRepository.save(work);
+    }
+
+    private void requireCraftsman(User user) {
+        String role = user == null ? null : user.getRole();
+        if (user == null || (!"CRAFTSMAN".equalsIgnoreCase(role) && !"1".equals(role))) {
+            throw new IllegalStateException("只有匠人可以管理非遗展品");
+        }
+    }
+
+    private void applyFields(HeritageWork work, String title, String description, String skillBackground,
+                             String modelUrl, MultipartFile modelFile,
+                             MultipartFile coverFile, String coverUrl,
+                             MultipartFile[] imageFiles, String imageUrls) {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("展品标题不能为空");
+        }
+        work.setTitle(title.trim());
+        work.setDescription(trimToNull(description));
+        work.setSkillBackground(trimToNull(skillBackground));
+        String uploadedModel = saveModelFile(modelFile);
+        if (uploadedModel != null) {
+            work.setModelUrl(uploadedModel);
+        } else if (modelUrl != null && !modelUrl.isBlank()) {
+            work.setModelUrl(modelUrl.trim());
+        }
+        String uploadedCover = saveFile(coverFile);
+        String submittedCoverUrl = trimToNull(coverUrl);
+        if (uploadedCover != null) {
+            work.setCoverImg(uploadedCover);
+        } else if (submittedCoverUrl != null) {
+            work.setCoverImg(submittedCoverUrl);
+        }
+
+        List<String> images = new ArrayList<>();
+        if (imageFiles != null) {
+            for (MultipartFile imageFile : imageFiles) {
+                String path = saveFile(imageFile);
+                if (path != null) {
+                    images.add(path);
+                }
+            }
+        }
+        if (imageUrls != null) {
+            images.addAll(Arrays.stream(imageUrls.split("[,\\r\\n]+"))
+                    .map(String::trim)
+                    .filter(value -> !value.isEmpty())
+                    .collect(Collectors.toList()));
+        }
+        if (!images.isEmpty()) {
+            work.setImageList(String.join(",", images));
+        }
+    }
+
+    private String saveFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
             return null;
         }
-        existing.setTitle(form.getTitle());
-        existing.setCategory(form.getCategory());
-        existing.setSkillBackground(form.getSkillBackground());
-        existing.setDescription(form.getDescription());
-        //封面/多图/模型：仅当本次上传了新文件才覆盖，否则保留原值
-        if (form.getCoverImg() != null) {
-            existing.setCoverImg(form.getCoverImg());
+        String originalName = file.getOriginalFilename() == null ? "" : file.getOriginalFilename();
+        String extension = "";
+        int extensionIndex = originalName.lastIndexOf('.');
+        if (extensionIndex >= 0 && extensionIndex < originalName.length() - 1) {
+            extension = originalName.substring(extensionIndex).replaceAll("[^a-zA-Z0-9.]", "");
         }
-        if (form.getImageList() != null) {
-            existing.setImageList(form.getImageList());
+        String fileName = UUID.randomUUID() + extension;
+        try {
+            Files.createDirectories(uploadDirectory);
+            Files.copy(file.getInputStream(), uploadDirectory.resolve(fileName));
+            return "/uploads/heritage/" + fileName;
+        } catch (IOException exception) {
+            throw new IllegalStateException("图片保存失败", exception);
         }
-        if (form.getModelUrl() != null) {
-            existing.setModelUrl(form.getModelUrl());
+    }
+
+    private String saveModelFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
         }
-        //编辑后重新进入待审核
-        existing.setAuditStatus(0);
-        existing.setAuditRemark(null);
-        return heritageWorkRepository.save(existing);
+        String originalName = file.getOriginalFilename() == null ? "" : file.getOriginalFilename();
+        int extensionIndex = originalName.lastIndexOf('.');
+        if (extensionIndex < 0 || extensionIndex == originalName.length() - 1) {
+            throw new IllegalArgumentException("3D模型文件必须是 .glb 或 .gltf 格式");
+        }
+        String extension = originalName.substring(extensionIndex).toLowerCase();
+        if (!".glb".equals(extension) && !".gltf".equals(extension)) {
+            throw new IllegalArgumentException("仅支持 .glb 或 .gltf 格式的3D模型");
+        }
+        String fileName = UUID.randomUUID() + extension;
+        try {
+            Files.createDirectories(modelUploadDirectory);
+            Files.copy(file.getInputStream(), modelUploadDirectory.resolve(fileName));
+            return "/uploads/heritage/models/" + fileName;
+        } catch (IOException exception) {
+            throw new IllegalStateException("3D模型保存失败", exception);
+        }
+    }
+
+    private void applyCategory(HeritageWork work, String category) {
+        String selected = trimToNull(category);
+        if (selected == null) {
+            return;
+        }
+        if (selected.length() > 50 || (!DEFAULT_CATEGORIES.contains(selected)
+                && !selected.equals(work.getCategory()))) {
+            throw new IllegalArgumentException("请选择有效的非遗分类");
+        }
+        work.setCategory(selected);
+    }
+
+    private String trimToNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
     }
 }

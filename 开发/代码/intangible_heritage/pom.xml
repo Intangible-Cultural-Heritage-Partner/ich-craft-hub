@@ -52,6 +52,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <!-- 删掉 <version>6.5.3.Final</version> 这一行，让 Spring Boot 自动匹配 -->
+        </dependency>
     </dependencies>
 
     <build>

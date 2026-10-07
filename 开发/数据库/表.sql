@@ -6,14 +6,14 @@ DEFAULT COLLATE utf8mb4_unicode_ci;
 USE intangible_heritage_platform;
 
 -- 1.用户表 user
--- 角色：0普通用户，1匠人，2管理员
+-- 角色：USER普通用户 ｜ CRAFTSMAN匠人 ｜ ADMIN管理员
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '用户主键id',
   `username` VARCHAR(50) NOT NULL UNIQUE COMMENT '登录账号',
-  `password` VARCHAR(100) NOT NULL COMMENT '密码（加密存储）',
-  `nickname` VARCHAR(50) NOT NULL COMMENT '昵称',
-  `role` TINYINT NOT NULL DEFAULT 0 COMMENT '0普通用户 1匠人 2管理员',
+  `password` VARCHAR(100) NOT NULL COMMENT '密码（明文，待后续加密）',
+  `phone` VARCHAR(50) NOT NULL UNIQUE COMMENT '手机号',
+  `role` TINYINT DEFAULT 0 COMMENT '0普通用户 1匠人 2管理员',
   `avatar` VARCHAR(255) DEFAULT NULL COMMENT '头像图片地址',
   `introduce` TEXT DEFAULT NULL COMMENT '匠人简介，普通用户可为空',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间'
@@ -28,7 +28,7 @@ CREATE TABLE `heritage_work` (
   `category` VARCHAR(50) NOT NULL COMMENT '非遗分类，如剪纸、木雕、苏绣',
   `cover_img` VARCHAR(255) DEFAULT NULL COMMENT '封面图',
   `image_list` TEXT DEFAULT NULL COMMENT '多张作品图片，逗号分隔存储url',
-  `model_url` VARCHAR(255) DEFAULT NULL COMMENT '3D模型文件地址（.glb/.gltf），可为空',
+  `model_url` VARCHAR(500) DEFAULT NULL COMMENT 'GLB/GLTF模型地址',
   `skill_background` TEXT DEFAULT NULL COMMENT '技艺背景介绍',
   `description` TEXT DEFAULT NULL COMMENT '作品描述',
   `audit_status` TINYINT NOT NULL DEFAULT 0 COMMENT '0待审核 1审核通过 2驳回',
@@ -140,3 +140,51 @@ CREATE TABLE `custom_message` (
   FOREIGN KEY (`sender_id`) REFERENCES `user`(`id`),
   FOREIGN KEY (`receiver_id`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='定制申请双向聊天消息';
+
+-- 10.匠人申请表 craftsman_apply
+USE `intangible_heritage_platform`;
+DROP TABLE IF EXISTS `craftsman_apply`;
+CREATE TABLE `craftsman_apply` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT NOT NULL COMMENT '申请人用户id',
+  `real_name` VARCHAR(50) NOT NULL COMMENT '真实姓名',
+  `introduce` TEXT NOT NULL COMMENT '匠人简介与经历',
+  `skill_introduction` TEXT NOT NULL COMMENT '擅长技艺介绍',
+  `proof_images` TEXT DEFAULT NULL COMMENT '佐证资料图片，多个以逗号分隔',
+  `audit_status` TINYINT NOT NULL DEFAULT 0 COMMENT '0待审核 1审核通过 2驳回',
+  `audit_remark` VARCHAR(200) DEFAULT NULL COMMENT '审核备注/驳回理由',
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='匠人申请表';
+
+============= -- 定制申请表 -- 状态：0新建申请 1已拒绝 2沟通中 3需求完结 -- ==================
+CREATE TABLE IF NOT EXISTS `custom_order` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID' ,
+    `apply_user_id` BIGINT NOT NULL COMMENT '发起申请用户ID' ,
+    `craftsman_id` BIGINT NOT NULL COMMENT '被申请匠人ID' ,
+    `work_desc` VARCHAR ( 1000 ) NOT NULL COMMENT '定制作品描述' ,
+    `material_require` VARCHAR ( 500 ) DEFAULT NULL COMMENT '材质要求' ,
+    `budget` VARCHAR ( 100 ) DEFAULT NULL COMMENT '心理预算' ,
+    `expect_finish_time` VARCHAR ( 100 ) DEFAULT NULL COMMENT '期望完成时间' ,
+    `ref_img` VARCHAR ( 500 ) DEFAULT NULL COMMENT '参考图片URL' ,
+    `remark` VARCHAR ( 1000 ) DEFAULT NULL COMMENT '备注留言' ,
+    `order_status`        TINYINT NOT NULL DEFAULT 0 COMMENT '0新建 1已拒绝 2沟通中 3需求完结' ,
+    `refuse_reason` VARCHAR ( 500 ) DEFAULT NULL COMMENT '匠人拒绝理由' ,
+    `create_time`         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间' , PRIMARY KEY (`id`),
+    KEY `idx_apply_user`  (`apply_user_id`),
+    KEY `idx_craftsman`   (`craftsman_id`),
+    KEY `idx_status`      (`order_status`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '定制申请表' ;
+
+============= -- 定制沟通消息表 -- 依附定制申请，仅 order_status=2（沟通中）时可新增 -- =============
+CREATE TABLE IF NOT EXISTS `custom_message` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID' ,
+    `custom_order_id` BIGINT NOT NULL COMMENT '关联定制申请ID' ,
+    `sender_id` BIGINT NOT NULL COMMENT '发送者用户ID' ,
+    `receiver_id` BIGINT NOT NULL COMMENT '接收者用户ID' ,
+    `content`           TEXT DEFAULT NULL COMMENT '消息内容' ,
+    `img_url` VARCHAR ( 500 ) DEFAULT NULL COMMENT '图片URL' ,
+    `send_time`         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发送时间' , PRIMARY KEY (`id`),
+    KEY `idx_order`     (`custom_order_id`),
+    KEY `idx_sender`    (`sender_id`),
+    KEY `idx_receiver`  (`receiver_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '定制沟通消息表' ;

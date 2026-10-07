@@ -2,81 +2,110 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>非遗作品展示</title>
+    <title>非遗展品</title>
     <style>
-        body {
-            margin: 0;
-            font-family: "Microsoft Yahei", sans-serif;
-            background-color: #f8f5f0;
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
+        .wrap { padding: 40px 6%; }
+        .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+        .top h1 { margin: 0 0 6px; color: #784b2a; font-size: 26px; }
+        .top p { margin: 0; color: #888; font-size: 14px; }
+        .top .actions { display: flex; gap: 10px; }
+        .top a {
+            color: #fff; background: #784b2a;
+            padding: 10px 20px; border-radius: 8px;
+            text-decoration: none; font-size: 14px;
+            transition: background 0.2s, transform 0.15s;
+            display: inline-block;
         }
-        .main-container { padding: 40px 60px; }
-        h1 { color:#784b2a; }
-        .work-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 24px;
-            margin-top: 24px;
+        .top a:hover { background: #5f3a20; transform: translateY(-1px); }
+        .message { padding: 12px 16px; background: #fff3cd; color: #856404; border-radius: 8px; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px; }
+        .card {
+            background: #fff; border-radius: 14px; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border: 1px solid #f0e6d8;
+            transition: transform 0.25s, box-shadow 0.25s;
+            display: flex; flex-direction: column;
         }
-        .work-card {
-            background:#fff;
-            border-radius:8px;
-            overflow:hidden;
-            box-shadow: 0 1px 6px #0000001a;
-            text-decoration:none;
-            color:inherit;
-            display:block;
-            transition: transform .15s, box-shadow .15s;
-        }
-        .work-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 16px #0000002a;
-        }
-        .work-cover {
-            width:100%;
-            height:180px;
-            object-fit:cover;
-            background:#eee;
-            display:block;
-        }
-        .work-cover.placeholder {
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:#999;
-            font-size:14px;
-        }
-        .work-body { padding:14px 16px; }
-        .work-title { font-size:17px; font-weight:bold; color:#333; margin:0 0 8px; }
-        .work-cat {
-            display:inline-block;
-            font-size:12px;
-            color:#784b2a;
-            background:#f3ece3;
-            padding:2px 10px;
-            border-radius:12px;
-        }
-        .empty { color:#888; margin-top:30px; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 28px rgba(120,75,42,0.15); }
+        .cover { width: 100%; height: 180px; object-fit: cover; background: #eadfce; }
+        .placeholder { height: 180px; display: grid; place-items: center; color: #856f5b; background: #f5ede2; font-size: 14px; }
+        .content { padding: 18px; flex: 1; display: flex; flex-direction: column; }
+        .content h3 { margin: 0 0 8px; color: #784b2a; font-size: 17px; }
+        .content small { color: #999; font-size: 12px; display: block; margin-bottom: 8px; }
+        .content p { color: #666; font-size: 14px; line-height: 1.5; margin: 0 0 14px; flex: 1; }
+        .content .actions { display: flex; gap: 14px; align-items: center; }
+        .content .actions a { color: #784b2a; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .content .actions a:hover { text-decoration: underline; }
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-bottom: 8px; align-self: flex-start; }
+        .content .reject-reason { color: #842029; background: #f8d7da; padding: 8px 10px; border-radius: 6px; font-size: 13px; margin: 0 0 10px; }
+        .status-0 { background: #fff3cd; color: #856404; }
+        .status-1 { background: #d4edda; color: #155724; }
+        .status-2 { background: #f8d7da; color: #721c24; }
+        .empty-card { background: #fff; padding: 48px; border-radius: 14px; text-align: center; color: #999; margin-top: 24px; border: 1px dashed #d8cbbd; }
+    </style>
+    <style>
+        .category-filter { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+        .category-filter select, .category-filter button { padding: 10px 14px; border: 1px solid #784b2a; border-radius: 8px; font: inherit; }
+        .category-filter select { background: #fff; color: #333; }
+        .category-filter button { background: #784b2a; color: #fff; cursor: pointer; }
+        .category-filter :focus-visible { outline: 3px solid #a0673f; outline-offset: 3px; }
+        .category-label { color: #784b2a; font-size: 13px; margin-bottom: 8px; }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
-
-<div class="main-container">
-    <h1>非遗作品展示</h1>
-    <p style="color:#666;">浏览匠人发布的非遗手作，点击查看技艺背景与作品详情</p>
-
-    <div class="work-grid">
-        <a class="work-card" th:each="w : ${works}" th:href="@{'/work/' + ${w.id}}">
-            <img class="work-cover" th:if="${w.coverImg != null}" th:src="${w.coverImg}" alt="封面">
-            <div class="work-cover placeholder" th:if="${w.coverImg == null}">暂无封面图</div>
-            <div class="work-body">
-                <p class="work-title" th:text="${w.title}">作品标题</p>
-                <span class="work-cat" th:text="${w.category}">分类</span>
-            </div>
-        </a>
+<main class="wrap">
+    <div class="top">
+        <div>
+            <h1 th:text="${mine == true ? '我的非遗展品' : '非遗展品'}">非遗展品</h1>
+            <p>浏览匠人发布的非遗作品，了解作品背后的传统技艺。</p>
+        </div>
+        <div class="actions" th:if="${session.loginUser != null and (session.loginUser.role == 'CRAFTSMAN' or session.loginUser.role == '1')}">
+            <a th:href="@{/work/create}">发布展品</a>
+            <a th:href="@{/work/mine}">我的展品</a>
+        </div>
     </div>
-
-    <p class="empty" th:if="${#lists.isEmpty(works)}">暂无已发布的非遗展品。</p>
-</div>
+    <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
+    <form class="category-filter" method="get" th:action="${mine == true ? '/work/mine' : '/work/list'}">
+        <label for="category-filter">非遗分类</label>
+        <select id="category-filter" name="category">
+            <option value="">全部分类</option>
+            <option th:each="category : ${categoryOptions}" th:value="${category}"
+                    th:text="${category}" th:selected="${category == selectedCategory}">分类</option>
+        </select>
+        <button type="submit">筛选</button>
+    </form>
+    <div class="grid" th:if="${works != null and !works.isEmpty()}">
+        <article class="card" th:each="work : ${works}">
+            <img class="cover" th:if="${work.coverImg != null and !work.coverImg.isBlank()}" th:src="${work.coverImg}" th:alt="${work.title}">
+            <div class="placeholder" th:unless="${work.coverImg != null and !work.coverImg.isBlank()}">暂无封面</div>
+            <div class="content">
+                <span class="status-badge" th:if="${mine}" th:classappend="'status-' + ${work.auditStatus}">
+                    <span th:switch="${work.auditStatus}">
+                        <span th:case="0">审核中</span>
+                        <span th:case="1">已通过</span>
+                        <span th:case="2">已驳回</span>
+                    </span>
+                </span>
+                <p class="reject-reason" th:if="${mine == true and work.auditStatus == 2 and work.auditRemark != null}"
+                   th:text="'驳回理由：' + ${work.auditRemark}"></p>
+                <h3 th:text="${work.title}">展品标题</h3>
+                <span class="category-label" th:text="${work.category}">其他</span>
+                <small th:text="${work.craftsman != null ? '匠人：' + work.craftsman.username : '匠人作品'}">匠人作品</small>
+                <p th:text="${work.description != null ? work.description : '暂无作品介绍'}">作品介绍</p>
+                <div class="actions">
+                    <a th:href="@{/work/{id}(id=${work.id})}">查看详情</a>
+                    <a th:if="${session.loginUser != null and work.craftsman != null and session.loginUser.id == work.craftsman.id}"
+                       th:href="@{/work/{id}/edit(id=${work.id})}">编辑</a>
+                </div>
+            </div>
+        </article>
+    </div>
+    <div class="empty-card" th:unless="${works != null and !works.isEmpty()}">
+        <span th:text="${selectedCategory != null and !selectedCategory.isBlank() ? '该分类暂无展品，请切换其他分类。' : '暂无展品，匠人可以从“发布展品”开始添加。'}">暂无展品</span>
+    </div>
+</main>
 </body>
 </html>
