@@ -1,43 +1,58 @@
 package com.zjxy.intangible_heritage.controller;
 
+import com.zjxy.intangible_heritage.entity.User;
+import com.zjxy.intangible_heritage.service.InteractionService;
+import com.zjxy.intangible_heritage.service.UserWorkService;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@RequiredArgsConstructor
 public class IndexController {
 
+    private final UserWorkService userWorkService;
+    private final InteractionService interactionService;
+
     @GetMapping("/")
-    public String index(){
+    public String index() {
         return "index";
     }
 
-    //非遗展品列表页
     @GetMapping("/work/list")
-    public String workList(){
+    public String workList() {
         return "work/list";
     }
 
-    //手作教程列表页
     @GetMapping("/tutorial/list")
-    public String tutorialList(){
+    public String tutorialList() {
         return "tutorial/list";
     }
 
-    //定制对接页面
     @GetMapping("/custom/apply")
-    public String customApply(){
+    public String customApply() {
         return "apply";
     }
 
-    //用户作品分享页
-    @GetMapping("/userWork/share")
-    public String userWorkShare(){
-        return "share";
-    }
-
-    //用户中心
     @GetMapping("/user/userCenter")
-    public String userUserCenter(){
+    public String userUserCenter(HttpSession session, Model model) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("user", loginUser);
+
+        int worksCount = userWorkService.listByUser(loginUser.getId()).size();
+        int likesCount = interactionService.listLikesByUser(loginUser.getId(), 3).size();
+        int commentsCount = interactionService.listMyComments(loginUser.getId()).size();
+
+        model.addAttribute("myWorksCount", worksCount);
+        model.addAttribute("myLikesCount", likesCount);
+        model.addAttribute("myCommentsCount", commentsCount);
+
         return "user/userCenter";
     }
 }
