@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登录 / 注册</title>
+    <style>
+        @keyframes floatOrb { 0%,100%{transform:translate(0,0)} 50%{transform:translate(25px,-30px)} }
+        @keyframes floatOrb2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,20px)} }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+            background: linear-gradient(145deg, #2a1508 0%, #3d2010 35%, #5c3317 65%, #784b2a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            padding: 24px;
+        }
+        canvas#particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        .bg-orb {
+            position: fixed; border-radius: 50%; filter: blur(80px); z-index: 0;
+        }
+        .orb1 { width: 450px; height: 450px; background: radial-gradient(circle, rgba(160,103,63,0.22), transparent 70%); top: -8%; left: -6%; animation: floatOrb 12s ease-in-out infinite; }
+        .orb2 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(200,144,96,0.16), transparent 70%); bottom: -10%; right: -6%; animation: floatOrb2 15s ease-in-out infinite; }
+        .orb3 { width: 260px; height: 260px; background: radial-gradient(circle, rgba(232,201,160,0.12), transparent 70%); top: 45%; left: 55%; animation: floatOrb 10s ease-in-out infinite reverse; }
+        @keyframes gentleFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes gentleFloat2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+        .bg-text {
+            position: fixed; z-index: 0;
+            color: rgba(212,176,132,0.25);
+            font-family: "KaiTi", "STKaiti", "FangSong", "STFangsong", serif;
+            pointer-events: none;
+            user-select: none;
+        }
+        .bg-text-vertical {
+            writing-mode: vertical-rl;
+            letter-spacing: 12px;
+            font-size: 28px;
+            font-weight: 400;
+        }
+        .bg-text-left {
+            left: 6%; top: 12%;
+            animation: gentleFloat 8s ease-in-out infinite;
+        }
+        .bg-text-right {
+            right: 6%; bottom: 12%;
+            animation: gentleFloat2 10s ease-in-out infinite;
+        }
+        .bg-text-poem {
+            font-size: 16px;
+            letter-spacing: 6px;
+            line-height: 2.2;
+        }
+        .bg-text-poem-left {
+            left: 4%; bottom: 18%;
+            animation: gentleFloat2 12s ease-in-out infinite;
+        }
+        .bg-text-poem-right {
+            right: 5%; top: 18%;
+            animation: gentleFloat 9s ease-in-out infinite;
+        }
+        .bg-text-big {
+            font-size: 80px;
+            letter-spacing: 20px;
+            font-weight: 700;
+            opacity: 0.12;
+        }
+        .bg-text-big-left {
+            left: 3%; top: 50%;
+            transform: translateY(-50%) rotate(-8deg);
+        }
+        .bg-text-big-right {
+            right: 2%; bottom: 30%;
+            transform: rotate(5deg);
+        }
+        .auth-card {
+            width: 450px;
+            max-width: 100%;
+            background: rgba(255,250,245,0.72);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: 0 24px 64px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.3);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.7s cubic-bezier(0.16,1,0.3,1);
+        }
+        .brand-bar {
+            background: linear-gradient(135deg, rgba(92,51,23,0.9), rgba(120,75,42,0.85), rgba(160,103,63,0.8));
+            color: #fff;
+            text-align: center;
+            padding: 28px 20px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .brand-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 300%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+            animation: shimmer 5s linear infinite;
+        }
+        .brand-bar .logo { font-size: 34px; margin-bottom: 8px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25)); }
+        .brand-bar .title { font-size: 19px; font-weight: 700; letter-spacing: 3px; text-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .brand-bar .sub { font-size: 12px; opacity: 0.82; margin-top: 5px; letter-spacing: 2px; }
+        .tabs {
+            display: flex;
+            background: rgba(250,247,242,0.5);
+            border-bottom: 1px solid rgba(216,203,189,0.4);
+            position: relative;
+        }
+        .tab-indicator {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 50%; height: 3px;
+            background: linear-gradient(90deg, #784b2a, #a0673f);
+            border-radius: 3px 3px 0 0;
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+        }
+        .tab-indicator.right { transform: translateX(100%); }
+        .tab {
+            flex: 1;
+            padding: 16px 0;
+            text-align: center;
+            cursor: pointer;
+            color: #999;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+        .tab.active { color: #5c3317; font-weight: 700; }
+        .slider {
+            display: flex;
+            width: 200%;
+            transition: transform 0.48s cubic-bezier(0.16,1,0.3,1);
+        }
+        .slider.to-register { transform: translateX(-50%); }
+        .panel {
+            width: 50%;
+            padding: 30px 32px;
+        }
+        .panel h2 {
+            margin: 0 0 24px;
+            color: #5c3317;
+            font-size: 23px;
+            font-weight: 700;
+            position: relative;
+        }
+        .panel h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px; left: 0;
+            width: 38px; height: 3px;
+            background: linear-gradient(90deg, #784b2a, #a0673f);
+            border-radius: 2px;
+        }
+        .panel .field { margin-bottom: 18px; }
+        .panel label {
+            display: block;
+            margin-bottom: 7px;
+            color: #5c3317;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .panel input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid rgba(216,203,189,0.7);
+            border-radius: 11px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+            background: rgba(255,255,255,0.65);
+        }
+        .panel input:focus {
+            border-color: #784b2a;
+            box-shadow: 0 0 0 4px rgba(120,75,42,0.08), 0 4px 12px rgba(120,75,42,0.05);
+            background: rgba(255,255,255,0.88);
+            transform: translateY(-1px);
+        }
+        .panel input::placeholder { color: #bbb; }
+        .captcha-row { display: flex; gap: 10px; align-items: center; }
+        .captcha-row input { flex: 1; }
+        .captcha-img {
+            height: 44px;
+            cursor: pointer;
+            border: 1.5px solid rgba(216,203,189,0.7);
+            border-radius: 11px;
+            transition: transform 0.2s;
+        }
+        .captcha-img:hover { transform: scale(1.04); }
+        .btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #5c3317, #784b2a, #a0673f);
+            background-size: 200% 200%;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+            box-shadow: 0 5px 18px rgba(120,75,42,0.32);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 300%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+            transition: left 0.5s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(120,75,42,0.42); background-position: 100% 0; }
+        .btn:hover::after { left: 100%; }
+        .btn:active { transform: translateY(0); }
+        .guest-btn {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #784b2a;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .guest-btn:hover { background: rgba(120,75,42,0.06); text-decoration: none; }
+        .divider {
+            display: flex; align-items: center; gap: 12px;
+            margin: 18px 0; color: #c0b5a5; font-size: 13px;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(216,203,189,0.5); }
+        .msg {
+            color: #b42318;
+            font-size: 13px;
+            margin-bottom: 14px;
+            padding: 10px 14px;
+            background: rgba(254,240,240,0.8);
+            border-radius: 9px;
+            border-left: 3px solid #b42318;
+            display: none;
+        }
+        .msg:not(:empty) { display: block; }
+    </style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
+
+<div class="bg-text bg-text-vertical bg-text-left">匠心传承</div>
+<div class="bg-text bg-text-vertical bg-text-right">技艺流芳</div>
+<div class="bg-text bg-text-poem bg-text-poem-left">指尖流转<br>千年匠心</div>
+<div class="bg-text bg-text-poem bg-text-poem-right">一针一线<br>皆是传承</div>
+<div class="bg-text bg-text-big bg-text-big-left">非遗</div>
+<div class="bg-text bg-text-big bg-text-big-right">手作</div>
+
+<div class="auth-card">
+    <div class="brand-bar">
+        <div class="logo">🏺</div>
+        <div class="title">非遗手作共创平台</div>
+        <div class="sub">传承匠心 · 共创美好</div>
+    </div>
+    <div class="tabs">
+        <div class="tab active" id="tab-login" onclick="switchTab('login')">登 录</div>
+        <div class="tab" id="tab-register" onclick="switchTab('register')">注 册</div>
+        <div class="tab-indicator" id="tabIndicator"></div>
+    </div>
+
+    <div class="slider" id="slider">
+        <div class="panel">
+            <h2>欢迎回来</h2>
+            <p class="msg" th:text="${msg}"></p>
+            <form th:action="@{/login}" method="post">
+                <div class="field">
+                    <label>用户名 / 手机号</label>
+                    <input type="text" name="account" required placeholder="请输入用户名或手机号">
+                </div>
+                <div class="field">
+                    <label>密码</label>
+                    <input type="password" name="password" required placeholder="请输入密码">
+                </div>
+                <button type="submit" class="btn">登 录</button>
+            </form>
+            <div class="divider">或</div>
+            <a class="guest-btn" th:href="@{/}">以游客身份浏览 →</a>
+        </div>
+
+        <div class="panel">
+            <h2>加入我们</h2>
+            <p class="msg" th:text="${msg}"></p>
+            <form th:action="@{/register}" method="post">
+                <div class="field">
+                    <label>用户名</label>
+                    <input type="text" name="username" required placeholder="给自己取个名字">
+                </div>
+                <div class="field">
+                    <label>密码</label>
+                    <input type="password" name="password" required placeholder="设置登录密码">
+                </div>
+                <div class="field">
+                    <label>手机号</label>
+                    <input type="tel" name="phone" required pattern="\d{11}" maxlength="11" placeholder="请输入11位手机号">
+                </div>
+                <div class="field">
+                    <label>验证码</label>
+                    <div class="captcha-row">
+                        <input type="text" name="captcha" required maxlength="4" placeholder="请输入右侧验证码">
+                        <img class="captcha-img" th:src="@{/captcha}" alt="验证码" title="点击刷新" onclick="refreshCaptcha(this)">
+                    </div>
+                </div>
+                <button type="submit" class="btn">注 册</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var captchaUrl = /*[[@{/captcha}]]*/ '/captcha';
+    function refreshCaptcha(img) {
+        img.style.transform = 'scale(0.9)';
+        setTimeout(function(){ img.style.transform = ''; }, 200);
+        img.src = captchaUrl + '?' + new Date().getTime();
+    }
+    function switchTab(tab) {
+        var slider = document.getElementById('slider');
+        var tabLogin = document.getElementById('tab-login');
+        var tabRegister = document.getElementById('tab-register');
+        var indicator = document.getElementById('tabIndicator');
+        if (tab === 'register') {
+            slider.classList.add('to-register');
+            tabRegister.classList.add('active');
+            tabLogin.classList.remove('active');
+            indicator.classList.add('right');
+        } else {
+            slider.classList.remove('to-register');
+            tabLogin.classList.add('active');
+            tabRegister.classList.remove('active');
+            indicator.classList.remove('right');
+        }
+    }
+    var showRegister = /*[[${showRegister}]]*/ false;
+    var registerError = /*[[${registerError}]]*/ false;
+    if (showRegister || registerError) switchTab('register');
+
+    (function(){
+        var canvas = document.getElementById('particles');
+        var ctx = canvas.getContext('2d');
+        var particles = [];
+        var count = 55;
+        function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resize();
+        window.addEventListener('resize', resize);
+        for(var i=0;i<count;i++){
+            particles.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*1.8+0.4, vx:(Math.random()-0.5)*0.35, vy:(Math.random()-0.5)*0.35, a:Math.random()*0.35+0.08 });
+        }
+        function draw(){
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            for(var i=0;i<particles.length;i++){
+                var p=particles[i];
+                p.x+=p.vx; p.y+=p.vy;
+                if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
+                if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
+                ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+                ctx.fillStyle='rgba(212,176,132,'+p.a+')'; ctx.fill();
+                for(var j=i+1;j<particles.length;j++){
+                    var q=particles[j], dx=p.x-q.x, dy=p.y-q.y, d=dx*dx+dy*dy;
+                    if(d<14000){ ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.strokeStyle='rgba(168,110,68,'+(0.05*(1-d/14000))+')'; ctx.stroke(); }
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+    })();
+</script>
+</body>
+</html>

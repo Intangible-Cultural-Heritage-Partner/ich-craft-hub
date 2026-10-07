@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="navbar">
+<style>
+    @keyframes navSlideDown { from{opacity:0;transform:translateY(-100%)} to{opacity:1;transform:translateY(0)} }
+    .nav-bar{
+        background: linear-gradient(135deg, #3d2010 0%, #5c3317 30%, #6b3e1f 70%, #7a4a28 100%);
+        color:#fff;
+        padding: 0 3rem;
+        height: 72px;
+        display:flex;
+        gap:1.5rem;
+        align-items:center;
+        box-shadow: 0 4px 24px rgba(30,15,5,0.35);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        animation: navSlideDown 0.5s ease;
+    }
+    .nav-bar::after{
+        content:'';
+        position:absolute;
+        left:0; right:0; bottom:0;
+        height:2px;
+        background: linear-gradient(90deg, transparent 5%, #c89060, #e8c9a0, #c89060, transparent 95%);
+    }
+    .nav-bar .brand{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        white-space: nowrap;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+        cursor: default;
+    }
+    .nav-bar .brand .logo{
+        font-size: 30px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .nav-bar .nav-links{
+        display:flex;
+        gap: 0.4rem;
+        height: 100%;
+        align-items: center;
+        margin-left: 2rem;
+    }
+    .nav-bar .nav-links a{
+        color:#fff;
+        text-decoration:none;
+        font-size:15px;
+        font-weight: 500;
+        padding: 8px 20px;
+        border-radius: 22px;
+        transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+        opacity: 0.85;
+        border: 1px solid transparent;
+        position: relative;
+    }
+    .nav-bar .nav-links a:hover{
+        background: rgba(255,255,255,0.15);
+        border-color: rgba(255,255,255,0.25);
+        opacity: 1;
+        text-decoration:none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .nav-bar .nav-links a:active{ transform: translateY(0); }
+    .avatar-wrap{
+        margin-left:auto;
+        position:relative;
+        padding-bottom:14px;
+    }
+    .avatar-img{
+        width:44px;
+        height:44px;
+        border-radius:50%;
+        cursor:pointer;
+        border:2.5px solid rgba(255,255,255,0.6);
+        object-fit: cover;
+        display:block;
+        transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    .avatar-wrap:hover .avatar-img{
+        transform: scale(1.12);
+        box-shadow: 0 4px 16px rgba(200,144,96,0.4);
+        border-color: rgba(255,255,255,0.9);
+    }
+    .dropdown-menu{
+        display:none;
+        position:absolute;
+        right:0;
+        top:58px;
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        min-width:190px;
+        border-radius:16px;
+        box-shadow:0 12px 40px rgba(30,15,5,0.2), 0 0 0 1px rgba(240,230,216,0.5);
+        z-index:999;
+        overflow:hidden;
+        border: 1px solid rgba(240,230,216,0.6);
+    }
+    .dropdown-menu::before{
+        content:'';
+        position:absolute;
+        top:-7px; right:20px;
+        width:14px; height:14px;
+        background: rgba(255,255,255,0.95);
+        transform: rotate(45deg);
+        border-left:1px solid rgba(240,230,216,0.6);
+        border-top:1px solid rgba(240,230,216,0.6);
+    }
+    .dropdown-menu a{
+        display:block;
+        color:#5c3317;
+        padding:13px 20px;
+        font-size:14px;
+        font-weight: 500;
+        transition: all 0.25s;
+        border-left: 3px solid transparent;
+    }
+    .dropdown-menu a:hover{
+        background: rgba(120,75,42,0.06);
+        color:#784b2a;
+        border-left-color:#784b2a;
+        text-decoration:none;
+        padding-left: 24px;
+    }
+    .avatar-wrap:hover .dropdown-menu{ display:block; }
+</style>
+
+<div class="nav-bar">
+    <div class="brand">
+        <span class="logo">🏺</span>
+        <span>非遗手作共创平台</span>
+    </div>
+    <div class="nav-links">
+        <a th:href="@{/}">首页</a>
+        <a th:href="@{/work/list}">非遗展品</a>
+        <a th:href="@{/tutorial/list}">手作教程</a>
+    </div>
+
+    <!--头像+下拉菜单-->
+    <div th:fragment="nav" class="avatar-wrap">
+        <!--默认头像，未登录使用默认图；已登录显示用户头像，无头像也使用默认占位图-->
+        <img class="avatar-img"
+             th:src="${session.loginUser != null && session.loginUser.avatar != null ? session.loginUser.avatar : '/images/default_avatar.png'}"
+             alt="头像">
+
+        <div class="dropdown-menu">
+            <!-- ==========未登录下拉========== -->
+            <div th:if="${session.loginUser == null}">
+                <a th:href="@{/login}">登录</a>
+                <a th:href="@{/register}">注册</a>
+            </div>
+
+            <!-- ==========普通用户 role=0 下拉========== -->
+            <div th:if="${session.loginUser != null && session.loginUser.role == '0'}">
+                <a th:href="@{/custom/apply}">定制申请</a>
+                <a th:href="@{/custom/myApply}">我的定制</a>
+                <a th:href="@{/userWork/publish}">我的作品</a>
+                <a th:href="@{/craftsman/apply}">申请成为匠人</a>
+                <a th:href="@{/user/userCenter}">个人中心</a>
+                <a th:href="@{/logout}">退出登录</a>
+            </div>
+
+            <!-- ==========匠人 role=1 下拉========== -->
+            <div th:if="${session.loginUser != null && session.loginUser.role == '1'}">
+                <a th:href="@{/work/create}">发布展品</a>
+                <a th:href="@{/tutorial/create}">发布教程</a>
+                <a th:href="@{/custom/myCraft}">定制订单</a>
+                <a th:href="@{/user/userCenter}">个人中心</a>
+                <a th:href="@{/logout}">退出登录</a>
+            </div>
+
+            <!-- ==========管理员 role=2 下拉========== -->
+            <div th:if="${session.loginUser != null && session.loginUser.role == '2'}">
+                <a th:href="@{/audit/list}">内容审核</a>
+                <a th:href="@{/admin/stat}">数据概览</a>
+                <a th:href="@{/user/userCenter}">个人中心</a>
+                <a th:href="@{/logout}">退出登录</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

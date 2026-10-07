@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>发给我的定制</title>
+    <style>
+        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
+        .wrap{padding:30px 50px;}
+        h2{color:#784b2a;}
+        .msg{color:#2e7d32;margin-bottom:10px;}
+        table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 4px #ccc;}
+        th,td{border:1px solid #e0d8c8;padding:10px;text-align:left;}
+        th{background:#784b2a;color:#fff;}
+        tr:hover{background:#faf6ee;}
+        .badge{padding:3px 10px;border-radius:10px;font-size:13px;}
+        .s0{background:#fff3cd;color:#8a6d3b;}
+        .s1{background:#f8d7da;color:#842029;}
+        .s2{background:#d1e7dd;color:#0f5132;}
+        .s3{background:#cfe2ff;color:#084298;}
+        form{display:inline-block;margin-right:8px;}
+        input[type=text]{width:200px;padding:5px;border:1px solid #ccc;border-radius:4px;}
+        button{padding:5px 12px;border:none;border-radius:4px;cursor:pointer;}
+        .accept{background:#0f5132;color:#fff;}
+        .reject{background:#842029;color:#fff;}
+        a.btn{color:#784b2a;}
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <h2>发给我的定制申请</h2>
+    <p class="msg" th:text="${msg}"></p>
+
+    <div th:if="${orders != null && !orders.isEmpty()}">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>申请人</th>
+                <th>作品描述</th>
+                <th>材质要求</th>
+                <th>预算</th>
+                <th>期望时间</th>
+                <th>状态</th>
+                <th>申请时间</th>
+                <th>操作</th>
+            </tr>
+            <tr th:each="o : ${orders}">
+                <td th:text="${o.id}"></td>
+                <td th:text="${partyNames.get(o.applyUserId)}"></td>
+                <td th:text="${o.workDesc}"></td>
+                <td th:text="${o.materialRequire}"></td>
+                <td th:text="${o.budget}"></td>
+                <td th:text="${o.expectFinishTime}"></td>
+                <td>
+                    <span class="badge"
+                          th:classappend="'s' + ${o.orderStatus}"
+                          th:text="${o.statusText}"></span>
+                </td>
+                <td th:text="${o.createTime}"></td>
+                <td>
+                    <!-- 新建态：可接受 / 拒绝 -->
+                    <form th:if="${o.orderStatus == 0}" th:action="@{'/custom/accept/' + ${o.id}}" method="post">
+                        <button class="accept" type="submit">接受</button>
+                    </form>
+                    <form th:if="${o.orderStatus == 0}" th:action="@{'/custom/reject/' + ${o.id}}" method="post">
+                        <input type="text" name="refuseReason" placeholder="拒绝理由"/>
+                        <button class="reject" type="submit">拒绝</button>
+                    </form>
+                    <!-- 其它态：进聊天页 -->
+                    <a th:href="@{'/custom/chat/' + ${o.id}}" class="btn">沟通/查看</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <p th:if="${orders == null || orders.isEmpty()}">暂无收到的申请。</p>
+</div>
+</body>
+</html>

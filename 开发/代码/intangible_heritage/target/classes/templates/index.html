@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>非遗手作数字展示与共创平台</title>
+    <style>
+        @keyframes heroFade { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,-20px)} }
+        @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,15px)} }
+        @keyframes cardIn { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+            background: #f8f5f0;
+            color: #333;
+        }
+        .hero {
+            background: linear-gradient(135deg, #3d2010 0%, #5c3317 25%, #784b2a 50%, #a0673f 75%, #b87a4a 100%);
+            color: #fff;
+            padding: 80px 8% 90px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero .orb {
+            position: absolute; border-radius: 50%; filter: blur(60px);
+        }
+        .hero .orb1 { width: 300px; height: 300px; background: rgba(200,144,96,0.15); right: -3%; top: -10%; animation: float1 8s ease-in-out infinite; }
+        .hero .orb2 { width: 250px; height: 250px; background: rgba(232,201,160,0.1); left: 5%; bottom: -15%; animation: float2 11s ease-in-out infinite; }
+        .hero-content { position: relative; z-index: 1; animation: heroFade 0.8s ease; }
+        .hero h1 {
+            margin: 0 0 16px;
+            font-size: 38px;
+            letter-spacing: 4px;
+            color: #fff;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .hero p {
+            margin: 0;
+            font-size: 17px;
+            color: rgba(255,255,255,0.85);
+            letter-spacing: 2px;
+        }
+        .main-container {
+            padding: 60px 8%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 36px;
+        }
+        .section-title {
+            font-size: 26px;
+            color: #5c3317;
+            margin: 0;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 12px;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 50px; height: 3px;
+            background: linear-gradient(90deg, #784b2a, #a0673f);
+            border-radius: 2px;
+        }
+        .section-sub {
+            color: #999;
+            margin: 0;
+            font-size: 15px;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 28px;
+        }
+        .func-card {
+            background: #fff;
+            padding: 32px 28px;
+            border-radius: 18px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+            transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+            border: 1px solid rgba(240,230,216,0.6);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: cardIn 0.6s ease forwards;
+        }
+        .func-card:nth-child(1) { animation-delay: 0.1s; }
+        .func-card:nth-child(2) { animation-delay: 0.2s; }
+        .func-card:nth-child(3) { animation-delay: 0.3s; }
+        .func-card:nth-child(4) { animation-delay: 0.4s; }
+        .func-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #784b2a, #a0673f, #c89060);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .func-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(120,75,42,0.15);
+            border-color: rgba(120,75,42,0.15);
+        }
+        .func-card:hover::before { opacity: 1; }
+        .func-card .icon {
+            font-size: 42px;
+            margin-bottom: 18px;
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+        .func-card:hover .icon { transform: scale(1.15) rotate(-5deg); }
+        .func-card h3 {
+            margin: 0 0 10px;
+            color: #5c3317;
+            font-size: 19px;
+            font-weight: 700;
+        }
+        .func-card p {
+            margin: 0 0 20px;
+            color: #888;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .func-card a {
+            color: #784b2a;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .func-card a:hover {
+            gap: 8px;
+            color: #5c3317;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="hero">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="hero-content">
+        <h1>非遗手作数字展示与共创平台</h1>
+        <p>非遗作品展示 · 手作教程 · 定制对接 · 用户作品分享共创</p>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">平台功能</h2>
+            <p class="section-sub">探索非遗技艺，开启手作之旅</p>
+        </div>
+    </div>
+    <div class="cards">
+        <div class="func-card">
+            <div class="icon">🏺</div>
+            <h3>非遗作品展示</h3>
+            <p>浏览匠人非遗手作，查看技艺背景介绍</p>
+            <a th:href="@{/work/list}">前往浏览 <span>→</span></a>
+        </div>
+        <div class="func-card">
+            <div class="icon">📖</div>
+            <h3>手作教程</h3>
+            <p>学习手工技艺，视频图文并茂</p>
+            <a th:href="@{/tutorial/list}">前往学习 <span>→</span></a>
+        </div>
+        <div class="func-card">
+            <div class="icon">🤝</div>
+            <h3>手作定制对接</h3>
+            <p>向匠人发起定制，线上沟通需求</p>
+            <a th:href="@{/custom/apply}">发起定制 <span>→</span></a>
+        </div>
+        <div class="func-card">
+            <div class="icon">💝</div>
+            <h3>用户作品分享</h3>
+            <p>分享练习作品，点赞评论交流</p>
+            <a th:href="@{/userWork/share}">查看分享 <span>→</span></a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

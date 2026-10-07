@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>手作教程</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
+        .wrap { padding: 40px 6%; }
+        .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+        .top h1 { margin: 0 0 6px; color: #784b2a; font-size: 26px; }
+        .top p { margin: 0; color: #888; font-size: 14px; }
+        .top .actions { display: flex; gap: 10px; }
+        .top a { color: #fff; background: #784b2a; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; transition: background 0.2s; display: inline-block; }
+        .top a:hover { background: #5f3a20; }
+        .message { padding: 12px 16px; background: #fff3cd; color: #856404; border-radius: 8px; margin-bottom: 20px; }
+        .category-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+        .category-bar a {
+            padding: 7px 18px; border-radius: 20px; text-decoration: none;
+            font-size: 14px; border: 1px solid #d8cbbd; color: #784b2a;
+            background: #fff; transition: all 0.2s;
+        }
+        .category-bar a:hover { background: #f0e6d8; }
+        .category-bar a.active { background: #784b2a; color: #fff; border-color: #784b2a; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px; }
+        .card {
+            background: #fff; border-radius: 14px; overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 1px solid #f0e6d8;
+            transition: transform 0.25s, box-shadow 0.25s;
+            display: flex; flex-direction: column;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 28px rgba(120,75,42,0.15); }
+        .cover-wrap { position: relative; width: 100%; height: 170px; background: linear-gradient(135deg, #eadfce, #d8cbbd); }
+        .cover-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .video-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0,0,0,0.65); color: #fff; font-size: 12px;
+            padding: 3px 8px; border-radius: 4px;
+        }
+        .content { padding: 16px 18px; flex: 1; display: flex; flex-direction: column; }
+        .content h3 { margin: 0 0 6px; color: #784b2a; font-size: 17px; }
+        .content .desc { color: #666; font-size: 13px; line-height: 1.5; margin: 0 0 10px; flex: 1;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+        .tag {
+            display: inline-block; padding: 2px 10px; border-radius: 12px;
+            font-size: 12px; background: #f0e6d8; color: #784b2a;
+        }
+        .tag.cat { background: #784b2a; color: #fff; }
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-bottom: 8px; align-self: flex-start; }
+        .status-0 { background: #fff3cd; color: #856404; }
+        .status-1 { background: #d4edda; color: #155724; }
+        .status-2 { background: #f8d7da; color: #721c24; }
+        .reject-reason { color: #842029; background: #f8d7da; padding: 6px 10px; border-radius: 6px; font-size: 12px; margin: 0 0 8px; }
+        .empty-card { background: #fff; padding: 60px 24px; border-radius: 14px; text-align: center; color: #999; border: 1px dashed #d8cbbd; }
+        .empty-card .icon { font-size: 48px; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div class="wrap">
+    <div class="top">
+        <div>
+            <h1 th:text="${mine == true ? '我的教程' : '手作教程'}">手作教程</h1>
+            <p>学习非遗手工技艺，跟随匠人一步步制作传统手作</p>
+        </div>
+        <div class="actions" th:if="${session.loginUser != null and (session.loginUser.role == 'CRAFTSMAN' or session.loginUser.role == '1')}">
+            <a th:href="@{/tutorial/create}">发布教程</a>
+            <a th:href="@{/tutorial/mine}">我的教程</a>
+        </div>
+    </div>
+    <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
+
+    <div class="category-bar" th:if="${categories != null and mine != true}">
+        <a th:href="@{/tutorial/list}" th:classappend="${currentCategory == null or currentCategory.isEmpty()} ? 'active'">全部</a>
+        <a th:each="cat : ${categories}" th:href="@{/tutorial/list(category=${cat})}"
+           th:text="${cat}" th:classappend="${cat == currentCategory} ? 'active'"></a>
+    </div>
+
+    <div class="grid" th:if="${tutorials != null and !tutorials.isEmpty()}">
+        <a class="card" th:each="t : ${tutorials}" th:href="@{/tutorial/{id}(id=${t.id})}" style="text-decoration:none;color:inherit;">
+            <div class="cover-wrap">
+                <img th:if="${t.coverImg != null and !t.coverImg.isEmpty()}" th:src="${t.coverImg}" th:alt="${t.title}">
+                <span class="video-badge" th:if="${t.videoUrl != null and !t.videoUrl.isEmpty()}">▶ 视频</span>
+            </div>
+            <div class="content">
+                <span class="status-badge" th:if="${mine}" th:classappend="'status-' + ${t.auditStatus}">
+                    <span th:switch="${t.auditStatus}"><span th:case="0">审核中</span><span th:case="1">已通过</span><span th:case="2">已驳回</span></span>
+                </span>
+                <p class="reject-reason" th:if="${mine == true and t.auditStatus == 2 and t.auditRemark != null}"
+                   th:text="'驳回：' + ${t.auditRemark}"></p>
+                <h3 th:text="${t.title}">教程标题</h3>
+                <p class="desc" th:text="${t.description != null ? t.description : '暂无介绍'}">教程介绍</p>
+                <div class="tag-row">
+                    <span class="tag cat" th:if="${t.category != null}" th:text="${t.category}">分类</span>
+                    <span class="tag" th:each="tag : ${#strings.arraySplit(t.tags == null ? '' : t.tags, ',')}"
+                          th:if="${!tag.trim().isEmpty()}" th:text="${tag.trim()}">标签</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="empty-card" th:unless="${tutorials != null and !tutorials.isEmpty()}">
+        <div class="icon">📖</div>
+        <p>暂无教程，敬请期待匠人发布精彩手作教程</p>
+    </div>
+</div>
+</body>
+</html>

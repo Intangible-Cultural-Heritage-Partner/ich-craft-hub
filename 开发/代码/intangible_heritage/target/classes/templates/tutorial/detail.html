@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${tutorial.title} + ' - 手作教程'">手作教程详情</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
+        .wrap { max-width: 900px; margin: 36px auto; padding: 0 20px; }
+        .panel { background: #fff; padding: 36px; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border: 1px solid #f0e6d8; }
+        h1 { color: #784b2a; margin: 0 0 8px; font-size: 26px; }
+        .meta { color: #999; font-size: 14px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f0e6d8; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+        .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+        .tag { display: inline-block; padding: 3px 12px; border-radius: 14px; font-size: 13px; background: #f0e6d8; color: #784b2a; }
+        .tag.cat { background: #784b2a; color: #fff; }
+        .cover { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 20px; }
+        .video-wrap { margin-bottom: 24px; border-radius: 12px; overflow: hidden; background: #000; }
+        .video-wrap video { width: 100%; max-height: 480px; display: block; }
+        .section { margin-top: 24px; line-height: 1.9; white-space: pre-wrap; }
+        .section h2 { color: #784b2a; font-size: 19px; margin: 0 0 12px; padding-left: 12px; border-left: 4px solid #784b2a; }
+        .section div { color: #555; font-size: 15px; }
+        .reject-notice { color: #842029; background: #f8d7da; padding: 14px 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #dc3545; }
+        .reject-notice strong { display: block; margin-bottom: 4px; }
+        .links { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+        .links a { color: #784b2a; text-decoration: none; padding: 8px 18px; border: 1px solid #784b2a; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
+        .links a:hover { background: #784b2a; color: #fff; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<main class="wrap">
+    <article class="panel">
+        <h1 th:text="${tutorial.title}">教程标题</h1>
+        <div class="meta">
+            <span th:if="${craftsman != null}" th:text="'匠人：' + ${craftsman.username}"></span>
+            <span th:if="${tutorial.createTime != null}" th:text="${#temporals.format(tutorial.createTime, 'yyyy-MM-dd HH:mm')}"></span>
+        </div>
+        <div class="tag-row">
+            <span class="tag cat" th:if="${tutorial.category != null}" th:text="${tutorial.category}">分类</span>
+            <span class="tag" th:each="tag : ${tagList}" th:text="${tag}">标签</span>
+        </div>
+        <div class="reject-notice" th:if="${tutorial.auditStatus == 2 or (tutorial.auditStatus == 0 and tutorial.auditRemark != null)}">
+            <strong th:text="${tutorial.auditStatus == 2 ? '该教程被审核驳回：' : '上次驳回理由（已重新提交，等待再次审核）：'}"></strong>
+            <span th:text="${tutorial.auditRemark != null ? tutorial.auditRemark : '审核未通过，请修改后重新提交'}"></span>
+        </div>
+        <img class="cover" th:if="${tutorial.coverImg != null and !tutorial.coverImg.isEmpty()}" th:src="${tutorial.coverImg}" th:alt="${tutorial.title}">
+        <div class="video-wrap" th:if="${tutorial.videoUrl != null and !tutorial.videoUrl.isEmpty()}">
+            <video controls preload="metadata">
+                <source th:src="${tutorial.videoUrl}">
+                您的浏览器不支持视频播放
+            </video>
+        </div>
+        <div class="section" th:if="${tutorial.description != null and !tutorial.description.isEmpty()}">
+            <h2>教程简介</h2>
+            <div th:text="${tutorial.description}">简介</div>
+        </div>
+        <div class="section" th:if="${tutorial.content != null and !tutorial.content.isEmpty()}">
+            <h2>图文教程</h2>
+            <div th:text="${tutorial.content}">图文正文</div>
+        </div>
+        <div class="links">
+            <a th:href="@{/tutorial/list}">返回教程列表</a>
+            <a th:if="${session.loginUser != null and session.loginUser.id == tutorial.craftsmanId}"
+               th:href="@{/tutorial/{id}/edit(id=${tutorial.id})}">编辑教程</a>
+        </div>
+    </article>
+</main>
+</body>
+</html>

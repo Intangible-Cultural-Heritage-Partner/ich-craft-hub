@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>发布教程</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
+        .wrap { max-width: 800px; margin: 36px auto; padding: 0 20px; }
+        .panel { background: #fff; padding: 32px; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border: 1px solid #f0e6d8; }
+        .panel h1 { color: #784b2a; margin: 0 0 6px; font-size: 24px; }
+        .panel .subtitle { color: #999; font-size: 14px; margin: 0 0 24px; padding-bottom: 18px; border-bottom: 1px solid #f0e6d8; }
+        .panel label { display: block; margin-top: 18px; color: #784b2a; font-weight: 500; font-size: 15px; }
+        .panel input, .panel textarea, .panel select {
+            width: 100%; box-sizing: border-box; margin-top: 8px;
+            padding: 11px 14px; border: 1px solid #d8cbbd; border-radius: 8px;
+            font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+            background: #fff;
+        }
+        .panel input:focus, .panel textarea:focus, .panel select:focus { border-color: #784b2a; box-shadow: 0 0 0 3px rgba(120,75,42,0.1); }
+        .panel textarea { min-height: 120px; resize: vertical; }
+        .panel select { cursor: pointer; }
+        .panel button, .panel a {
+            display: inline-block; margin-top: 24px; padding: 12px 28px;
+            border: 0; border-radius: 8px; text-decoration: none;
+            font-size: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .panel button { color: #fff; background: linear-gradient(135deg, #784b2a, #a0673f); box-shadow: 0 4px 12px rgba(120,75,42,0.3); }
+        .panel button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.4); }
+        .panel a { color: #784b2a; border: 1px solid #784b2a; background: #fff; }
+        .panel a:hover { background: #784b2a; color: #fff; }
+        .message { color: #b42318; background: #fef0f0; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; }
+        .hint { color: #999; font-size: 13px; margin-top: 6px; }
+        .tag-input-wrap { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+        .tag-input-wrap input { flex: 1; min-width: 200px; }
+        .quick-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .quick-tags span {
+            padding: 4px 12px; border-radius: 14px; font-size: 13px;
+            background: #f0e6d8; color: #784b2a; cursor: pointer;
+            border: 1px solid #d8cbbd; transition: all 0.2s; user-select: none;
+        }
+        .quick-tags span:hover { background: #784b2a; color: #fff; }
+        .quick-tags span.selected { background: #784b2a; color: #fff; border-color: #784b2a; }
+        .section-divider { border: 0; border-top: 1px dashed #d8cbbd; margin: 28px 0 8px; }
+        .section-label { color: #784b2a; font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<main class="wrap">
+    <section class="panel">
+        <h1 th:text="${tutorial.id == null ? '发布手作教程' : '编辑手作教程'}">发布手作教程</h1>
+        <p class="subtitle">分享你的非遗技艺，图文+视频让学习更直观</p>
+        <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
+
+        <form th:action="${formAction}" method="post" enctype="multipart/form-data">
+            <label>教程标题
+                <input type="text" name="title" required maxlength="100" th:value="${tutorial.title}" placeholder="如：传统窗花剪纸入门">
+            </label>
+
+            <label>教程简介
+                <textarea name="description" maxlength="300" rows="3" th:text="${tutorial.description}" placeholder="一句话介绍教程内容，方便浏览者快速了解"></textarea>
+            </label>
+
+            <label>分类
+                <select name="category">
+                    <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}"
+                            th:selected="${cat == tutorial.category}">分类</option>
+                </select>
+            </label>
+
+            <label>标签
+                <input type="text" name="tags" id="tagsInput" th:value="${tutorial.tags}" placeholder="自定义标签，逗号分隔">
+            </label>
+            <div class="quick-tags">
+                <span onclick="toggleTag(this)">入门</span>
+                <span onclick="toggleTag(this)">进阶</span>
+                <span onclick="toggleTag(this)">传统</span>
+                <span onclick="toggleTag(this)">创新</span>
+                <span onclick="toggleTag(this)">亲子</span>
+                <span onclick="toggleTag(this)">零基础</span>
+                <span onclick="toggleTag(this)">节日</span>
+                <span onclick="toggleTag(this)">装饰</span>
+            </div>
+
+            <label>封面图片
+                <input type="file" name="coverFile" accept="image/*">
+            </label>
+
+            <hr class="section-divider">
+            <p class="section-label">📹 视频教程（可选）</p>
+            <label>上传视频文件
+                <input type="file" name="videoFile" accept="video/*">
+            </label>
+            <p class="hint">支持 mp4、webm 等常见视频格式</p>
+
+            <hr class="section-divider">
+            <p class="section-label">📝 图文教程（可选）</p>
+            <label>图文正文
+                <textarea name="content" rows="12" th:text="${tutorial.content}" placeholder="详细的手作步骤说明，支持文字描述每一步操作"></textarea>
+            </label>
+            <p class="hint">视频和图文至少填写一项，让学习者有完整的学习资料</p>
+
+            <p class="hint" th:if="${tutorial.id != null}" style="color: #b45309;">注意：编辑保存后，教程将重新进入审核流程。</p>
+
+            <button type="submit">发布教程</button>
+            <a th:href="@{/tutorial/list}">取消</a>
+        </form>
+    </section>
+</main>
+<script>
+    function toggleTag(el) {
+        el.classList.toggle('selected');
+        syncTags();
+    }
+    function syncTags() {
+        var selected = document.querySelectorAll('.quick-tags span.selected');
+        var custom = document.getElementById('tagsInput').value.split(',').map(function(s){return s.trim();}).filter(function(s){return s;});
+        var quickTags = [];
+        selected.forEach(function(el){ quickTags.push(el.textContent); });
+        var all = quickTags.concat(custom.filter(function(t){ return quickTags.indexOf(t) === -1; }));
+        document.getElementById('tagsInput').value = all.join(',');
+    }
+    document.getElementById('tagsInput').addEventListener('input', function() {
+        var vals = this.value.split(',').map(function(s){return s.trim();});
+        document.querySelectorAll('.quick-tags span').forEach(function(el) {
+            el.classList.toggle('selected', vals.indexOf(el.textContent) !== -1);
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        var vals = (document.getElementById('tagsInput').value || '').split(',').map(function(s){return s.trim();});
+        document.querySelectorAll('.quick-tags span').forEach(function(el) {
+            if (vals.indexOf(el.textContent) !== -1) el.classList.add('selected');
+        });
+    });
+</script>
+</body>
+</html>
