@@ -2,10 +2,12 @@ package com.zjxy.intangible_heritage.controller;
 
 import com.zjxy.intangible_heritage.entity.CustomMessage;
 import com.zjxy.intangible_heritage.entity.CustomOrder;
+import com.zjxy.intangible_heritage.entity.CustomPayment;
 import com.zjxy.intangible_heritage.entity.User;
 import com.zjxy.intangible_heritage.repository.UserRepository;
 import com.zjxy.intangible_heritage.service.CustomMessageService;
 import com.zjxy.intangible_heritage.service.CustomOrderService;
+import com.zjxy.intangible_heritage.service.PaymentService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +32,11 @@ import java.util.Map;
  *   GET  /custom/chat/{id}    聊天页
  *   POST /custom/chat/{id}    发消息
  *   GET  /custom/messages/{id} AJAX 拉取消息（轮询）
+ *   POST /custom/quote/{id}   匠人报价（沟通中 -> 待付定金）
+ *   POST /custom/quoteReject/{id} 申请人拒绝报价（待付定金 -> 沟通中）
+ *   POST /custom/done/{id}    匠人标记完工（制作中 -> 待付尾款）
+ *   POST /custom/payDeposit/{id}   支付定金（收银台）
+ *   POST /custom/payBalance/{id}   支付尾款（收银台）
  */
 @Controller
 @RequiredArgsConstructor
@@ -36,6 +44,7 @@ public class CustomOrderController {
 
     private final CustomOrderService customOrderService;
     private final CustomMessageService customMessageService;
+    private final PaymentService paymentService;
     private final UserRepository userRepository;
 
     // ---------- 申请表单 ----------
@@ -154,10 +163,15 @@ public class CustomOrderController {
         User other = userRepository.findById(otherId).orElse(null);
         List<CustomMessage> messages = customMessageService.listByOrder(id);
 
+        boolean isCraftsman = loginUser.getId().equals(order.getCraftsmanId());
         model.addAttribute("order", order);
         model.addAttribute("other", other);
         model.addAttribute("messages", messages);
         model.addAttribute("loginUserId", loginUser.getId());
+        model.addAttribute("isCraftsman", isCraftsman);
+        if (order.getQuotePrice() != null && order.getDepositAmount() != null) {
+            model.addAttribute("balanceAmount", order.getQuotePrice().subtract(order.getDepositAmount()));
+        }
         return "custom/chat";
     }
 
@@ -183,5 +197,69 @@ public class CustomOrderController {
         // 必须是当事人
         customOrderService.getForUserOrCraftsman(id, loginUser.getId());
         return customMessageService.listByOrder(id);
+    }
+
+    // ---------- 报价与交易流转 ----------
+    @PostMapping("/custom/quote/{id}")
+    public String quote(@PathVariable Long id,
+                        @RequestParam BigDecimal quotePrice,
+                        @RequestParam(required = false) String quoteNote,
+                        HttpSession session, RedirectAttributes ra) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        try {
+            customOrderService.quote(id, loginUser.getId(), quotePrice, quoteNote);
+            ra.addFlashAttribute("msg", "报价已发送，等待申请人确认");
+        } catch (IllegalStateException e) {
+            ra.addFlashAttribute("msg", "报价失败：" + e.getMessage());
+        }
+        return "redirect:/custom/chat/" + id;
+    }
+
+    @PostMapping("/custom/quoteReject/{id}")
+    public String quoteReject(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        try {
+            customOrderService.rejectQuote(id, loginUser.getId());
+            ra.addFlashAttribute("msg", "已拒绝报价，可继续沟通");
+        } catch (IllegalStateException e) {
+            ra.addFlashAttribute("msg", "操作失败：" + e.getMessage());
+        }
+        return "redirect:/custom/chat/" + id;
+    }
+
+    @PostMapping("/custom/done/{id}")
+    public String done(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        try {
+            customOrderService.craftsmanDone(id, loginUser.getId());
+            ra.addFlashAttribute("msg", "已标记完工，等待申请人支付尾款");
+        } catch (IllegalStateException e) {
+            ra.addFlashAttribute("msg", "操作失败：" + e.getMessage());
+        }
+        return "redirect:/custom/chat/" + id;
+    }
+
+    @PostMapping("/custom/payDeposit/{id}")
+    public String payDeposit(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        try {
+            CustomPayment payment = paymentService.createDepositPayment(id, loginUser.getId());
+            return "redirect:/custom/pay/" + payment.getOutTradeNo();
+        } catch (IllegalStateException e) {
+            ra.addFlashAttribute("msg", "支付失败：" + e.getMessage());
+            return "redirect:/custom/chat/" + id;
+        }
+    }
+
+    @PostMapping("/custom/payBalance/{id}")
+    public String payBalance(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        try {
+            CustomPayment payment = paymentService.createBalancePayment(id, loginUser.getId());
+            return "redirect:/custom/pay/" + payment.getOutTradeNo();
+        } catch (IllegalStateException e) {
+            ra.addFlashAttribute("msg", "支付失败：" + e.getMessage());
+            return "redirect:/custom/chat/" + id;
+        }
     }
 }

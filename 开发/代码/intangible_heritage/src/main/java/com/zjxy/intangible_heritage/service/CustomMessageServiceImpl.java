@@ -19,10 +19,11 @@ public class CustomMessageServiceImpl implements CustomMessageService {
     @Override
     @Transactional
     public CustomMessage send(Long orderId, Long senderId, String content) {
-        // 必须先校验：发送方是该单子申请方或匠人之一，且单子处于沟通中
+        // 必须先校验：发送方是该单子申请方或匠人之一，且单子处于可沟通状态（沟通中/待付定金/制作中/待付尾款）
         CustomOrder order = customOrderService.getForUserOrCraftsman(orderId, senderId);
-        if (order.getOrderStatus() != 2) {
-            throw new IllegalStateException("仅沟通中状态允许发消息");
+        Integer s = order.getOrderStatus();
+        if (s == null || (s != 2 && s != 4 && s != 5 && s != 6)) {
+            throw new IllegalStateException("当前状态不允许发送消息");
         }
         // receiver = 单子的另一方
         Long receiverId = senderId.equals(order.getApplyUserId())

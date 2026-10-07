@@ -1,11 +1,12 @@
 package com.zjxy.intangible_heritage.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * 定制申请表
- * 状态：0新建申请 1已拒绝 2沟通中 3需求完结
+ * 状态：0新建申请 1已拒绝 2沟通中 3需求完结 4待付定金(已报价) 5制作中 6待付尾款 7交易完成
  */
 @Entity
 @Table(name = "custom_order")
@@ -55,6 +56,18 @@ public class CustomOrder {
     @Column(name = "refuse_reason")
     private String refuseReason;
 
+    /** 匠人报价（总价） */
+    @Column(name = "quote_price", precision = 10, scale = 2)
+    private BigDecimal quotePrice;
+
+    /** 定金金额（报价 * 定金比例） */
+    @Column(name = "deposit_amount", precision = 10, scale = 2)
+    private BigDecimal depositAmount;
+
+    /** 报价说明 */
+    @Column(name = "quote_note", length = 300)
+    private String quoteNote;
+
     @Column(name = "create_time", insertable = false, updatable = false)
     private LocalDateTime createTime;
 
@@ -93,6 +106,15 @@ public class CustomOrder {
     public String getRefuseReason() { return refuseReason; }
     public void setRefuseReason(String refuseReason) { this.refuseReason = refuseReason; }
 
+    public BigDecimal getQuotePrice() { return quotePrice; }
+    public void setQuotePrice(BigDecimal quotePrice) { this.quotePrice = quotePrice; }
+
+    public BigDecimal getDepositAmount() { return depositAmount; }
+    public void setDepositAmount(BigDecimal depositAmount) { this.depositAmount = depositAmount; }
+
+    public String getQuoteNote() { return quoteNote; }
+    public void setQuoteNote(String quoteNote) { this.quoteNote = quoteNote; }
+
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 
@@ -104,6 +126,10 @@ public class CustomOrder {
             case 1 -> "已拒绝";
             case 2 -> "沟通中";
             case 3 -> "需求完结";
+            case 4 -> "待付定金";
+            case 5 -> "制作中";
+            case 6 -> "待付尾款";
+            case 7 -> "交易完成";
             default -> "未知";
         };
     }

@@ -17,6 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
         //   - 其它路径（chat/messages/accept/reject/finish）只做登录校验，
         //     "是否当事人"由 service 层细校验
         registry.addInterceptor(new RoleInterceptor())
-                .addPathPatterns("/custom/**", "/admin/**");
+                .addPathPatterns("/custom/**", "/admin/**", "/wallet/**");
     }
 }
