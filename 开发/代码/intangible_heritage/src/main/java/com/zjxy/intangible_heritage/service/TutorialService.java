@@ -14,6 +14,8 @@ public interface TutorialService {
 
     List<Tutorial> findByCraftsman(Long craftsmanId);
 
+    List<Tutorial> findByCraftsmanAndCategory(Long craftsmanId, String category);
+
     Optional<Tutorial> findById(Long id);
 
     Tutorial create(Long craftsmanId, String title, String description, String category, String tags,

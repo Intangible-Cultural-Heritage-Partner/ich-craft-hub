@@ -46,6 +46,11 @@ public class TutorialServiceImpl implements TutorialService {
     }
 
     @Override
+    public List<Tutorial> findByCraftsmanAndCategory(Long craftsmanId, String category) {
+        return tutorialRepository.findByCraftsmanIdAndCategoryOrderByCreateTimeDesc(craftsmanId, category);
+    }
+
+    @Override
     public Optional<Tutorial> findById(Long id) {
         return tutorialRepository.findById(id);
     }

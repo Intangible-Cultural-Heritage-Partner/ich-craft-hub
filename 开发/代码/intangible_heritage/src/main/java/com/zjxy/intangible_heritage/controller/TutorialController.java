@@ -156,11 +156,17 @@ public class TutorialController {
     }
 
     @GetMapping("/tutorial/mine")
-    public String mine(HttpSession session, Model model) {
+    public String mine(@RequestParam(required = false) String category,
+                       HttpSession session, Model model) {
         User user = currentCraftsman(session);
         if (user == null) return "redirect:/tutorial/list?msg=请先以匠人身份登录";
-        model.addAttribute("tutorials", tutorialService.findByCraftsman(user.getId()));
+        if (category != null && !category.isBlank() && !"全部".equals(category)) {
+            model.addAttribute("tutorials", tutorialService.findByCraftsmanAndCategory(user.getId(), category));
+        } else {
+            model.addAttribute("tutorials", tutorialService.findByCraftsman(user.getId()));
+        }
         model.addAttribute("categories", CATEGORIES);
+        model.addAttribute("currentCategory", category);
         model.addAttribute("mine", true);
         return "tutorial/list";
     }

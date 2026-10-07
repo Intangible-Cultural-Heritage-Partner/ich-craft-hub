@@ -71,13 +71,13 @@
     </div>
     <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
 
-    <div class="category-bar" th:if="${categories != null and mine != true}">
-        <a th:href="@{/tutorial/list}" th:classappend="${currentCategory == null or currentCategory.isEmpty()} ? 'active'">全部</a>
-        <a th:each="cat : ${categories}" th:href="@{/tutorial/list(category=${cat})}"
-           th:text="${cat}" th:classappend="${cat == currentCategory} ? 'active'"></a>
+    <div class="category-bar" th:if="${categories != null}">
+        <a href="javascript:void(0)" data-cat="" th:classappend="${currentCategory == null or currentCategory.isEmpty()} ? 'active'" onclick="loadCategory(this.getAttribute('data-cat'))">全部</a>
+        <a th:each="cat : ${categories}" href="javascript:void(0)" th:data-cat="${cat}"
+           th:text="${cat}" th:classappend="${cat == currentCategory} ? 'active'" onclick="loadCategory(this.getAttribute('data-cat'))"></a>
     </div>
 
-    <div class="grid" th:if="${tutorials != null and !tutorials.isEmpty()}">
+    <div id="tutorialGrid" class="grid" th:if="${tutorials != null and !tutorials.isEmpty()}">
         <a class="card" th:each="t : ${tutorials}" th:href="@{/tutorial/{id}(id=${t.id})}" style="text-decoration:none;color:inherit;">
             <div class="cover-wrap">
                 <img th:if="${t.coverImg != null and !t.coverImg.isEmpty()}" th:src="${t.coverImg}" th:alt="${t.title}">
@@ -99,10 +99,53 @@
             </div>
         </a>
     </div>
-    <div class="empty-card" th:unless="${tutorials != null and !tutorials.isEmpty()}">
+    <div id="emptyCard" class="empty-card" th:unless="${tutorials != null and !tutorials.isEmpty()}">
         <div class="icon">📖</div>
         <p>暂无教程，敬请期待匠人发布精彩手作教程</p>
     </div>
 </div>
+
+<script th:inline="javascript">
+var isMine = /*[[${mine}]]*/ false;
+function loadCategory(cat) {
+    var base = isMine ? '/tutorial/mine' : '/tutorial/list';
+    var url = cat ? base + '?category=' + encodeURIComponent(cat) : base;
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function(res) { return res.text(); })
+        .then(function(html) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            var newGrid = doc.getElementById('tutorialGrid');
+            var newEmpty = doc.getElementById('emptyCard');
+            var grid = document.getElementById('tutorialGrid');
+            var empty = document.getElementById('emptyCard');
+            if (newGrid) {
+                if (grid) { grid.outerHTML = newGrid.outerHTML; }
+                else { document.querySelector('.wrap').insertBefore(newGrid, document.querySelector('.empty-card') || null); }
+            } else if (grid) {
+                grid.remove();
+            }
+            if (newEmpty) {
+                if (empty) { empty.outerHTML = newEmpty.outerHTML; }
+                else { document.querySelector('.wrap').appendChild(newEmpty); }
+            } else if (empty) {
+                empty.remove();
+            }
+            // 更新分类高亮
+            document.querySelectorAll('.category-bar a').forEach(function(a) {
+                if (a.getAttribute('data-cat') === cat) {
+                    a.classList.add('active');
+                } else {
+                    a.classList.remove('active');
+                }
+            });
+            // 更新URL但不刷新页面
+            history.pushState({}, '', url);
+        })
+        .catch(function() {
+            window.location.href = url;
+        });
+}
+</script>
 </body>
 </html>

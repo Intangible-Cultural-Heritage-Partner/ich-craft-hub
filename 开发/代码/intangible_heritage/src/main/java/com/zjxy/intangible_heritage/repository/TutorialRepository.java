@@ -13,6 +13,8 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Long> {
 
     List<Tutorial> findByCraftsmanIdOrderByCreateTimeDesc(Long craftsmanId);
 
+    List<Tutorial> findByCraftsmanIdAndCategoryOrderByCreateTimeDesc(Long craftsmanId, String category);
+
     List<Tutorial> findByAuditStatusAndCategoryOrderByCreateTimeDesc(Integer auditStatus, String category);
 
     List<Tutorial> findByCategoryOrderByCreateTimeDesc(String category);
