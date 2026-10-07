@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,8 +25,11 @@ public class HeritageWorkController {
     private final HeritageWorkService heritageWorkService;
 
     @GetMapping("/work/list")
-    public String list(Model model, @RequestParam(required = false) String msg) {
-        model.addAttribute("works", heritageWorkService.findAll());
+    public String list(Model model, @RequestParam(required = false) String msg,
+                       @RequestParam(required = false) String category) {
+        model.addAttribute("works", heritageWorkService.findAll(category));
+        model.addAttribute("categoryOptions", heritageWorkService.findCategories(null));
+        model.addAttribute("selectedCategory", category == null ? "" : category.trim());
         model.addAttribute("mine", false);
         model.addAttribute("msg", msg);
         return "work/list";
@@ -61,6 +65,19 @@ public class HeritageWorkController {
             images.add(image.trim());
         }
     }
+
+    @ModelAttribute("categoryOptions")
+    public List<String> categoryOptions() {
+        return HeritageWorkService.DEFAULT_CATEGORIES;
+    }
+
+    private void includeCurrentCategory(Model model, HeritageWork work) {
+        List<String> options = new ArrayList<>(HeritageWorkService.DEFAULT_CATEGORIES);
+        if (work.getCategory() != null && !work.getCategory().isBlank() && !options.contains(work.getCategory())) {
+            options.add(work.getCategory());
+        }
+        model.addAttribute("categoryOptions", options);
+    }
     @GetMapping("/work/create")
     public String createPage(HttpSession session, Model model) {
         if (currentCraftsman(session) == null) {
@@ -73,6 +90,7 @@ public class HeritageWorkController {
 
     @PostMapping("/work/create")
     public String create(@RequestParam String title,
+                         @RequestParam(required = false) String category,
                          @RequestParam(required = false) String description,
                          @RequestParam(required = false) String skillBackground,
                          @RequestParam(required = false) String modelUrl,
@@ -89,7 +107,7 @@ public class HeritageWorkController {
         }
         try {
             HeritageWork work = heritageWorkService.create(user, title, description, skillBackground,
-                    modelUrl, modelFile, coverFile, coverUrl, imageFiles, imageUrls);
+                    modelUrl, modelFile, coverFile, coverUrl, imageFiles, imageUrls, category);
             return "redirect:/work/" + work.getId();
         } catch (RuntimeException exception) {
             HeritageWork formWork = new HeritageWork();
@@ -97,6 +115,8 @@ public class HeritageWorkController {
             formWork.setDescription(description);
             formWork.setSkillBackground(skillBackground);
             formWork.setModelUrl(modelUrl);
+            formWork.setCategory(category);
+            includeCurrentCategory(model, formWork);
             model.addAttribute("work", formWork);
             model.addAttribute("formAction", "/work/create");
             model.addAttribute("msg", exception.getMessage());
@@ -115,6 +135,7 @@ public class HeritageWorkController {
             return "redirect:/work/list?msg=无权编辑该展品";
         }
         model.addAttribute("work", work);
+        includeCurrentCategory(model, work);
         model.addAttribute("formAction", "/work/" + id + "/edit");
         return "work/form";
     }
@@ -122,6 +143,8 @@ public class HeritageWorkController {
     @PostMapping("/work/{id}/edit")
     public String edit(@PathVariable Long id,
                        @RequestParam String title,
+                       @RequestParam(required = false) String category,
+                       @RequestParam(defaultValue = "false") boolean removeModel,
                        @RequestParam(required = false) String description,
                        @RequestParam(required = false) String skillBackground,
                        @RequestParam(required = false) String modelUrl,
@@ -138,30 +161,40 @@ public class HeritageWorkController {
         }
         try {
             HeritageWork work = heritageWorkService.update(id, user, title, description, skillBackground,
-                    modelUrl, modelFile, coverFile, coverUrl, imageFiles, imageUrls);
+                    modelUrl, modelFile, coverFile, coverUrl, imageFiles, imageUrls, category, removeModel);
             return "redirect:/work/" + id;
         } catch (RuntimeException exception) {
             HeritageWork formWork = heritageWorkService.findById(id).orElse(new HeritageWork());
+            if (formWork.getCraftsman() == null || !user.getId().equals(formWork.getCraftsman().getId())) {
+                return "redirect:/work/list?msg=无权编辑该展品";
+            }
             formWork.setTitle(title);
             formWork.setDescription(description);
             formWork.setSkillBackground(skillBackground);
+            if (category != null && !category.isBlank()) {
+                formWork.setCategory(category.trim());
+            }
+            includeCurrentCategory(model, formWork);
             if (modelUrl != null && !modelUrl.isBlank()) {
                 formWork.setModelUrl(modelUrl);
             }
             model.addAttribute("work", formWork);
             model.addAttribute("formAction", "/work/" + id + "/edit");
+            model.addAttribute("removeModel", removeModel);
             model.addAttribute("msg", exception.getMessage());
             return "work/form";
         }
     }
 
     @GetMapping("/work/mine")
-    public String mine(HttpSession session, Model model) {
+    public String mine(HttpSession session, Model model, @RequestParam(required = false) String category) {
         User user = currentCraftsman(session);
         if (user == null) {
             return "redirect:/work/list?msg=请先以匠人身份登录";
         }
-        model.addAttribute("works", heritageWorkService.findByCraftsman(user.getId()));
+        model.addAttribute("works", heritageWorkService.findByCraftsman(user.getId(), category));
+        model.addAttribute("categoryOptions", heritageWorkService.findCategories(user.getId()));
+        model.addAttribute("selectedCategory", category == null ? "" : category.trim());
         model.addAttribute("mine", true);
         return "work/list";
     }

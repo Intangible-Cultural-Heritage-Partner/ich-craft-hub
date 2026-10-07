@@ -32,6 +32,10 @@
         .reject-notice strong { display: block; margin-bottom: 4px; }
         .hint { color: #999; font-size: 13px; margin-top: 6px; }
     </style>
+    <style>
+        .panel select { width: 100%; padding: 12px; border: 1px solid #d8cbbd; border-radius: 8px; background: #fff; color: #333; font: inherit; }
+        .panel select:focus-visible { outline: 3px solid #a0673f; outline-offset: 2px; }
+    </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
@@ -48,6 +52,12 @@
         <form th:action="${formAction}" method="post" enctype="multipart/form-data">
             <label>展品标题
                 <input type="text" name="title" required maxlength="100" th:value="${work.title}">
+            </label>
+            <label>非遗分类
+                <select name="category" required>
+                    <option th:each="category : ${categoryOptions}" th:value="${category}"
+                            th:text="${category}" th:selected="${category == work.category}">其他</option>
+                </select>
             </label>
             <label>封面图片文件
                 <input type="file" name="coverFile" accept="image/*">
@@ -66,10 +76,15 @@
                 <input type="file" name="modelFile" accept=".glb,.gltf,model/gltf-binary,model/gltf+json">
             </label>
             <label>3D 模型 URL
-                <input type="url" name="modelUrl" placeholder="例如：https://example.com/exhibit.glb" th:value="${work.modelUrl}">
+                <input type="text" name="modelUrl" placeholder="https://example.com/exhibit.glb 或 /models/exhibit.glb" th:value="${work.modelUrl}">
             </label>
             <p class="hint">优先使用单文件 GLB；同时填写文件和 URL 时，上传文件优先保存。GLTF 的 .bin 和纹理文件必须保持相对路径可访问。</p>
             <p class="hint" th:if="${work.modelUrl != null and !work.modelUrl.isBlank()}">当前模型地址：<span th:text="${work.modelUrl}"></span></p>
+            <label th:if="${work.id != null}">
+                <input type="checkbox" name="removeModel" value="true" th:checked="${removeModel == true}" style="width:auto;">
+                移除当前模型关联
+            </label>
+            <p class="hint" th:if="${work.id != null}">留空保留原模型；勾选移除会忽略模型 URL，但不会删除文件。请勿同时上传新模型。</p>
             <label>作品介绍
                 <textarea name="description" th:text="${work.description}"></textarea>
             </label>

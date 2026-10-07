@@ -99,6 +99,7 @@
                     <div th:if="${!galleryImages.isEmpty()}">
                         <button id="hero-button" class="hero-button" type="button" onclick="openPhoto()" aria-label="放大查看展品图片"><img id="main-photo" th:src="${galleryImages[0]}" th:alt="${work.title}"><span id="photo-label" class="photo-label">图片 01</span><span class="zoom-label">⌕ 放大查看</span></button>
                         <div class="thumbs"><button th:each="image, stat : ${galleryImages}" class="thumb" type="button" th:attr="data-thumb=${stat.index},data-src=${image},data-label=${'图片 ' + (stat.index + 1)}" th:aria-pressed="${stat.index == 0}" onclick="selectPhoto(this)"><span class="thumb-image"><img th:src="${image}" th:alt="${work.title + ' 图片 ' + (stat.index + 1)}"></span><span th:text="${'图片 ' + (stat.index + 1)}">图片 1</span></button></div>
+                        <p id="photo-error" class="helper" role="status" hidden>图片加载失败，请选择其他图片或稍后重试。</p>
                         <p class="helper">点击缩略图切换，点击大图查看细节。</p>
                     </div>
                     <div class="empty-gallery" th:unless="${!galleryImages.isEmpty()}"><div><strong>暂时没有上传展品图片</strong><br><span>请先补充封面图或展品图片，图片展廊会在这里展示。</span></div></div>
@@ -144,20 +145,57 @@
         ['photo', 'model'].forEach(function (key) { const active = mode === key; const tab = document.getElementById('tab-' + key); tab.setAttribute('aria-selected', String(active)); tab.tabIndex = active ? 0 : -1; document.getElementById(key + '-panel').hidden = !active; });
         const note = document.getElementById('mode-note'); if (note) note.textContent = mode === 'photo' ? note.dataset.photoNote || note.textContent : modelViewerStateLabel();
         document.getElementById('announcer').textContent = mode === 'photo' ? text.photo : text.model;
-        if (mode === 'model') ensureModelViewer();
+        if (mode === 'model') { ensureModelViewer(); animateModel(); }
+        else pauseModelViewer();
     }
-    function selectPhoto(button) { selectedPhoto = Number(button.dataset.thumb); const image = document.getElementById('main-photo'); image.src = button.dataset.src; image.alt = button.dataset.label; document.getElementById('photo-label').textContent = button.dataset.label; document.querySelectorAll('[data-thumb]').forEach(function (item) { item.setAttribute('aria-pressed', String(item === button)); }); const total = document.querySelectorAll('[data-thumb]').length; document.getElementById('mode-note').textContent = '\u56fe\u7247 ' + String(selectedPhoto + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0'); document.getElementById('announcer').textContent = '\u5df2\u9009\u62e9' + button.dataset.label; }
+    function selectPhoto(button) {
+        selectedPhoto = Number(button.dataset.thumb);
+        const image = document.getElementById('main-photo');
+        setPhotoError(false);
+        image.src = button.dataset.src;
+        image.alt = button.dataset.label;
+        document.getElementById('photo-label').textContent = button.dataset.label;
+        document.querySelectorAll('[data-thumb]').forEach(function (item) { item.setAttribute('aria-pressed', String(item === button)); });
+        const total = document.querySelectorAll('[data-thumb]').length;
+        const note = document.getElementById('mode-note');
+        note.dataset.photoNote = '图片 ' + String(selectedPhoto + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+        note.textContent = note.dataset.photoNote;
+        document.getElementById('announcer').textContent = '已选择' + button.dataset.label;
+    }
+    function setPhotoError(failed) {
+        const message = document.getElementById('photo-error');
+        const image = document.getElementById('main-photo');
+        const button = document.getElementById('hero-button');
+        if (!message || !image || !button) return;
+        message.hidden = !failed;
+        image.style.visibility = failed ? 'hidden' : 'visible';
+        button.disabled = failed;
+        if (failed) document.getElementById('announcer').textContent = message.textContent;
+    }
     function openPhoto() { const image = document.getElementById('main-photo'); const dialogImage = document.getElementById('dialog-photo'); dialogImage.src = image.src; dialogImage.alt = image.alt; document.getElementById('dialog-title').textContent = '\u5c55\u54c1\u56fe\u7247 \u00b7 ' + document.getElementById('photo-label').textContent; const dialog = document.getElementById('photo-dialog'); if (typeof dialog.showModal === 'function') dialog.showModal(); document.getElementById('close-dialog').focus(); }
     function modelViewerStateLabel() { if (!document.getElementById('model-ready').hidden) return modelViewer.demo ? '\u4ea4\u4e92\u5f0f 3D \u6f14\u793a' : '\u53ef\u4ea4\u4e92 3D \u6a21\u578b'; if (!document.getElementById('model-loading').hidden) return '\u6b63\u5728\u52a0\u8f7d 3D \u6a21\u578b'; if (!document.getElementById('model-error').hidden || !document.getElementById('model-webgl').hidden) return '3D \u6a21\u578b\u4e0d\u53ef\u7528'; return '\u5c1a\u672a\u914d\u7f6e\u771f\u5b9e 3D \u6a21\u578b'; }
     function setModelState(state) { ['loading', 'ready', 'empty', 'error', 'webgl'].forEach(function (key) { document.getElementById('model-' + key).hidden = key !== state; }); document.getElementById('model-ready').hidden = state !== 'ready'; document.getElementById('mode-note').textContent = modelViewerStateLabel(); document.getElementById('announcer').textContent = text[state]; }
-    function setModelProgress(value) { const progress = document.getElementById('model-progress'); const bar = document.getElementById('model-progress-bar'); if (value == null) { progress.hidden = true; return; } progress.hidden = false; bar.style.width = Math.max(0, Math.min(100, value)) + '%'; const label = document.getElementById('model-loading-text'); if (label && value > 0) label.textContent = '\\u5df2\\u52a0\\u8f7d ' + Math.round(value) + '%'; }
+    function setModelProgress(value) { const progress = document.getElementById('model-progress'); const bar = document.getElementById('model-progress-bar'); if (value == null) { progress.hidden = true; return; } progress.hidden = false; bar.style.width = Math.max(0, Math.min(100, value)) + '%'; const label = document.getElementById('model-loading-text'); if (label) label.textContent = '已加载 ' + Math.round(value) + '%'; }
     function resetModelView() { if (modelViewer.controls) { modelViewer.controls.reset(); modelViewer.controls.update(); } }
     function enterModelFullscreen() { const stage = document.getElementById('model-stage'); if (document.fullscreenElement) { document.exitFullscreen(); } else if (stage.requestFullscreen) { stage.requestFullscreen(); } }
     function resizeModelViewer() { if (!modelViewer.renderer || !modelViewer.camera || modelViewer.disposed) return; const container = document.getElementById('model-canvas-container'); const width = Math.max(container.clientWidth, 1); const height = Math.max(container.clientHeight, 1); modelViewer.camera.aspect = width / height; modelViewer.camera.updateProjectionMatrix(); modelViewer.renderer.setSize(width, height, false); modelViewer.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); }
     function disposeMaterial(material) { const materials = Array.isArray(material) ? material : [material]; materials.forEach(function (item) { if (!item) return; Object.keys(item).forEach(function (key) { const value = item[key]; if (value && value.isTexture) value.dispose(); }); item.dispose(); }); }
     function disposeObject(object) { object.traverse(function (child) { if (child.geometry) child.geometry.dispose(); if (child.material) disposeMaterial(child.material); }); }
     function disposeModelViewer() { if (modelViewer.disposed) return; modelViewer.disposed = true; if (modelViewer.frame) cancelAnimationFrame(modelViewer.frame); if (modelViewer.resizeObserver) modelViewer.resizeObserver.disconnect(); if (modelViewer.controls) modelViewer.controls.dispose(); if (modelViewer.root) disposeObject(modelViewer.root); if (modelViewer.renderer) { modelViewer.renderer.dispose(); modelViewer.renderer.forceContextLoss(); modelViewer.renderer.domElement.remove(); } modelViewer.frame = 0; }
-    function animateModel() { if (modelViewer.disposed || !modelViewer.renderer) return; modelViewer.frame = requestAnimationFrame(animateModel); modelViewer.controls.update(); modelViewer.renderer.render(modelViewer.scene, modelViewer.camera); }
+    function pauseModelViewer() {
+        if (modelViewer.frame) cancelAnimationFrame(modelViewer.frame);
+        modelViewer.frame = 0;
+    }
+    function animateModel() {
+        if (modelViewer.disposed || !modelViewer.renderer || !modelViewer.root || modelViewer.frame
+                || document.hidden || document.getElementById('model-panel').hidden) return;
+        modelViewer.controls.update();
+        modelViewer.renderer.render(modelViewer.scene, modelViewer.camera);
+        modelViewer.frame = requestAnimationFrame(function () {
+            modelViewer.frame = 0;
+            animateModel();
+        });
+    }
     function normalizeModel(root, THREE) { const box = new THREE.Box3().setFromObject(root); const center = box.getCenter(new THREE.Vector3()); const size = box.getSize(new THREE.Vector3()); const maxSize = Math.max(size.x, size.y, size.z) || 1; const scale = 2.6 / maxSize; root.scale.setScalar(scale); root.position.set(-center.x * scale, -center.y * scale, -center.z * scale); }
     function createDemoModel(THREE) {
         const group = new THREE.Group();
@@ -198,7 +236,21 @@
     }
     document.querySelector('[role=tablist]').addEventListener('keydown', function (event) { if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return; event.preventDefault(); const current = document.getElementById('tab-photo').getAttribute('aria-selected') === 'true' ? 'photo' : 'model'; const next = event.key === 'Home' ? 'photo' : event.key === 'End' ? 'model' : current === 'photo' ? 'model' : 'photo'; setMode(next); document.getElementById('tab-' + next).focus(); });
     const note = document.getElementById('mode-note'); if (note) note.dataset.photoNote = note.textContent;
-    window.addEventListener('pagehide', disposeModelViewer);
+    const mainPhoto = document.getElementById('main-photo');
+    if (mainPhoto) {
+        mainPhoto.addEventListener('error', function () { setPhotoError(true); });
+        mainPhoto.addEventListener('load', function () { setPhotoError(false); });
+        if (mainPhoto.complete && mainPhoto.getAttribute('src') && !mainPhoto.naturalWidth) setPhotoError(true);
+    }
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) pauseModelViewer();
+        else animateModel();
+    });
+    window.addEventListener('pagehide', function (event) {
+        if (event.persisted) pauseModelViewer();
+        else disposeModelViewer();
+    });
+    window.addEventListener('pageshow', function () { animateModel(); });
 </script>
 </body>
 </html>

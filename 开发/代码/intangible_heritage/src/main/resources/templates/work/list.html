@@ -45,6 +45,14 @@
         .status-2 { background: #f8d7da; color: #721c24; }
         .empty-card { background: #fff; padding: 48px; border-radius: 14px; text-align: center; color: #999; margin-top: 24px; border: 1px dashed #d8cbbd; }
     </style>
+    <style>
+        .category-filter { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+        .category-filter select, .category-filter button { padding: 10px 14px; border: 1px solid #784b2a; border-radius: 8px; font: inherit; }
+        .category-filter select { background: #fff; color: #333; }
+        .category-filter button { background: #784b2a; color: #fff; cursor: pointer; }
+        .category-filter :focus-visible { outline: 3px solid #a0673f; outline-offset: 3px; }
+        .category-label { color: #784b2a; font-size: 13px; margin-bottom: 8px; }
+    </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
@@ -60,6 +68,15 @@
         </div>
     </div>
     <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
+    <form class="category-filter" method="get" th:action="${mine == true ? '/work/mine' : '/work/list'}">
+        <label for="category-filter">非遗分类</label>
+        <select id="category-filter" name="category">
+            <option value="">全部分类</option>
+            <option th:each="category : ${categoryOptions}" th:value="${category}"
+                    th:text="${category}" th:selected="${category == selectedCategory}">分类</option>
+        </select>
+        <button type="submit">筛选</button>
+    </form>
     <div class="grid" th:if="${works != null and !works.isEmpty()}">
         <article class="card" th:each="work : ${works}">
             <img class="cover" th:if="${work.coverImg != null and !work.coverImg.isBlank()}" th:src="${work.coverImg}" th:alt="${work.title}">
@@ -75,6 +92,7 @@
                 <p class="reject-reason" th:if="${mine == true and work.auditStatus == 2 and work.auditRemark != null}"
                    th:text="'驳回理由：' + ${work.auditRemark}"></p>
                 <h3 th:text="${work.title}">展品标题</h3>
+                <span class="category-label" th:text="${work.category}">其他</span>
                 <small th:text="${work.craftsman != null ? '匠人：' + work.craftsman.username : '匠人作品'}">匠人作品</small>
                 <p th:text="${work.description != null ? work.description : '暂无作品介绍'}">作品介绍</p>
                 <div class="actions">
@@ -86,7 +104,7 @@
         </article>
     </div>
     <div class="empty-card" th:unless="${works != null and !works.isEmpty()}">
-        暂无展品，匠人可以从“发布展品”开始添加。
+        <span th:text="${selectedCategory != null and !selectedCategory.isBlank() ? '该分类暂无展品，请切换其他分类。' : '暂无展品，匠人可以从“发布展品”开始添加。'}">暂无展品</span>
     </div>
 </main>
 </body>
