@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>非遗作品展示</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft Yahei", sans‑serif;
+            background-color: #f8f5f0;
+        }
+        .main-container {
+            padding: 40px 60px;
+        }
+        h1 {
+            color:#784b2a;
+        }
+        .func-card{
+            background:#fff;
+            width:220px;
+            padding:20px;
+            margin:10px;
+            border‑radius:8px;
+            display:inline‑block;
+            box‑shadow: 0 1px 4px #ccc;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div style="padding:30px">
+    <h2>非遗作品展示页面</h2>
+    <p>匠人展品列表、作品详情</p>
+</div>
+</body>
+</html>

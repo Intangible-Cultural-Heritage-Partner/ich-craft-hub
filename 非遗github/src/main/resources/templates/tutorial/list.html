@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>作品广场</title>
+    <style>
+        * { box-sizing: border-box; }
+        body{margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#f0f2f5;}
+        .wrap{padding:20px 30px;max-width:1200px;margin:0 auto;}
+        .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+        .top-bar h2{margin:0;font-size:22px;color:#333;}
+        .btn-publish{background:linear-gradient(135deg,#e6162d,#c81424);color:#fff;padding:10px 22px;border-radius:22px;text-decoration:none;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(230,22,45,0.3);}
+
+        .grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:16px;}
+        @media(max-width:1000px){.grid{grid-template-columns:repeat(3, 1fr);}}
+        @media(max-width:700px){.grid{grid-template-columns:repeat(2, 1fr);}}
+
+        .card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-decoration:none;color:inherit;transition:transform 0.2s,box-shadow 0.2s;display:flex;flex-direction:column;}
+        .card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.12);}
+
+        .card-media{width:100%;aspect-ratio:1/1;background:#f5f5f5;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+        .card-media img,
+        .card-media video{width:100%;height:100%;object-fit:cover;display:block;}
+
+        .card-body{padding:12px 14px;}
+        .card-body h3{margin:0 0 6px;font-size:14px;font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .card-footer{display:flex;gap:14px;font-size:12px;color:#999;margin-top:6px;}
+        .empty{text-align:center;color:#999;padding:60px 0;font-size:14px;}
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div class="wrap">
+
+    <div class="top-bar">
+        <h2>作品广场</h2>
+        <a class="btn-publish" th:href="@{/userWork/publish}">✏️ 发布作品</a>
+    </div>
+
+    <div th:if="${works == null || works.isEmpty()}" class="empty">
+        还没有作品，快来发布第一个吧！
+    </div>
+
+    <div class="grid">
+        <a th:each="w : ${works}" class="card"
+           th:href="@{/userWork/detail/{id}(id=${w.id})}">
+
+            <div class="card-media">
+                <img th:if="${w.coverImg != null and w.coverImg != ''}"
+                     th:src="${w.coverImg}" alt="封面"/>
+                <video th:if="${(w.coverImg == null or w.coverImg == '') and w.videoUrl != null and w.videoUrl != ''}"
+                       th:src="${w.videoUrl}" muted preload="metadata"></video>
+                <img th:if="${(w.coverImg == null or w.coverImg == '') and (w.videoUrl == null or w.videoUrl == '')}"
+                     src="/images/default_avatar.png" alt="默认"/>
+            </div>
+
+            <div class="card-body">
+                <h3 th:text="${w.title}">作品标题</h3>
+                <div class="card-footer">
+                    <span>❤️ <span th:text="${likeCounts[w.id]}">0</span></span>
+                    <span>💬 <span th:text="${commentCounts[w.id]}">0</span></span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+</div>
+</body>
+</html>

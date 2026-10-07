@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的作品</title>
+    <style>
+        * { box-sizing: border-box; }
+        body{margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f7fa;}
+        .wrap{padding:30px 40px;max-width:1240px;margin:0 auto;}
+        .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+        .top-bar h2{margin:0;font-size:24px;color:#222;}
+        .btn-publish{background:linear-gradient(135deg,#e6162d,#c81424);color:#fff;padding:11px 24px;border-radius:24px;text-decoration:none;font-size:14px;font-weight:600;box-shadow:0 4px 14px rgba(230,22,45,0.35);}
+
+        .grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:20px;}
+        @media(max-width:1000px){.grid{grid-template-columns:repeat(3, 1fr);}}
+        @media(max-width:700px){.grid{grid-template-columns:repeat(2, 1fr);}}
+
+        .card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform 0.25s, box-shadow 0.25s;position:relative;}
+        .card:hover{transform:translateY(-6px);box-shadow:0 12px 28px rgba(0,0,0,0.12);}
+
+        .card-media{width:100%;aspect-ratio:1/1;background:#f5f5f5;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+        .card-media img{width:100%;height:100%;object-fit:cover;display:block;}
+
+        .badge{position:absolute;top:12px;right:12px;padding:4px 12px;border-radius:14px;font-size:12px;font-weight:600;color:#fff;backdrop-filter:blur(4px);}
+        .badge-0{background:rgba(255,193,7,0.9);}
+        .badge-1{background:rgba(40,167,69,0.9);}
+        .badge-2{background:rgba(220,53,69,0.9);}
+
+        .card-body{padding:14px 16px;}
+        .card-body h3{margin:0 0 6px;font-size:15px;font-weight:600;color:#222;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .card-body p{margin:0;font-size:13px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+        .actions{display:flex;gap:8px;padding:0 16px 14px;}
+        .actions a{flex:1;text-align:center;padding:7px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;transition:background 0.15s;}
+        .actions .view{background:#fff5f6;color:#e6162d;}
+        .actions .view:hover{background:#ffe4e7;}
+        .actions .del{background:#f5f5f5;color:#666;}
+        .actions .del:hover{background:#eee;}
+
+        .empty{text-align:center;color:#999;padding:80px 0;font-size:15px;}
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div class="wrap">
+
+    <div class="top-bar">
+        <h2>我发布的作品</h2>
+        <a class="btn-publish" th:href="@{/userWork/publish}">✏️ 发布新作品</a>
+    </div>
+
+    <div th:if="${works == null || works.isEmpty()}" class="empty">
+        你还没有发布过作品
+    </div>
+
+    <div class="grid">
+        <div th:each="w : ${works}" class="card">
+            <div class="card-media">
+                <img th:if="${w.coverImg != null and w.coverImg != ''}" th:src="${w.coverImg}" alt="封面"/>
+                <img th:if="${w.coverImg == null or w.coverImg == ''}" src="/images/default_avatar.png" alt="默认"/>
+            </div>
+            <span class="badge"
+                  th:classappend="${w.auditStatus == 0 ? 'badge-0' : (w.auditStatus == 1 ? 'badge-1' : 'badge-2')}"
+                  th:text="${w.auditStatus == 0 ? '待审核' : (w.auditStatus == 1 ? '已通过' : '已驳回')}"></span>
+
+            <div class="card-body">
+                <h3 th:text="${w.title}">标题</h3>
+                <p th:text="${w.description}">描述</p>
+            </div>
+            <div class="actions">
+                <a class="view" th:href="@{/userWork/detail/{id}(id=${w.id})}">查看</a>
+                <a class="del" th:href="@{/userWork/delete/{id}(id=${w.id})}"
+                   onclick="return confirm('确定删除吗？')">删除</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
