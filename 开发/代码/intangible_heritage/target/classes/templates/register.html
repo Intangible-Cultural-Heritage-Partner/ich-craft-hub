@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft Yahei", sans‑serif;
+            background-color: #f8f5f0;
+        }
+        .main-container {
+            padding: 40px 60px;
+        }
+        h1 {
+            color:#784b2a;
+        }
+        .func-card{
+            background:#fff;
+            width:220px;
+            padding:20px;
+            margin:10px;
+            border‑radius:8px;
+            display:inline‑block;
+            box‑shadow: 0 1px 4px #ccc;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<div style="padding:30px;max-width:400px;">
+    <h2>用户注册</h2>
+    <p th:text="${msg}" style="color:red"></p>
+    <form th:action="@{/register}" method="post">
+        <div>账号：<input type="text" name="username" required></div>
+        <div style="margin:10px 0">密码：<input type="password" name="password" required></div>
+        <div>昵称：<input type="text" name="nickname" required></div>
+        <div style="margin:10px 0">
+            身份：
+            <select name="role">
+                <option value="0">普通爱好者</option>
+                <option value="1">匠人</option>
+            </select>
+        </div>
+        <button type="submit">注册</button>
+    </form>
+</div>
+</body>
+</html>

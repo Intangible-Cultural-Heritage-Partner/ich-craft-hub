@@ -9,6 +9,27 @@ import java.util.Optional;
 
 public interface HeritageWorkService {
 
+    List<String> DEFAULT_CATEGORIES = List.of("剪纸", "木雕", "苏绣", "陶瓷", "竹编", "其他");
+
+    List<HeritageWork> findAll(String category);
+
+    List<HeritageWork> findByCraftsman(Long craftsmanId, String category);
+
+    List<String> findCategories(Long craftsmanId);
+
+    HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile, MultipartFile coverFile,
+                        String coverUrl, MultipartFile[] imageFiles, String imageUrls, String category,
+                        boolean removeModel);
+
+    HeritageWork create(User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile, MultipartFile coverFile,
+                        String coverUrl, MultipartFile[] imageFiles, String imageUrls, String category);
+
+    HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile, MultipartFile coverFile,
+                        String coverUrl, MultipartFile[] imageFiles, String imageUrls, String category);
+
     List<HeritageWork> findAll();
 
     Optional<HeritageWork> findById(Long id);
@@ -23,11 +44,21 @@ public interface HeritageWorkService {
                         MultipartFile coverFile, String coverUrl,
                         MultipartFile[] imageFiles, String imageUrls);
 
+    HeritageWork create(User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile,
+                        MultipartFile coverFile, String coverUrl,
+                        MultipartFile[] imageFiles, String imageUrls);
+
     HeritageWork update(Long id, User craftsman, String title, String description,
                         MultipartFile coverFile, String coverUrl,
                         MultipartFile[] imageFiles, String imageUrls);
 
     HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                        MultipartFile coverFile, String coverUrl,
+                        MultipartFile[] imageFiles, String imageUrls);
+
+    HeritageWork update(Long id, User craftsman, String title, String description, String skillBackground,
+                        String modelUrl, MultipartFile modelFile,
                         MultipartFile coverFile, String coverUrl,
                         MultipartFile[] imageFiles, String imageUrls);
 }

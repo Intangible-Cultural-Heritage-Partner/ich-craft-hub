@@ -2,7 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${work.title} + ' - 非遗展品'">非遗展品详情</title>
+    <title th:text="${work.title} + ' - 非遗展品详情'">非遗展品详情</title>
+    <!-- Google model-viewer：用于展示 3D 模型（.glb/.gltf），支持旋转缩放 -->
+    <script type="module"
+            src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
@@ -33,7 +36,41 @@
             padding: 10px 22px; border-radius: 10px; font-size: 15px; font-weight: 500;
             cursor: pointer; transition: all 0.25s; text-decoration: none;
             border: 1px solid rgba(200,170,120,0.3); color: #784b2a; background: rgba(255,255,255,0.6);
+        body {
+            margin: 0;
+            font-family: "Microsoft Yahei", sans-serif;
+            background-color: #f8f5f0;
         }
+        .wrap { padding: 30px 60px; max-width: 1000px; }
+        h1 { color:#784b2a; margin-bottom: 6px; }
+        .cat {
+            display:inline-block; font-size:13px; color:#784b2a;
+            background:#f3ece3; padding:3px 12px; border-radius:12px;
+        }
+        .viewer, .gallery { margin-top: 20px; }
+        model-viewer {
+            width: 100%;
+            height: 460px;
+            background: #efeae3;
+            border-radius: 10px;
+        }
+        .gallery img {
+            width: 180px; height: 180px; object-fit: cover;
+            border-radius: 8px; margin: 6px; box-shadow: 0 1px 4px #ccc;
+        }
+        .cover-single {
+            max-width: 100%; border-radius: 10px; margin-top: 20px;
+        }
+        .section { background:#fff; padding:20px 24px; border-radius:10px; margin-top:22px; }
+        .section h3 { color:#784b2a; margin-top:0; }
+        .section p { color:#444; line-height:1.7; white-space:pre-wrap; }
+        .jump-bar { margin-top:26px; }
+        .jump-bar a {
+            display:inline-block; margin-right:14px; padding:10px 18px;
+            background:#784b2a; color:#fff; text-decoration:none; border-radius:6px;
+        }
+        .jump-bar a:hover { background:#5d3a20; }
+        .back { display:inline-block; margin-top:20px; color:#784b2a; }
         .fav-btn:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(120,75,42,0.25); }
         .fav-btn.favorited { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; }
         .fav-btn.favorited:hover { background: linear-gradient(135deg, #a0673f, #784b2a); }
@@ -42,54 +79,310 @@
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
 
-<div class="page-hero" style="padding:40px 8% 48px;">
-    <div class="orb orb1"></div>
-    <div class="orb orb2"></div>
-    <div class="hero-inner">
-        <h1 th:text="${work.title}">展品详情</h1>
-        <p th:if="${craftsman != null}" th:text="'匠人：' + ${craftsman.username}"></p>
+<div class="wrap">
+    <h1 th:text="${work.title}">作品标题</h1>
+    <span class="cat" th:text="${work.category}">分类</span>
+
+    <!-- 有3D模型：优先用 model-viewer 展示 -->
+    <div class="viewer" th:if="${work.modelUrl != null}">
+        <model-viewer th:attr="src=${work.modelUrl}"
+                      alt="3D模型"
+                      camera-controls
+                      auto-rotate
+                      shadow-intensity="1"
+                      ar>
+        </model-viewer>
+        <p style="color:#888;font-size:13px;">拖动可旋转，滚轮缩放</p>
     </div>
+
+    <!-- 无3D模型：展示图片画廊（多图优先，否则封面图） -->
+    <div class="gallery" th:if="${work.modelUrl == null and !#lists.isEmpty(images)}">
+        <img th:each="img : ${images}" th:src="${img}" alt="作品图片">
+    </div>
+    <img class="cover-single"
+         th:if="${work.modelUrl == null and #lists.isEmpty(images) and work.coverImg != null}"
+         th:src="${work.coverImg}" alt="封面图">
+
+    <div class="section" th:if="${work.skillBackground != null and !work.skillBackground.isBlank()}">
+        <h3>技艺背景</h3>
+        <p th:text="${work.skillBackground}">技艺背景介绍</p>
+    </div>
+
+    <div class="section" th:if="${work.description != null and !work.description.isBlank()}">
+        <h3>作品描述</h3>
+        <p th:text="${work.description}">作品描述</p>
+    </div>
+
+    <!-- 预留跳转：手作教程 / 用户作品（教程模块C、用户作品模块E，最后汇总时接入真实链接） -->
+    <div class="jump-bar">
+        <a th:href="@{/tutorial/list}">相关手作教程</a>
+        <a th:href="@{/userWork/share}">看看用户作品</a>
+    </div>
+
+    <a class="back" th:href="@{/work/list}">← 返回展品列表</a>
 </div>
 
-<main class="page-body" style="padding-top:28px;">
-        <h1 th:text="${work.title}">展品标题</h1>
-        <p class="craftsman-info" th:text="${work.craftsman != null ? '发布匠人：' + work.craftsman.username : ''}">发布匠人</p>
-        <div class="reject-notice" th:if="${work.auditStatus == 2 or (work.auditStatus == 0 and work.auditRemark != null)}">
-            <strong th:text="${work.auditStatus == 2 ? '该展品被审核驳回：' : '上次驳回理由（已重新提交，等待再次审核）：'}"></strong>
-            <span th:text="${work.auditRemark != null ? work.auditRemark : '审核未通过，请修改后重新提交'}"></span>
-        </div>
-        <img class="hero" th:if="${work.coverImg != null and !work.coverImg.isBlank()}" th:src="${work.coverImg}" th:alt="${work.title}">
-        <div class="section">
-            <h2>作品介绍</h2>
-            <div th:text="${work.description != null ? work.description : '暂无介绍'}">作品介绍</div>
-        </div>
-        <div class="section">
-            <h2>技艺背景</h2>
-            <div th:text="${work.skillBackground != null ? work.skillBackground : '暂无技艺背景介绍'}">技艺背景</div>
-        </div>
-        <div class="gallery" th:if="${work.imageList != null and !work.imageList.isBlank()}">
-            <img th:each="image : ${#strings.arraySplit(work.imageList, ',')}" th:src="${image}" alt="展品图片">
-        </div>
-        <div style="margin-top:24px;" th:if="${session.loginUser != null}">
-            <form method="post" th:action="@{/favorite/toggle}" style="display:inline;">
-                <input type="hidden" name="targetId" th:value="${work.id}">
-                <input type="hidden" name="targetType" value="work">
-                <input type="hidden" name="redirect" th:value="'/work/' + ${work.id}">
-                <button type="submit" class="fav-btn" th:classappend="${isFavorited} ? 'favorited' : ''">
-                    <span th:if="${isFavorited}">❤️ 已收藏</span>
-                    <span th:unless="${isFavorited}">🤍 收藏</span>
-                </button>
-            </form>
-        </div>
-        <div class="links">
-            <a th:href="@{/tutorial/list}">查看手作教程</a>
-            <a th:href="@{/work/mine}">查看用户作品</a>
-            <a th:if="${session.loginUser != null and work.craftsman != null and session.loginUser.id == work.craftsman.id}"
-               th:href="@{/work/{id}/edit(id=${work.id})}">编辑展品</a>
-            <a th:href="@{/work/list}">返回展品列表</a>
-        </div>
-    </article>
-</main>
+<dialog id="photo-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-head">
+        <span id="dialog-title">展品图片</span>
+        <button id="close-dialog" class="dialog-close" type="button" onclick="document.getElementById('photo-dialog').close()" aria-label="关闭图片预览">×</button>
+    </div>
+    <div class="dialog-image"><img id="dialog-photo" alt="放大查看展品"></div>
+    <p class="helper">按 Esc 或点击关闭返回图片展廊。</p>
+</dialog>
+<p id="announcer" class="sr-only" role="status" aria-live="polite"></p>
 
+<script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js"}}
+</script>
+<script>
+    let selectedPhoto = 0;
+    let modelViewerPromise;
+    const modelViewer = { scene: null, camera: null, renderer: null, controls: null, root: null, resizeObserver: null, frame: 0, disposed: false, demo: false };
+    const threeModuleUrl = 'https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js';
+    const controlsModuleUrl = 'https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/controls/OrbitControls.js';
+    const loaderModuleUrl = 'https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/loaders/GLTFLoader.js';
+    const text = { photo: '已切换到图片展廊', model: '已切换到3D预览', loading: '正在加载3D模型', ready: '3D模型加载完成，可拖动旋转', demoReady: '交互式3D演示模型已加载，可拖动旋转', empty: '尚未配置真实3D模型', error: '3D模型加载失败', webgl: '当前浏览器不支持WebGL' };
+
+    function setMode(mode) {
+        ['photo', 'model'].forEach(function (key) {
+            const active = mode === key;
+            const tab = document.getElementById('tab-' + key);
+            tab.setAttribute('aria-selected', String(active));
+            tab.tabIndex = active ? 0 : -1;
+            document.getElementById(key + '-panel').hidden = !active;
+        });
+        const note = document.getElementById('mode-note');
+        if (note) note.textContent = mode === 'photo' ? note.dataset.photoNote || note.textContent : modelViewerStateLabel();
+        document.getElementById('announcer').textContent = mode === 'photo' ? text.photo : text.model;
+        if (mode === 'model') { ensureModelViewer(); animateModel(); }
+        else pauseModelViewer();
+    }
+    function selectPhoto(button) {
+        selectedPhoto = Number(button.dataset.thumb);
+        const image = document.getElementById('main-photo');
+        setPhotoError(false);
+        image.src = button.dataset.src;
+        image.alt = button.dataset.label;
+        document.getElementById('photo-label').textContent = button.dataset.label;
+        document.querySelectorAll('[data-thumb]').forEach(function (item) {
+            item.setAttribute('aria-pressed', String(item === button));
+        });
+        const total = document.querySelectorAll('[data-thumb]').length;
+        const note = document.getElementById('mode-note');
+        note.dataset.photoNote = '图片 ' + String(selectedPhoto + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+        note.textContent = note.dataset.photoNote;
+        document.getElementById('announcer').textContent = '已选择' + button.dataset.label;
+    }
+    function setPhotoError(failed) {
+        const message = document.getElementById('photo-error');
+        const image = document.getElementById('main-photo');
+        const button = document.getElementById('hero-button');
+        if (!message || !image || !button) return;
+        message.hidden = !failed;
+        image.style.visibility = failed ? 'hidden' : 'visible';
+        button.disabled = failed;
+        if (failed) document.getElementById('announcer').textContent = message.textContent;
+    }
+    function openPhoto() {
+        const image = document.getElementById('main-photo');
+        const dialogImage = document.getElementById('dialog-photo');
+        dialogImage.src = image.src;
+        dialogImage.alt = image.alt;
+        document.getElementById('dialog-title').textContent = '展品图片 · ' + document.getElementById('photo-label').textContent;
+        const dialog = document.getElementById('photo-dialog');
+        if (typeof dialog.showModal === 'function') dialog.showModal();
+        document.getElementById('close-dialog').focus();
+    }
+    function modelViewerStateLabel() {
+        if (!document.getElementById('model-ready').hidden) return modelViewer.demo ? '交互式3D演示' : '可交互3D模型';
+        if (!document.getElementById('model-loading').hidden) return '正在加载3D模型';
+        if (!document.getElementById('model-error').hidden || !document.getElementById('model-webgl').hidden) return '3D模型不可用';
+        return '尚未配置真实3D模型';
+    }
+    function setModelState(state) {
+        ['loading', 'ready', 'empty', 'error', 'webgl'].forEach(function (key) {
+            document.getElementById('model-' + key).hidden = key !== state;
+        });
+        document.getElementById('model-ready').hidden = state !== 'ready';
+        document.getElementById('mode-note').textContent = modelViewerStateLabel();
+        document.getElementById('announcer').textContent = text[state];
+    }
+    function setModelProgress(value) {
+        const progress = document.getElementById('model-progress');
+        const bar = document.getElementById('model-progress-bar');
+        if (value == null) { progress.hidden = true; return; }
+        progress.hidden = false;
+        bar.style.width = Math.max(0, Math.min(100, value)) + '%';
+        const label = document.getElementById('model-loading-text');
+        if (label) label.textContent = '已加载 ' + Math.round(value) + '%';
+    }
+    function resetModelView() { if (modelViewer.controls) { modelViewer.controls.reset(); modelViewer.controls.update(); } }
+    function enterModelFullscreen() {
+        const stage = document.getElementById('model-stage');
+        if (document.fullscreenElement) { document.exitFullscreen(); }
+        else if (stage.requestFullscreen) { stage.requestFullscreen(); }
+    }
+    function resizeModelViewer() {
+        if (!modelViewer.renderer || !modelViewer.camera || modelViewer.disposed) return;
+        const container = document.getElementById('model-canvas-container');
+        const width = Math.max(container.clientWidth, 1);
+        const height = Math.max(container.clientHeight, 1);
+        modelViewer.camera.aspect = width / height;
+        modelViewer.camera.updateProjectionMatrix();
+        modelViewer.renderer.setSize(width, height, false);
+        modelViewer.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    }
+    function disposeMaterial(material) {
+        const materials = Array.isArray(material) ? material : [material];
+        materials.forEach(function (item) {
+            if (!item) return;
+            Object.keys(item).forEach(function (key) {
+                const value = item[key];
+                if (value && value.isTexture) value.dispose();
+            });
+            item.dispose();
+        });
+    }
+    function disposeObject(object) {
+        object.traverse(function (child) {
+            if (child.geometry) child.geometry.dispose();
+            if (child.material) disposeMaterial(child.material);
+        });
+    }
+    function disposeModelViewer() {
+        if (modelViewer.disposed) return;
+        modelViewer.disposed = true;
+        if (modelViewer.frame) cancelAnimationFrame(modelViewer.frame);
+        if (modelViewer.resizeObserver) modelViewer.resizeObserver.disconnect();
+        if (modelViewer.controls) modelViewer.controls.dispose();
+        if (modelViewer.root) disposeObject(modelViewer.root);
+        if (modelViewer.renderer) {
+            modelViewer.renderer.dispose();
+            modelViewer.renderer.forceContextLoss();
+            modelViewer.renderer.domElement.remove();
+        }
+        modelViewer.frame = 0;
+    }
+    function pauseModelViewer() {
+        if (modelViewer.frame) cancelAnimationFrame(modelViewer.frame);
+        modelViewer.frame = 0;
+    }
+    function animateModel() {
+        if (modelViewer.disposed || !modelViewer.renderer || !modelViewer.root || modelViewer.frame
+                || document.hidden || document.getElementById('model-panel').hidden) return;
+        modelViewer.controls.update();
+        modelViewer.renderer.render(modelViewer.scene, modelViewer.camera);
+        modelViewer.frame = requestAnimationFrame(function () {
+            modelViewer.frame = 0;
+            animateModel();
+        });
+    }
+    function normalizeModel(root, THREE) {
+        const box = new THREE.Box3().setFromObject(root);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+        const maxSize = Math.max(size.x, size.y, size.z) || 1;
+        const scale = 2.6 / maxSize;
+        root.scale.setScalar(scale);
+        root.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+    }
+    function createDemoModel(THREE) {
+        const group = new THREE.Group();
+        const red = new THREE.MeshStandardMaterial({ color: 0x9f3f2e, roughness: .55, metalness: .08 });
+        const gold = new THREE.MeshStandardMaterial({ color: 0xd3a14a, roughness: .4, metalness: .18 });
+        const dark = new THREE.MeshStandardMaterial({ color: 0x5b3828, roughness: .72, metalness: .04 });
+        const base = new THREE.Mesh(new THREE.CylinderGeometry(.78, .94, .16, 64), dark); base.position.y = -.72; group.add(base);
+        const foot = new THREE.Mesh(new THREE.CylinderGeometry(.62, .7, .16, 64), gold); foot.position.y = -.58; group.add(foot);
+        const profile = [new THREE.Vector2(.18, -.48), new THREE.Vector2(.42, -.39), new THREE.Vector2(.58, -.08), new THREE.Vector2(.5, .22), new THREE.Vector2(.36, .39), new THREE.Vector2(.4, .58), new THREE.Vector2(.26, .7), new THREE.Vector2(.22, .86)];
+        const body = new THREE.Mesh(new THREE.LatheGeometry(profile, 64), red); body.position.y = -.05; group.add(body);
+        const neck = new THREE.Mesh(new THREE.CylinderGeometry(.23, .28, .13, 64), gold); neck.position.y = .84; group.add(neck);
+        const rim = new THREE.Mesh(new THREE.TorusGeometry(.24, .045, 16, 64), gold); rim.position.y = .92; group.add(rim);
+        const band = new THREE.Mesh(new THREE.TorusGeometry(.5, .035, 12, 64), gold); band.position.y = .2; group.add(band);
+        const upperBand = new THREE.Mesh(new THREE.TorusGeometry(.37, .03, 12, 64), gold); upperBand.position.y = .57; group.add(upperBand);
+        return group;
+    }
+    async function ensureModelViewer() {
+        if (modelViewerPromise) return modelViewerPromise;
+        const url = (document.getElementById('model-stage').dataset.modelUrl || '').trim();
+        modelViewerPromise = (async function () {
+            setModelState('loading'); setModelProgress(url ? 0 : null);
+            document.getElementById('model-status-fact').textContent = url ? text.loading : '正在准备交互式3D演示模型';
+            try {
+                const modules = await Promise.all([import(threeModuleUrl), import(controlsModuleUrl), ...(url ? [import(loaderModuleUrl)] : [])]);
+                if (modelViewer.disposed) return;
+                const THREE = modules[0]; const OrbitControls = modules[1].OrbitControls; const GLTFLoader = url ? modules[2].GLTFLoader : null;
+                const container = document.getElementById('model-canvas-container');
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                modelViewer.scene = new THREE.Scene(); modelViewer.camera = new THREE.PerspectiveCamera(42, 1, .01, 100); modelViewer.renderer = renderer; modelViewer.disposed = false;
+                renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15; renderer.setClearColor(0x000000, 0);
+                renderer.domElement.className = 'model-canvas'; renderer.domElement.setAttribute('aria-label', '可交互的3D展品模型');
+                container.replaceChildren(renderer.domElement);
+                modelViewer.scene.add(new THREE.HemisphereLight(0xfff4df, 0x6f5b48, 2.2));
+                const keyLight = new THREE.DirectionalLight(0xffffff, 2.7); keyLight.position.set(4, 6, 5); modelViewer.scene.add(keyLight);
+                const fillLight = new THREE.DirectionalLight(0xe6c6a2, 1.1); fillLight.position.set(-4, 2, -3); modelViewer.scene.add(fillLight);
+                modelViewer.camera.position.set(0, 1.3, 4.2);
+                modelViewer.controls = new OrbitControls(modelViewer.camera, renderer.domElement);
+                modelViewer.controls.enableDamping = true; modelViewer.controls.dampingFactor = .08;
+                modelViewer.controls.minDistance = 1.3; modelViewer.controls.maxDistance = 8;
+                modelViewer.controls.target.set(0, .15, 0); modelViewer.controls.update();
+                modelViewer.resizeObserver = new ResizeObserver(resizeModelViewer); modelViewer.resizeObserver.observe(container); resizeModelViewer();
+                document.getElementById('model-reset').onclick = resetModelView; document.getElementById('model-fullscreen').onclick = enterModelFullscreen;
+                if (!url) {
+                    modelViewer.demo = true; document.getElementById('model-tag').textContent = '交互式3D演示';
+                    modelViewer.root = createDemoModel(THREE); normalizeModel(modelViewer.root, THREE); modelViewer.scene.add(modelViewer.root);
+                    setModelProgress(null); setModelState('ready');
+                    document.getElementById('model-status-fact').textContent = text.demoReady; animateModel(); return;
+                }
+                modelViewer.demo = false; document.getElementById('model-tag').textContent = '真实3D预览';
+                const loader = new GLTFLoader();
+                loader.load(url, function (gltf) {
+                    if (modelViewer.disposed) { disposeObject(gltf.scene || gltf.scenes[0]); return; }
+                    modelViewer.root = gltf.scene || gltf.scenes[0];
+                    normalizeModel(modelViewer.root, THREE);
+                    modelViewer.scene.add(modelViewer.root);
+                    setModelProgress(null); setModelState('ready');
+                    document.getElementById('model-status-fact').textContent = text.ready; animateModel();
+                }, function (event) {
+                    if (event.lengthComputable) setModelProgress(event.loaded / event.total * 100);
+                }, function () {
+                    setModelProgress(null); setModelState('error');
+                    document.getElementById('model-status-fact').textContent = '模型加载失败，请检查地址或文件';
+                });
+            } catch (error) {
+                if (modelViewer.disposed) return;
+                setModelProgress(null);
+                const webglError = error && (error.name === 'WebGLUnavailableError' || /webgl/i.test(error.message || ''));
+                setModelState(webglError ? 'webgl' : 'error');
+                document.getElementById('model-status-fact').textContent = webglError ? '浏览器不支持WebGL' : '模型加载失败，请检查网络';
+            }
+        })();
+        return modelViewerPromise;
+    }
+    document.querySelector('[role=tablist]').addEventListener('keydown', function (event) {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const current = document.getElementById('tab-photo').getAttribute('aria-selected') === 'true' ? 'photo' : 'model';
+        const next = event.key === 'Home' ? 'photo' : event.key === 'End' ? 'model' : current === 'photo' ? 'model' : 'photo';
+        setMode(next);
+        document.getElementById('tab-' + next).focus();
+    });
+    const note = document.getElementById('mode-note'); if (note) note.dataset.photoNote = note.textContent;
+    const mainPhoto = document.getElementById('main-photo');
+    if (mainPhoto) {
+        mainPhoto.addEventListener('error', function () { setPhotoError(true); });
+        mainPhoto.addEventListener('load', function () { setPhotoError(false); });
+        if (mainPhoto.complete && mainPhoto.getAttribute('src') && !mainPhoto.naturalWidth) setPhotoError(true);
+    }
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) pauseModelViewer();
+        else animateModel();
+    });
+    window.addEventListener('pagehide', function (event) {
+        if (event.persisted) pauseModelViewer();
+        else disposeModelViewer();
+    });
+    window.addEventListener('pageshow', function () { animateModel(); });
+</script>
 </body>
 </html>

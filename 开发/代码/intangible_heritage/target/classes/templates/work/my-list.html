@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我发布的非遗展品</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft Yahei", sans-serif;
+            background-color: #f8f5f0;
+        }
+        .wrap { padding: 30px 60px; }
+        h2 { color:#784b2a; }
+        .toolbar { margin-bottom: 18px; }
+        .btn {
+            display:inline-block; background:#784b2a; color:#fff; text-decoration:none;
+            padding:9px 18px; border-radius:6px;
+        }
+        .btn:hover { background:#5d3a20; }
+        table { width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; }
+        th, td { padding:12px 14px; text-align:left; border-bottom:1px solid #eee; font-size:14px; }
+        th { background:#f3ece3; color:#784b2a; }
+        .cover-thumb { width:60px; height:60px; object-fit:cover; border-radius:6px; background:#eee; }
+        .status { padding:3px 10px; border-radius:12px; font-size:12px; }
+        .s0 { background:#fef3cd; color:#8a6d1b; }   /* 待审核 */
+        .s1 { background:#d7f0dd; color:#1e7a3c; }   /* 通过 */
+        .s2 { background:#fbdcdc; color:#b03434; }   /* 驳回 */
+        .remark { color:#b03434; font-size:12px; }
+        .op a { color:#784b2a; margin-right:10px; }
+        .empty { color:#888; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <h2>我发布的非遗展品</h2>
+    <div class="toolbar">
+        <a class="btn" th:href="@{/heritageWork/publish}">+ 发布新展品</a>
+    </div>
+
+    <table th:if="${!#lists.isEmpty(works)}">
+        <thead>
+        <tr>
+            <th>封面</th><th>标题</th><th>分类</th><th>审核状态</th><th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="w : ${works}">
+            <td>
+                <img class="cover-thumb" th:if="${w.coverImg != null}" th:src="${w.coverImg}" alt="封面">
+                <span th:if="${w.coverImg == null}" style="color:#bbb;font-size:12px;">无</span>
+            </td>
+            <td th:text="${w.title}">标题</td>
+            <td th:text="${w.category}">分类</td>
+            <td>
+                <span th:switch="${w.auditStatus}">
+                    <span th:case="0" class="status s0">待审核</span>
+                    <span th:case="1" class="status s1">审核通过</span>
+                    <span th:case="2" class="status s2">已驳回</span>
+                </span>
+                <div class="remark" th:if="${w.auditStatus == 2 and w.auditRemark != null}"
+                     th:text="'驳回原因：' + ${w.auditRemark}"></div>
+            </td>
+            <td class="op">
+                <a th:href="@{'/work/' + ${w.id}}">查看</a>
+                <a th:href="@{'/heritageWork/edit/' + ${w.id}}">编辑</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p class="empty" th:if="${#lists.isEmpty(works)}">你还没有发布任何非遗展品。</p>
+</div>
+</body>
+</html>

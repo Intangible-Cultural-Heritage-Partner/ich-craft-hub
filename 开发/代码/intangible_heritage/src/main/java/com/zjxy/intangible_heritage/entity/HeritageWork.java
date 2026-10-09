@@ -28,6 +28,9 @@ public class HeritageWork {
     @Column(name = "image_list", columnDefinition = "TEXT")
     private String imageList;
 
+    @Column(name = "model_url", length = 500)
+    private String modelUrl;
+
     @Column(name = "skill_background", columnDefinition = "TEXT")
     private String skillBackground;
 
@@ -92,6 +95,14 @@ public class HeritageWork {
 
     public void setImageList(String imageList) {
         this.imageList = imageList;
+    }
+
+    public String getModelUrl() {
+        return modelUrl;
+    }
+
+    public void setModelUrl(String modelUrl) {
+        this.modelUrl = modelUrl;
     }
 
     public String getSkillBackground() {

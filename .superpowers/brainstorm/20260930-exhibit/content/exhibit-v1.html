@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>非遗展品 · 2D / 3D 界面草图</title>
+</head>
+<body style="margin:0;background:#f8f5f0;color:#333;font-family:'Microsoft Yahei','PingFang SC',sans-serif;line-height:1.6;">
+<div style="background:#eee5d8;color:#70482e;font-size:12px;padding:8px 24px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center;">
+<span>界面草图 · 示例内容，不连接业务数据</span><span style="opacity:.5;">/</span><span>3D 区域为二维透视示意，尚未接入真实模型</span>
+</div>
+<header style="background:linear-gradient(135deg,#5c3317 0%,#6b3e1f 50%,#7a4a28 100%);color:white;min-height:68px;padding:0 clamp(16px,3vw,40px);display:flex;align-items:center;gap:24px;flex-wrap:wrap;border-bottom:3px solid #d4a574;box-shadow:0 3px 16px #8b5a2b30;box-sizing:border-box;">
+<a href="http://127.0.0.1:18080/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:10px;font-size:21px;font-weight:600;letter-spacing:-.5px;padding:14px 0;">
+<svg width="28" height="32" viewBox="0 0 28 32" fill="none" stroke="#e8c9a0" stroke-width="1.5" aria-hidden="true"><path d="M10 3h8M10 3v6c0 3-6 4-6 11 0 6 4 9 10 9s10-3 10-9c0-7-6-8-6-11V3M6 17h16M5 21h18M10 8h8"/></svg>
+非遗手作共创平台</a>
+<nav aria-label="主导航" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+<a href="http://127.0.0.1:18080/" target="_blank" rel="noopener" style="color:white;text-decoration:none;padding:9px 18px;font-size:15px;">首页</a>
+<a href="#exhibit" aria-current="page" style="color:white;text-decoration:none;padding:9px 18px;font-size:15px;background:#ffffff20;border:1px solid #ffffff36;border-radius:22px;">非遗展品</a>
+<a href="http://127.0.0.1:18080/tutorial/list" target="_blank" rel="noopener" style="color:white;text-decoration:none;padding:9px 18px;font-size:15px;">手作教程</a>
+</nav>
+<a href="http://127.0.0.1:18080/" target="_blank" rel="noopener" style="margin-left:auto;color:#f3ddc5;text-decoration:none;font-size:13px;padding:12px 0;white-space:nowrap;">返回当前系统 ↗</a>
+</header>
+<main id="exhibit" style="max-width:1180px;margin:0 auto;padding:26px clamp(16px,3vw,28px) 44px;">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+<div style="font-size:13px;color:#766d63;">非遗展品 <span style="padding:0 10px;color:#afa18f;">/</span> 传统刺绣 <span style="padding:0 10px;color:#afa18f;">/</span> 展品详情</div>
+<span style="color:#784b2a;font-size:12px;padding:4px 11px;border:1px solid #e4d3bd;border-radius:20px;">设计预览 · 第一版</span>
+</div>
+<article style="background:white;border:1px solid #f0e6d8;border-radius:16px;box-shadow:0 2px 16px #0000000a;padding:clamp(16px,3vw,28px);">
+<div style="display:flex;flex-wrap:wrap;gap:clamp(24px,3vw,38px);align-items:flex-start;">
+<section aria-label="展品查看区域" style="flex:1.55 1 460px;min-width:0;">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+<div role="tablist" aria-label="展示方式" style="display:flex;background:#f6f2ec;padding:4px;border-radius:10px;gap:4px;">
+<button id="tab-photo" type="button" role="tab" aria-selected="true" aria-controls="photo-panel" style="border:0;border-radius:7px;padding:10px 17px;background:#784b2a;color:white;font:inherit;font-size:14px;cursor:pointer;min-height:44px;display:flex;gap:7px;align-items:center;" onclick="setMode('photo')"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>图片展廊</button>
+<button id="tab-model" type="button" role="tab" aria-selected="false" aria-controls="model-panel" tabindex="-1" style="border:0;border-radius:7px;padding:10px 17px;background:transparent;color:#784b2a;font:inherit;font-size:14px;cursor:pointer;min-height:44px;display:flex;gap:7px;align-items:center;" onclick="setMode('model')"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 3 9 5v8l-9 5-9-5V8l9-5ZM3 8l9 5 9-5M12 13v8M7.5 5.5l9 5"/></svg>3D 预览</button>
+</div><span id="mode-note" style="color:#766d63;font-size:12px;">图片 01 / 03</span>
+</div>
+<div id="photo-panel" role="tabpanel" aria-labelledby="tab-photo">
+<button type="button" onclick="openPhoto()" aria-label="放大查看展品图片" style="display:block;position:relative;width:100%;height:clamp(290px,32vw,410px);overflow:hidden;border:0;border-radius:12px;padding:0;background:#f3e9d9;cursor:zoom-in;">
+<img id="main-photo" src="/files/embroidery.jpg" alt="金色丝线绣成的仙鹤与云纹，浅金色织物底面" style="width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block;">
+<span style="position:absolute;left:16px;top:16px;background:#fffef5e8;color:#654329;border:1px solid #f4ecd9;border-radius:18px;padding:5px 11px;font-size:12px;">整体展示</span>
+<span style="position:absolute;bottom:14px;right:14px;background:#fffef5ed;color:#654329;border-radius:8px;padding:7px 12px;font-size:12px;display:flex;gap:6px;align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6M10 7v6M7 10h6"/></svg>放大查看</span>
+</button>
+<div style="display:flex;gap:10px;margin-top:12px;">
+<button data-thumb="0" type="button" aria-pressed="true" onclick="selectPhoto(0)" style="flex:1;min-width:0;border:2px solid #784b2a;border-radius:9px;padding:4px;background:#fff;cursor:pointer;text-align:left;"><div style="height:68px;overflow:hidden;border-radius:5px;"><img src="/files/embroidery.jpg" alt="整体展示" style="width:100%;height:100%;object-fit:cover;"></div><span style="display:block;padding:5px 5px 2px;font-size:12px;color:#654329;">整体展示</span></button>
+<button data-thumb="1" type="button" aria-pressed="false" onclick="selectPhoto(1)" style="flex:1;min-width:0;border:2px solid #eee6db;border-radius:9px;padding:4px;background:#fff;cursor:pointer;text-align:left;"><div style="height:68px;overflow:hidden;border-radius:5px;"><img src="/files/embroidery.jpg" alt="仙鹤局部裁切" style="width:100%;height:100%;object-fit:cover;transform:scale(1.9);object-position:70% 60%;"></div><span style="display:block;padding:5px 5px 2px;font-size:12px;color:#654329;">仙鹤细节</span></button>
+<button data-thumb="2" type="button" aria-pressed="false" onclick="selectPhoto(2)" style="flex:1;min-width:0;border:2px solid #eee6db;border-radius:9px;padding:4px;background:#fff;cursor:pointer;text-align:left;"><div style="height:68px;overflow:hidden;border-radius:5px;"><img src="/files/embroidery.jpg" alt="云纹局部裁切" style="width:100%;height:100%;object-fit:cover;transform:scale(2.7);object-position:15% 30%;"></div><span style="display:block;padding:5px 5px 2px;font-size:12px;color:#654329;">云纹局部</span></button>
+</div>
+<p style="margin:9px 0 0;color:#786f63;font-size:12px;">点击缩略图切换，点击大图查看细节。草图细节图为同一素材的裁切。</p>
+</div>
+<div id="model-panel" role="tabpanel" aria-labelledby="tab-model" hidden>
+<div id="model-stage" style="position:relative;width:100%;height:clamp(290px,32vw,410px);background:radial-gradient(ellipse at 50% 40%,#faf7f1,#ede5d8);border:1px solid #e8ded0;border-radius:12px;overflow:hidden;box-sizing:border-box;">
+<span style="position:absolute;top:16px;left:16px;color:#765238;border:1px solid #deccb5;background:#fffaf0;padding:5px 10px;border-radius:18px;font-size:12px;z-index:2;">3D 区域布局示意</span>
+<div id="model-ready" style="height:100%;display:flex;align-items:center;justify-content:center;perspective:900px;">
+<div style="position:absolute;bottom:17%;left:17%;width:66%;height:11%;border-radius:50%;background:#8c6b4040;filter:blur(18px);"></div>
+<div id="model-illustration" style="position:relative;width:65%;aspect-ratio:1.4;transform:rotateY(-24deg) rotateX(8deg);border:9px solid #a47a4a;border-right-color:#765638;border-bottom-color:#785535;box-shadow:10px 12px 0 #765638,18px 23px 24px #755e442e;background:#e2d4bd;border-radius:2px;box-sizing:border-box;">
+<img src="/files/embroidery.jpg" alt="刺绣装框的二维透视示意，不是真实三维模型" style="width:100%;height:100%;object-fit:cover;display:block;">
+</div>
+<div style="position:absolute;bottom:16px;left:16px;right:16px;text-align:center;color:#755c42;font-size:12px;">二维透视示意 · 非真实 3D 模型</div>
+</div>
+<div id="model-empty" hidden style="height:100%;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px 24px;box-sizing:border-box;"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#a18462" stroke-width="1.2" aria-hidden="true"><path d="m12 3 9 5v8l-9 5-9-5V8l9-5ZM3 8l9 5 9-5M12 13v8"/></svg><h3 style="font-size:18px;font-weight:500;color:#784b2a;margin:16px 0 5px;">这件展品还没有 3D 模型</h3><p style="font-size:13px;color:#766b5e;margin:0 0 18px;">图片和技艺介绍仍然可以正常浏览。</p><button type="button" onclick="setMode('photo')" style="padding:10px 18px;border:1px solid #784b2a;border-radius:8px;background:white;color:#784b2a;font:inherit;font-size:14px;cursor:pointer;">继续查看图片</button></div>
+<div id="model-error" hidden style="height:100%;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px 24px;box-sizing:border-box;"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#a18462" stroke-width="1.5" aria-hidden="true"><path d="M12 8v5m0 3v1M10.3 4.5 2.8 18a2 2 0 0 0 1.8 3h15a2 2 0 0 0 1.8-3L13.7 4.5a2 2 0 0 0-3.4 0Z"/></svg><h3 style="font-size:18px;font-weight:500;color:#784b2a;margin:16px 0 5px;">模型暂时未能加载</h3><p style="font-size:13px;color:#766b5e;margin:0 0 18px;">不影响图片浏览，可重新尝试加载。</p><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;"><button type="button" onclick="setModelState('ready')" style="padding:10px 18px;border:0;border-radius:8px;background:#784b2a;color:white;font:inherit;font-size:14px;cursor:pointer;">重试示意</button><button type="button" onclick="setMode('photo')" style="padding:10px 18px;border:1px solid #784b2a;border-radius:8px;background:white;color:#784b2a;font:inherit;font-size:14px;cursor:pointer;">查看图片</button></div></div>
+</div>
+<div aria-label="计划中的模型操作，草图暂不可用" style="margin-top:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+<span style="font-size:12px;color:#766d63;margin-right:auto;">正式版计划提供</span>
+<button type="button" disabled style="padding:9px 12px;border:1px solid #e4d7c7;border-radius:8px;background:#fbf8f3;color:#8a7b6a;font-size:12px;cursor:not-allowed;">旋转 / 缩放</button><button type="button" disabled style="padding:9px 12px;border:1px solid #e4d7c7;border-radius:8px;background:#fbf8f3;color:#8a7b6a;font-size:12px;cursor:not-allowed;">复位视角</button><button type="button" disabled style="padding:9px 12px;border:1px solid #e4d7c7;border-radius:8px;background:#fbf8f3;color:#8a7b6a;font-size:12px;cursor:not-allowed;">全屏</button>
+</div>
+<p style="margin:9px 0 0;color:#786f63;font-size:12px;">草图不模拟真实旋转；正式版接入模型后，再启用这些操作。</p>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#f8f5f0;border-radius:8px;margin-top:13px;padding:10px;font-size:12px;">
+<span style="color:#766d63;">草图状态：</span>
+<button data-state="ready" aria-pressed="true" type="button" onclick="setModelState('ready')" style="border:1px solid #784b2a;background:#fff;color:#784b2a;padding:7px 10px;border-radius:6px;cursor:pointer;">展示区</button><button data-state="empty" aria-pressed="false" type="button" onclick="setModelState('empty')" style="border:1px solid #dfd4c6;background:transparent;color:#784b2a;padding:7px 10px;border-radius:6px;cursor:pointer;">无模型</button><button data-state="error" aria-pressed="false" type="button" onclick="setModelState('error')" style="border:1px solid #dfd4c6;background:transparent;color:#784b2a;padding:7px 10px;border-radius:6px;cursor:pointer;">加载失败</button>
+</div>
+</div>
+</section>
+<section aria-label="展品信息" style="flex:1 1 280px;min-width:0;padding-top:5px;">
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px;"><span style="font-size:12px;color:#784b2a;background:#f4ebdf;padding:4px 11px;border-radius:5px;">传统刺绣</span><span style="font-size:12px;color:#61705c;background:#eff3e9;padding:4px 11px;border-radius:5px;">示例展品</span></div>
+<h1 style="font-size:clamp(24px,3vw,30px);letter-spacing:-.7px;font-weight:500;line-height:1.45;color:#784b2a;margin:0 0 12px;">苏绣 · 金丝仙鹤</h1>
+<p style="font-size:15px;line-height:1.9;color:#74685b;margin:0 0 22px;">以丝线为笔，以绢帛为纸。<br>从一幅绣面，细看手作的纹理与层次。</p>
+<div style="display:flex;align-items:center;gap:12px;padding:18px 0;border-top:1px solid #f0e6d8;border-bottom:1px solid #f0e6d8;"><span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:#f2e6d5;color:#784b2a;font-size:17px;">匠</span><div><div style="font-size:14px;color:#654329;">匠人工作室 <span style="color:#8b8073;font-size:12px;">· 示例</span></div><div style="font-size:12px;color:#786f63;margin-top:3px;">发布者信息沿用现有展品资料</div></div></div>
+<div style="padding:22px 0 18px;"><h2 style="font-size:16px;color:#784b2a;font-weight:500;margin:0 0 10px;">作品介绍</h2><p style="font-size:14px;line-height:1.95;color:#625b52;margin:0;">绣面以仙鹤与云纹构成画面，细密的金色丝线交织出羽翼与纹样。图片展廊用于欣赏整体与局部；3D 展示将补充展品的空间形态。</p></div>
+<dl style="display:grid;grid-template-columns:70px 1fr;gap:10px;margin:0 0 24px;font-size:13px;"><dt style="color:#847667;">展示方式</dt><dd style="margin:0;color:#51493f;">多图浏览 / 3D 预览设计</dd><dt style="color:#847667;">素材说明</dt><dd style="margin:0;color:#51493f;">复用仓库已有刺绣图片</dd><dt style="color:#847667;">模型状态</dt><dd style="margin:0;color:#936b3a;">尚未接入真实模型</dd></dl>
+<button type="button" onclick="setMode('model');document.getElementById('tab-model').focus();document.getElementById('tab-model').scrollIntoView({block:'nearest'})" style="width:100%;background:linear-gradient(135deg,#784b2a,#a0673f);color:white;border:0;border-radius:8px;padding:13px 18px;font:inherit;font-size:15px;cursor:pointer;box-shadow:0 4px 12px #784b2a24;">预览 3D 区域布局 <span aria-hidden="true" style="margin-left:8px;">→</span></button>
+<a href="#craft" style="display:block;text-align:center;color:#784b2a;font-size:13px;padding:14px;text-decoration:none;">了解技艺背景 ↓</a>
+</section>
+</div>
+</article>
+<section id="craft" style="margin-top:24px;background:white;border:1px solid #f0e6d8;border-radius:16px;padding:clamp(20px,3vw,30px);box-shadow:0 2px 16px #00000007;">
+<h2 style="margin:0 0 15px;font-size:19px;font-weight:500;color:#784b2a;border-left:4px solid #784b2a;padding-left:12px;">技艺背景</h2>
+<p style="font-size:14px;color:#665e54;line-height:1.95;margin:0;max-width:880px;">一针一线之间，留住传统手艺的温度。这里继续使用匠人填写的技艺背景，不让新增的展示方式挤占内容本身。图片负责呈现色彩与纹理，3D 模型补充形态与空间细节，两种方式围绕同一件展品展开。</p>
+<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:22px;padding-top:20px;border-top:1px solid #f0e6d8;">
+<div style="flex:1 1 220px;"><span style="color:#a18055;font-size:12px;">01 / 保留熟悉的界面</span><p style="font-size:13px;color:#675d50;margin:5px 0 0;">米白底、棕色主色、圆角卡片与原有导航。</p></div><div style="flex:1 1 220px;"><span style="color:#a18055;font-size:12px;">02 / 逐步增强展示</span><p style="font-size:13px;color:#675d50;margin:5px 0 0;">先完善图片展廊，再按需加载 3D 模型。</p></div><div style="flex:1 1 220px;"><span style="color:#a18055;font-size:12px;">03 / 兼容只有图片的展品</span><p style="font-size:13px;color:#675d50;margin:5px 0 0;">没有模型、模型加载失败，仍可浏览图文。</p></div>
+</div>
+</section>
+<footer style="padding:24px 4px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:#827667;"><span>仅为界面与交互草图，不代表 3D 功能已开发完成。</span><span>在对话中告诉我需要保留或调整的部分。</span></footer>
+</main>
+<dialog id="photo-dialog" aria-labelledby="dialog-title" style="border:1px solid #d8cbbd;border-radius:14px;padding:18px;background:#f8f5f0;color:#784b2a;max-width:94vw;width:1000px;box-sizing:border-box;">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:14px;"><span id="dialog-title" style="font-size:15px;">展品图片 · 整体展示</span><button id="close-dialog" type="button" onclick="document.getElementById('photo-dialog').close()" aria-label="关闭图片预览" style="border:1px solid #d8cbbd;border-radius:8px;background:white;color:#784b2a;min-width:44px;min-height:44px;font-size:22px;cursor:pointer;">×</button></div>
+<div style="height:min(65vh,630px);overflow:hidden;border-radius:9px;background:#eee2cf;"><img id="dialog-photo" src="/files/embroidery.jpg" alt="放大查看刺绣展品" style="width:100%;height:100%;object-fit:contain;"></div>
+<p style="font-size:12px;color:#786f63;margin:12px 0 0;">按 Esc 或点击关闭返回图片展廊。</p>
+</dialog>
+<p id="announcer" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:0;"></p>
+<script>
+let selectedPhoto=0;
+const photos=[{name:'整体展示',scale:1,pos:'50% 50%'},{name:'仙鹤细节',scale:1.8,pos:'70% 60%'},{name:'云纹局部',scale:2.6,pos:'15% 30%'}];
+function setMode(mode){
+  ['photo','model'].forEach(key=>{
+    const active=mode===key,tab=document.getElementById('tab-'+key);
+    tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;
+    tab.style.background=active?'#784b2a':'transparent';tab.style.color=active?'white':'#784b2a';
+    document.getElementById(key+'-panel').hidden=!active;
+  });
+  document.getElementById('mode-note').textContent=mode==='photo'?'图片 0'+(selectedPhoto+1)+' / 03':'布局示意 · 非真实 3D';
+  document.getElementById('announcer').textContent=mode==='photo'?'已切换到图片展廊':'已切换到 3D 区域布局示意';
+}
+function selectPhoto(index){
+  selectedPhoto=index;const data=photos[index],image=document.getElementById('main-photo');
+  image.style.transform='scale('+data.scale+')';image.style.objectPosition=data.pos;
+  image.alt='刺绣展品 · '+data.name;image.nextElementSibling.textContent=data.name;
+  document.querySelectorAll('[data-thumb]').forEach(button=>{const active=Number(button.dataset.thumb)===index;button.setAttribute('aria-pressed',String(active));button.style.borderColor=active?'#784b2a':'#eee6db'});
+  document.getElementById('mode-note').textContent='图片 0'+(index+1)+' / 03';
+  document.getElementById('announcer').textContent='已选择'+data.name;
+}
+function setModelState(state){
+  ['ready','empty','error'].forEach(key=>{const panel=document.getElementById('model-'+key);panel.hidden=key!==state;panel.style.display=key===state?'flex':'none'});
+  document.querySelectorAll('[data-state]').forEach(button=>{const active=button.dataset.state===state;button.setAttribute('aria-pressed',String(active));button.style.background=active?'white':'transparent';button.style.borderColor=active?'#784b2a':'#dfd4c6'});
+  document.getElementById('announcer').textContent='草图状态：'+({ready:'展示区',empty:'无模型',error:'加载失败'}[state]);
+}
+function openPhoto(){
+  const image=document.getElementById('dialog-photo'),data=photos[selectedPhoto];
+  image.style.transform='scale('+data.scale+')';image.style.objectPosition=data.pos;
+  document.getElementById('dialog-title').textContent='展品图片 · '+data.name;
+  document.getElementById('photo-dialog').showModal();document.getElementById('close-dialog').focus();
+}
+document.querySelector('[role="tablist"]').addEventListener('keydown',event=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  event.preventDefault();const current=document.getElementById('tab-photo').getAttribute('aria-selected')==='true'?'photo':'model';
+  const next=event.key==='Home'?'photo':event.key==='End'?'model':current==='photo'?'model':'photo';
+  setMode(next);document.getElementById('tab-'+next).focus();
+});
+</script>
+</body>
+</html>
