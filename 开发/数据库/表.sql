@@ -1,7 +1,7 @@
 -- 创建数据库
 CREATE DATABASE IF NOT EXISTS intangible_heritage_platform
 DEFAULT CHARACTER SET utf8mb4
-DEFAULT COLLATE utf8mb4_unicode_ci;
+DEFAULT COLLATE utf8mb4_0900_ai_ci;
 
 USE intangible_heritage_platform;
 
@@ -17,7 +17,7 @@ CREATE TABLE `user` (
   `avatar` VARCHAR(255) DEFAULT NULL COMMENT '头像图片地址',
   `introduce` TEXT DEFAULT NULL COMMENT '匠人简介，普通用户可为空',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
 
 -- 2.非遗展品表 heritage_work （匠人上传官方非遗展品）
 DROP TABLE IF EXISTS `heritage_work`;
@@ -33,19 +33,17 @@ CREATE TABLE `heritage_work` (
   `audit_status` TINYINT NOT NULL DEFAULT 0 COMMENT '0待审核 1审核通过 2驳回',
   `audit_remark` VARCHAR(200) DEFAULT NULL COMMENT '管理员驳回备注',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  KEY `idx_craftsman_id` (`craftsman_id`),
-  KEY `idx_audit_status` (`audit_status`),
   FOREIGN KEY (`craftsman_id`) REFERENCES `user`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='匠人发布非遗展品';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='匠人发布非遗展品';
 
--- 3.手作教程表 tutorial（增加 category / tags / description，适配实体类）
+-- 3.手作教程表 tutorial（【修改点】新增content_images；description改为text）
 DROP TABLE IF EXISTS `tutorial`;
 CREATE TABLE `tutorial` (
   `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
   `craftsman_id` BIGINT NOT NULL COMMENT '发布匠人id，关联user.id',
   `title` VARCHAR(100) NOT NULL COMMENT '教程标题',
   `cover_img` VARCHAR(255) DEFAULT NULL COMMENT '教程封面',
-  `description` VARCHAR(1000) DEFAULT NULL COMMENT '教程简介',
+  `description` TEXT DEFAULT NULL COMMENT '教程简介',
   `category` VARCHAR(100) DEFAULT NULL COMMENT '教程分类',
   `tags` VARCHAR(500) DEFAULT NULL COMMENT '教程标签，逗号分隔',
   `content` TEXT DEFAULT NULL COMMENT '图文教程正文',
@@ -53,10 +51,9 @@ CREATE TABLE `tutorial` (
   `audit_status` TINYINT NOT NULL DEFAULT 0 COMMENT '0待审核 1审核通过 2驳回',
   `audit_remark` VARCHAR(200) DEFAULT NULL COMMENT '审核备注',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  KEY `idx_craftsman_id` (`craftsman_id`),
-  KEY `idx_audit_status` (`audit_status`),
+  `content_images` TEXT COMMENT '图文教程配图，多张图片URL逗号分隔',
   FOREIGN KEY (`craftsman_id`) REFERENCES `user`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='手作教程';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='手作教程';
 
 -- 4.用户分享作品表 user_work（普通用户上传自己练习手作）
 DROP TABLE IF EXISTS `user_work`;
@@ -70,10 +67,8 @@ CREATE TABLE `user_work` (
   `audit_status` TINYINT NOT NULL DEFAULT 0 COMMENT '0待审核 1审核通过 2驳回',
   `audit_remark` VARCHAR(200) DEFAULT NULL COMMENT '审核备注',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_audit_status` (`audit_status`),
   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='普通用户分享手作作品';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='普通用户分享手作作品';
 
 -- 5.收藏表 collect
 -- 用户可以收藏非遗展品、教程
@@ -86,7 +81,7 @@ CREATE TABLE `collect` (
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`),
   UNIQUE KEY uk_user_target (`user_id`,`target_type`,`target_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='收藏表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='收藏表';
 
 -- 6.评论表 comment
 -- 支持对非遗展品、教程、用户分享作品进行评论
@@ -98,9 +93,8 @@ CREATE TABLE `comment` (
   `target_id` BIGINT NOT NULL COMMENT '被评论对象id',
   `content` VARCHAR(500) NOT NULL COMMENT '评论内容',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  KEY `idx_target` (`target_type`,`target_id`),
   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评论表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='评论表';
 
 -- 7.点赞表 like_record
 DROP TABLE IF EXISTS `like_record`;
@@ -112,7 +106,7 @@ CREATE TABLE `like_record` (
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`),
   UNIQUE KEY uk_user_like (`user_id`,`target_type`,`target_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='点赞记录表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='点赞记录表';
 
 -- 8.定制申请表 custom_order
 -- 状态：0新建申请 1已拒绝 2沟通中 3需求完结
@@ -121,22 +115,19 @@ CREATE TABLE `custom_order` (
     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `apply_user_id` BIGINT NOT NULL COMMENT '发起申请用户ID',
     `craftsman_id` BIGINT NOT NULL COMMENT '被申请匠人ID',
-    `work_desc` VARCHAR(1000) NOT NULL COMMENT '定制作品描述',
-    `material_require` VARCHAR(500) DEFAULT NULL COMMENT '材质要求',
+    `work_desc` TEXT NOT NULL COMMENT '定制作品描述',
+    `material_require` TEXT DEFAULT NULL COMMENT '材质要求',
     `budget` VARCHAR(100) DEFAULT NULL COMMENT '心理预算',
     `expect_finish_time` VARCHAR(100) DEFAULT NULL COMMENT '期望完成时间',
-    `ref_img` VARCHAR(500) DEFAULT NULL COMMENT '参考图片URL',
-    `remark` VARCHAR(1000) DEFAULT NULL COMMENT '备注留言',
+    `ref_img` VARCHAR(255) DEFAULT NULL COMMENT '参考图片URL',
+    `remark` TEXT DEFAULT NULL COMMENT '备注留言',
     `order_status` TINYINT NOT NULL DEFAULT 0 COMMENT '0新建 1已拒绝 2沟通中 3需求完结',
-    `refuse_reason` VARCHAR(500) DEFAULT NULL COMMENT '匠人拒绝理由',
+    `refuse_reason` VARCHAR(300) DEFAULT NULL COMMENT '匠人拒绝理由',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (`id`),
-    KEY `idx_apply_user` (`apply_user_id`),
-    KEY `idx_craftsman` (`craftsman_id`),
-    KEY `idx_status` (`order_status`),
     FOREIGN KEY (`apply_user_id`) REFERENCES `user`(`id`),
     FOREIGN KEY (`craftsman_id`) REFERENCES `user`(`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '定制申请表';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT = '定制申请表';
 
 -- 9.定制沟通消息表 custom_message
 -- 依附定制申请，仅 order_status=2（沟通中）时可新增
@@ -147,16 +138,13 @@ CREATE TABLE `custom_message` (
     `sender_id` BIGINT NOT NULL COMMENT '发送者用户ID',
     `receiver_id` BIGINT NOT NULL COMMENT '接收者用户ID',
     `content` TEXT DEFAULT NULL COMMENT '消息内容',
-    `img_url` VARCHAR(500) DEFAULT NULL COMMENT '图片URL',
+    `img_url` VARCHAR(255) DEFAULT NULL COMMENT '图片URL',
     `send_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发送时间',
     PRIMARY KEY (`id`),
-    KEY `idx_order` (`custom_order_id`),
-    KEY `idx_sender` (`sender_id`),
-    KEY `idx_receiver` (`receiver_id`),
     FOREIGN KEY (`custom_order_id`) REFERENCES `custom_order`(`id`),
     FOREIGN KEY (`sender_id`) REFERENCES `user`(`id`),
     FOREIGN KEY (`receiver_id`) REFERENCES `user`(`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '定制沟通消息';
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT = '定制沟通消息';
 
 -- 10.匠人申请表 craftsman_apply
 DROP TABLE IF EXISTS `craftsman_apply`;
@@ -170,10 +158,39 @@ CREATE TABLE `craftsman_apply` (
   `audit_status` TINYINT NOT NULL DEFAULT 0 COMMENT '0待审核 1审核通过 2驳回',
   `audit_remark` VARCHAR(200) DEFAULT NULL COMMENT '审核备注/驳回理由',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_audit_status` (`audit_status`),
   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='匠人申请表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='匠人申请表';
+
+-- ==========【新增3张表，和dump新表保持一致】==========
+DROP TABLE IF EXISTS `favorite`;
+CREATE TABLE `favorite` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL,
+  `target_id` bigint NOT NULL,
+  `target_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_target` (`user_id`,`target_id`,`target_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='收藏表';
+
+DROP TABLE IF EXISTS `user_work_comment`;
+CREATE TABLE `user_work_comment` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `work_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户作品评论表';
+
+DROP TABLE IF EXISTS `user_work_like`;
+CREATE TABLE `user_work_like` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL,
+  `work_id` bigint NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_work` (`user_id`,`work_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户作品点赞表';
 
 -- 【可选】初始化管理员账号
 INSERT INTO `user`(`username`,`password`,`phone`,`role`,`avatar`,`introduce`)
