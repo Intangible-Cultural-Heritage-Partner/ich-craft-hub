@@ -6,8 +6,8 @@ import com.zjxy.intangible_heritage.entity.UserWorkLike;
 import com.zjxy.intangible_heritage.repository.UserWorkCommentRepository;
 import com.zjxy.intangible_heritage.repository.UserWorkLikeRepository;
 import com.zjxy.intangible_heritage.repository.UserWorkRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class UserWorkServiceImpl implements UserWorkService {
 
     private final UserWorkRepository userWorkRepository;
@@ -41,6 +40,10 @@ public class UserWorkServiceImpl implements UserWorkService {
 
     @Override
     public List<UserWork> findAllPassed() {
+        return listApproved();
+    }
+
+    @Override
     public UserWork publish(UserWork userWork) {
         userWork.setAuditStatus(0);
         userWork.setCreateTime(LocalDateTime.now());
@@ -54,6 +57,10 @@ public class UserWorkServiceImpl implements UserWorkService {
 
     @Override
     public List<UserWork> findByUserId(Long userId) {
+        return listByUser(userId);
+    }
+
+    @Override
     public List<UserWork> listByUser(Long userId) {
         return userWorkRepository.findByUserIdOrderByCreateTimeDesc(userId);
     }
@@ -110,6 +117,7 @@ public class UserWorkServiceImpl implements UserWorkService {
     }
 
     @Override
+    @Transactional
     public void toggleLike(Long userId, Long workId) {
         if (likeRepository.existsByUserIdAndWorkId(userId, workId)) {
             likeRepository.deleteByUserIdAndWorkId(userId, workId);
@@ -126,14 +134,15 @@ public class UserWorkServiceImpl implements UserWorkService {
     @Override
     public long commentCount(Long workId) {
         return commentRepository.countByWorkId(workId);
-    public UserWork findById(Long id) {
-        return userWorkRepository.findById(id).orElse(null);
     }
 
     @Override
     public UserWorkComment addComment(Long workId, Long userId, String content) {
         if (content == null || content.isBlank()) throw new IllegalArgumentException("评论内容不能为空");
         return commentRepository.save(new UserWorkComment(workId, userId, content.trim()));
+    }
+
+    @Override
     public void deleteById(Long id) {
         userWorkRepository.deleteById(id);
     }

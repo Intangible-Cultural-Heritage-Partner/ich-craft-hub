@@ -5,31 +5,31 @@
     <title>发给我的定制</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: rgba(232,201,160,0.95); }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #1a3a5c; }
         .wrap { padding: 36px 6%; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
         h2 { background: linear-gradient(135deg, #e8c9a0, #c89060); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 24px; letter-spacing: 1px; margin: 0 0 24px; }
-        .msg { color: #a8e6c3; margin-bottom: 14px; font-size: 14px; }
+        .msg { color: #0f5132; margin-bottom: 14px; font-size: 14px; }
         table { border-collapse: separate; border-spacing: 0; width: 100%; border-radius: 14px; overflow: hidden;
-            background: rgba(30,20,12,0.65); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); border: 1px solid rgba(200,144,96,0.12); }
-        th { background: linear-gradient(135deg, #3d2010, #5c3317); color: #e8c9a0; padding: 14px 16px; text-align: left; font-weight: 600; letter-spacing: 0.5px; font-size: 14px; }
-        td { padding: 12px 16px; border-bottom: 1px solid rgba(200,144,96,0.1); font-size: 14px; vertical-align: middle; color: rgba(232,201,160,0.9); }
-        tr:hover td { background: rgba(200,144,96,0.06); }
+            background: rgba(240,248,255,0.92) !important; backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%);
+            box-shadow: 0 4px 20px rgba(26,92,176,0.08) !important; border: 1px solid rgba(100,149,237,0.2) !important; color: #1a3a5c !important; }
+        th { background: linear-gradient(135deg, #784b2a, #8b5e3c) !important; color: #fff !important; padding: 14px 16px; text-align: left; font-weight: 600; letter-spacing: 0.5px; font-size: 14px; }
+        td { padding: 12px 16px; border-bottom: 1px solid rgba(100,149,237,0.1); font-size: 14px; vertical-align: middle; color: #1a3a5c !important; }
+        tr:hover td { background: rgba(42,122,226,0.04) !important; }
         .badge { padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 500; display: inline-block; }
-        .s0 { background: rgba(180,83,9,0.25); color: #e8c9a0; }
-        .s1 { background: rgba(180,35,24,0.25); color: #f8d7da; }
-        .s2 { background: rgba(45,122,79,0.25); color: #a8e6c3; }
-        .s3 { background: rgba(42,122,226,0.25); color: #8ab4f8; }
+        .s0 { background: rgba(180,83,9,0.12); color: #8a6d3b; }
+        .s1 { background: rgba(180,35,24,0.12); color: #842029; }
+        .s2 { background: rgba(45,122,79,0.12); color: #0f5132; }
+        .s3 { background: rgba(42,122,226,0.12); color: #1a5cb0; }
         form { display: inline-block; margin-right: 6px; vertical-align: middle; }
-        input[type=text] { width: 160px; padding: 8px 12px; border: 1px solid rgba(200,144,96,0.25); border-radius: 8px; font-size: 13px; background: rgba(30,20,12,0.6); color: #e8c9a0; transition: all 0.25s; }
-        input:focus { border-color: #c89060; box-shadow: 0 0 0 3px rgba(200,144,96,0.15); outline: none; }
-        .accept { background: linear-gradient(135deg, #2d7a4f, #3da866) !important; color: #fff; padding: 8px 16px !important; border: none !important; border-radius: 8px !important; cursor: pointer; font-size: 13px; transition: all 0.25s; box-shadow: 0 2px 8px rgba(45,122,79,0.25) !important; }
-        .accept:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(45,122,79,0.35) !important; }
-        .reject { background: linear-gradient(135deg, #b42318, #dc3545) !important; color: #fff; padding: 8px 16px !important; border: none !important; border-radius: 8px !important; cursor: pointer; font-size: 13px; transition: all 0.25s; box-shadow: 0 2px 8px rgba(180,35,24,0.25) !important; }
-        .reject:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(180,35,24,0.35) !important; }
-        a.btn { color: #c89060; text-decoration: none; font-weight: 500; transition: all 0.2s; }
-        a.btn:hover { color: #e8c9a0; }
-        .empty { color: rgba(200,180,150,0.5); text-align: center; padding: 48px; font-size: 15px; }
+        input[type=text] { width: 160px; padding: 8px 12px; border: 1px solid rgba(100,149,237,0.3); border-radius: 8px; font-size: 13px; background: rgba(255,255,255,0.8); color: #1a3a5c; transition: all 0.25s; }
+        input:focus { border-color: #2a7ae2; box-shadow: 0 0 0 3px rgba(42,122,226,0.15); outline: none; }
+        .accept { background: linear-gradient(135deg, #2d7a4f, #3da866) !important; color: #fff !important; padding: 8px 16px !important; border: none !important; border-radius: 8px !important; cursor: pointer; font-size: 13px; transition: none; box-shadow: 0 2px 8px rgba(45,122,79,0.25) !important; display: inline-block !important; }
+        .accept:hover { transform: none !important; padding: 8px 16px !important; color: #fff !important; background: linear-gradient(135deg, #2d7a4f, #3da866) !important; border: none !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(45,122,79,0.25) !important; display: inline-block !important; }
+        .reject { background: linear-gradient(135deg, #b42318, #dc3545) !important; color: #fff !important; padding: 8px 16px !important; border: none !important; border-radius: 8px !important; cursor: pointer; font-size: 13px; transition: none; box-shadow: 0 2px 8px rgba(180,35,24,0.25) !important; display: inline-block !important; }
+        .reject:hover { transform: none !important; padding: 8px 16px !important; color: #fff !important; background: linear-gradient(135deg, #b42318, #dc3545) !important; border: none !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(180,35,24,0.25) !important; display: inline-block !important; }
+        a.btn { color: #1a5cb0; text-decoration: none; font-weight: 500; transition: all 0.2s; }
+        a.btn:hover { color: #2a7ae2; }
+        .empty { color: #5a7a9a; text-align: center; padding: 48px; font-size: 15px; }
     </style>
 </head>
 <body>
@@ -49,7 +49,7 @@
     <p class="msg" th:text="${msg}"></p>
 
     <div th:if="${orders != null && !orders.isEmpty()}">
-        <table>
+        <table style="background: rgba(240,248,255,0.92) !important; border: 1px solid rgba(100,149,237,0.2) !important; color: #1a3a5c !important; box-shadow: 0 4px 20px rgba(26,92,176,0.08) !important;">
             <tr>
                 <th>ID</th>
                 <th>申请人</th>

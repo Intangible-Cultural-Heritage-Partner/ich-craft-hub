@@ -30,14 +30,15 @@
         .links a { color: #784b2a; text-decoration: none; padding: 10px 20px; border: 1px solid rgba(200,170,120,0.3); border-radius: 10px; font-size: 14px; transition: all 0.25s; font-weight: 500; }
         .links a:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(120,75,42,0.25); }
         .fav-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 22px; border-radius: 10px; font-size: 15px; font-weight: 500;
-            cursor: pointer; transition: all 0.25s; text-decoration: none;
-            border: 1px solid rgba(200,170,120,0.3); color: #784b2a; background: rgba(255,255,255,0.6);
+            display: inline-flex !important; align-items: center; gap: 8px;
+            padding: 10px 22px !important; border-radius: 24px !important; font-size: 15px; font-weight: 500;
+            cursor: pointer; transition: none; text-decoration: none;
+            border: 1.5px solid #eee !important; color: #666 !important; background: rgba(255,255,255,0.5) !important;
         }
-        .fav-btn:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(120,75,42,0.25); }
-        .fav-btn.favorited { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; }
-        .fav-btn.favorited:hover { background: linear-gradient(135deg, #a0673f, #784b2a); }
+        .fav-btn:hover { color: #d4a017 !important; border-color: #d4a017 !important; transform: none !important; box-shadow: none !important; background: rgba(255,255,255,0.5) !important; }
+        .fav-btn:active { transform: none !important; }
+        .fav-btn.favorited { background: #fffbe6 !important; color: #d4a017 !important; border-color: #d4a017 !important; }
+        .fav-btn.favorited:hover { background: #fffbe6 !important; }
 
         /* 页2新增功能组件，沿用页1色系 */
         .breadcrumb { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; color: #8a7a6a; font-size: 13px; }
@@ -217,16 +218,17 @@
             <div th:text="${work.skillBackground != null ? work.skillBackground : '暂无技艺背景介绍'}">技艺背景</div>
         </section>
 
-        <div style="margin-top:24px;" th:if="${session.loginUser != null}">
-            <form method="post" th:action="@{/favorite/toggle}" style="display:inline;">
+        <div style="margin-top:24px;">
+            <form th:if="${session.loginUser != null}" method="post" th:action="@{/favorite/toggle}" style="display:inline;">
                 <input type="hidden" name="targetId" th:value="${work.id}">
                 <input type="hidden" name="targetType" value="work">
                 <input type="hidden" name="redirect" th:value="'/work/' + ${work.id}">
                 <button type="submit" class="fav-btn" th:classappend="${isFavorited} ? 'favorited' : ''">
-                    <span th:if="${isFavorited}">❤️ 已收藏</span>
-                    <span th:unless="${isFavorited}">🤍 收藏</span>
+                    <span th:if="${isFavorited}">★ 已收藏</span>
+                    <span th:unless="${isFavorited}">☆ 收藏</span>
                 </button>
             </form>
+            <a th:if="${session.loginUser == null}" th:href="@{/login}" class="fav-btn">☆ 收藏</a>
         </div>
 
         <div class="links">

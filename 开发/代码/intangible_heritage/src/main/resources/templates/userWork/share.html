@@ -63,7 +63,7 @@
         <p th:if="${mine != null and mine}">管理我发布的所有手作作品</p>
         <div class="hero-actions">
             <a th:if="${session.loginUser != null}" th:href="@{/userWork/publish}" class="primary">+ 发布作品</a>
-            <a th:if="${mine == null or !mine}" th:href="@{/userWork/myPublish}">我的作品</a>
+            <a th:if="${mine == null or !mine}" th:href="@{/userWork/my}">我的作品</a>
             <a th:if="${mine != null and mine}" th:href="@{/userWork/share}">返回全部</a>
         </div>
     </div>
@@ -82,8 +82,8 @@
                 <h3 th:text="${w.title}">作品标题</h3>
                 <p th:text="${w.description != null ? w.description : '暂无描述'}">作品描述</p>
                 <div class="card-stats">
-                    <span>❤️ <span th:text="${@userWorkServiceImpl.likeCount(w.id)}">0</span></span>
-                    <span>💬 <span th:text="${@userWorkServiceImpl.commentCount(w.id)}">0</span></span>
+                    <span>❤️ <span th:text="${@interactionServiceImpl.countLikes(3, w.id)}">0</span></span>
+                    <span>💬 <span th:text="${@interactionServiceImpl.countComments(3, w.id)}">0</span></span>
                 </div>
                 <div class="card-actions" th:if="${mine != null and mine and session.loginUser != null and session.loginUser.id == w.userId}">
                     <span class="delete-link" th:attr="data-id=${w.id}" onclick="deleteWork(event, this)">删除</span>

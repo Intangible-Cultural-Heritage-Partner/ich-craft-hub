@@ -93,12 +93,16 @@
 
         /* 编辑按钮 */
         .edit-btn {
-            display: inline-block; margin-top: 16px; padding: 10px 22px;
-            background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff;
+            display: inline-block !important; margin-top: 16px; padding: 10px 22px !important;
+            background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff !important;
             border-radius: 10px; text-decoration: none; font-size: 14px; cursor: pointer; border: none;
             transition: all 0.25s; font-weight: 600; box-shadow: 0 4px 12px rgba(120,75,42,0.25);
         }
-        .edit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.35); }
+        .edit-btn:hover {
+            display: inline-block !important; padding: 10px 22px !important;
+            color: #fff !important; transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(120,75,42,0.35);
+        }
 
         /* 编辑模态框 */
         .modal-overlay {
@@ -161,27 +165,29 @@
         .modal .btn-group { display: flex; gap: 12px; margin-top: 20px; }
         .modal .btn-save {
             flex: 1;
-            padding: 11px;
-            background: linear-gradient(135deg, #784b2a, #a0673f);
-            color: #fff;
-            border: none;
-            border-radius: 6px;
+            padding: 11px !important;
+            background: linear-gradient(135deg, #784b2a, #a0673f) !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 6px !important;
             cursor: pointer;
             font-size: 15px;
             font-weight: 600;
+            box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important;
         }
-        .modal .btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(120,75,42,0.25); }
+        .modal .btn-save:hover { flex: 1; padding: 11px !important; background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important; border: none !important; border-radius: 6px !important; transform: none !important; box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important; display: inline-block !important; }
         .modal .btn-cancel {
             flex: 1;
-            padding: 11px;
-            background: rgba(255,255,255,0.6);
-            color: #784b2a;
-            border: 1px solid rgba(200,170,120,0.3);
-            border-radius: 6px;
+            padding: 11px !important;
+            background: rgba(255,255,255,0.6) !important;
+            color: #784b2a !important;
+            border: 1px solid rgba(200,170,120,0.3) !important;
+            border-radius: 6px !important;
             cursor: pointer;
             font-size: 15px;
+            box-shadow: none !important;
         }
-        .modal .btn-cancel:hover { background: rgba(120,75,42,0.08); }
+        .modal .btn-cancel:hover { flex: 1; padding: 11px !important; background: rgba(255,255,255,0.6) !important; color: #784b2a !important; border: 1px solid rgba(200,170,120,0.3) !important; border-radius: 6px !important; transform: none !important; box-shadow: none !important; display: inline-block !important; }
         .modal .hint { font-size: 12px; color: #7a6e60; margin-top: 4px; }
         .profile-msg { color: #0f5132; font-size: 14px; margin-bottom: 10px; text-align: center; }
 
@@ -319,8 +325,13 @@
                     <li th:if="${user != null and (user.role == '2' or user.role == 'ADMIN')}" class="admin">
                         <a th:href="@{/audit/list}">📋 内容审核</a>
                     </li>
+                    <li th:if="${user != null and (user.role == '0' or user.role == 'ADMIN')}" class="admin">
+                        <a th:href="@{/custom/myApply}">🎨 定制申请</a>
+                    </li>
+                    <li th:if="${user != null and (user.role == '1' or user.role == 'ADMIN')}" class="admin">
+                    <li><a th:href="@{/userWork/my}">✋ 我发布的手作作品</a></li>
+                    </li>
                     <li><a th:href="@{/custom/myApply}">🎨 我的定制申请</a></li>
-                    <li><a th:href="@{/userWork/myPublish}">✋ 我发布的手作作品</a></li>
                 </ul>
                 <a class="logout-btn" th:href="@{/logout}">退出登录</a>
             </section>

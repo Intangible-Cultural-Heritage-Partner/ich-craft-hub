@@ -3,6 +3,7 @@ package com.zjxy.intangible_heritage.service;
 import com.zjxy.intangible_heritage.entity.Favorite;
 import com.zjxy.intangible_heritage.repository.FavoriteRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
+    @Transactional
     public void favorite(Long userId, Long targetId, String targetType) {
         if (!isFavorited(userId, targetId, targetType)) {
             favoriteRepository.save(new Favorite(userId, targetId, targetType));
@@ -28,6 +30,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
+    @Transactional
     public void unfavorite(Long userId, Long targetId, String targetType) {
         favoriteRepository.deleteByUserIdAndTargetIdAndTargetType(userId, targetId, targetType);
     }

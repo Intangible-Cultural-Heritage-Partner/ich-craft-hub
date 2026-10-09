@@ -8,12 +8,8 @@ import com.zjxy.intangible_heritage.entity.UserWork;
 import com.zjxy.intangible_heritage.repository.UserRepository;
 import com.zjxy.intangible_heritage.service.FavoriteService;
 import com.zjxy.intangible_heritage.service.HeritageWorkService;
-import com.zjxy.intangible_heritage.service.TutorialService;
-import com.zjxy.intangible_heritage.service.UserWorkService;
-import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
-import com.zjxy.intangible_heritage.entity.User;
 import com.zjxy.intangible_heritage.service.InteractionService;
+import com.zjxy.intangible_heritage.service.TutorialService;
 import com.zjxy.intangible_heritage.service.UserWorkService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -36,14 +32,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class IndexController {
 
-    private final UserWorkService userWorkService;
-    private final InteractionService interactionService;
-
     private final HeritageWorkService heritageWorkService;
-    private final UserRepository userRepository;
-    private final FavoriteService favoriteService;
     private final TutorialService tutorialService;
     private final UserWorkService userWorkService;
+    private final InteractionService interactionService;
+    private final UserRepository userRepository;
+    private final FavoriteService favoriteService;
 
     @GetMapping("/")
     public String index(Model model) {
@@ -56,72 +50,43 @@ public class IndexController {
         return "index";
     }
 
-    //定制对接页面：已迁移到 CustomOrderController.applyForm()
-    // /custom/apply 由 CustomOrderController 处理（同时列出可选匠人）
-    @GetMapping("/work/list")
-    public String workList() {
-        return "work/list";
-    }
-
-    @GetMapping("/tutorial/list")
-    public String tutorialList() {
-        return "tutorial/list";
-    }
-
-    //定制对接页面
-    @GetMapping("/custom/apply")
-    public String customApply(){
-        return "apply";
-    }
-
-    //用户作品分享页
-    @GetMapping("/userWork/share")
-    public String userWorkShare(){
-        return "share";
-    }
-
-    //用户中心
+    // 用户中心
     @GetMapping("/user/userCenter")
-    public String userUserCenter(HttpSession session, Model model) {
-        Object value = session.getAttribute("loginUser");
-        if (value instanceof User user) {
-            model.addAttribute("user", user);
-            if (user.getId() != null && isCraftsman(user)) {
-                model.addAttribute("myWorks", heritageWorkService.findByCraftsman(user.getId()));
-            }
-            if (user.getId() != null) {
-                List<Favorite> workFavs = favoriteService.findByUserAndType(user.getId(), "work");
-                List<HeritageWork> favWorks = new ArrayList<>();
-                for (Favorite f : workFavs) {
-                    heritageWorkService.findById(f.getTargetId()).ifPresent(favWorks::add);
-                }
-                model.addAttribute("favWorks", favWorks);
-
-                List<Favorite> tutorialFavs = favoriteService.findByUserAndType(user.getId(), "tutorial");
-                List<Tutorial> favTutorials = new ArrayList<>();
-                for (Favorite f : tutorialFavs) {
-                    tutorialService.findById(f.getTargetId()).ifPresent(favTutorials::add);
-                }
-                model.addAttribute("favTutorials", favTutorials);
-
-                model.addAttribute("likedWorks", userWorkService.findLikedWorks(user.getId()));
-            }
-        }
     public String userUserCenter(HttpSession session, Model model) {
         User loginUser = (User) session.getAttribute("loginUser");
         if (loginUser == null) {
             return "redirect:/login";
         }
-
         model.addAttribute("user", loginUser);
 
-        int worksCount = userWorkService.listByUser(loginUser.getId()).size();
-        int likesCount = interactionService.listLikesByUser(loginUser.getId(), 3).size();
-        int commentsCount = interactionService.listMyComments(loginUser.getId()).size();
+        // 统计数据
+        model.addAttribute("myWorksCount", userWorkService.listByUser(loginUser.getId()).size());
+        model.addAttribute("myLikesCount", interactionService.listLikesByUser(loginUser.getId(), 3).size());
+        model.addAttribute("myCommentsCount", interactionService.listMyComments(loginUser.getId()).size());
 
-        model.addAttribute("myWorksCount", worksCount);
-        model.addAttribute("myLikesCount", likesCount);
-        model.addAttribute("myCommentsCount", commentsCount);
+        // 匠人的非遗展品
+        if (isCraftsman(loginUser)) {
+            model.addAttribute("myWorks", heritageWorkService.findByCraftsman(loginUser.getId()));
+        }
+
+        // 收藏的展品
+        List<Favorite> workFavs = favoriteService.findByUserAndType(loginUser.getId(), "work");
+        List<HeritageWork> favWorks = new ArrayList<>();
+        for (Favorite f : workFavs) {
+            heritageWorkService.findById(f.getTargetId()).ifPresent(favWorks::add);
+        }
+        model.addAttribute("favWorks", favWorks);
+
+        // 收藏的教程
+        List<Favorite> tutorialFavs = favoriteService.findByUserAndType(loginUser.getId(), "tutorial");
+        List<Tutorial> favTutorials = new ArrayList<>();
+        for (Favorite f : tutorialFavs) {
+            tutorialService.findById(f.getTargetId()).ifPresent(favTutorials::add);
+        }
+        model.addAttribute("favTutorials", favTutorials);
+
+        // 点赞的用户作品
+        model.addAttribute("likedWorks", userWorkService.findLikedWorks(loginUser.getId()));
 
         return "user/userCenter";
     }

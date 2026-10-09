@@ -32,14 +32,18 @@
         .sender { font-size: 12px; opacity: 0.7; margin-bottom: 4px; }
         .mine .sender { color: rgba(255,255,255,0.7); }
         .time { font-size: 11px; opacity: 0.5; text-align: right; margin-top: 4px; }
-        .input-row { display: flex; gap: 12px; margin-top: 16px; }
+        .action-row { display: flex; gap: 12px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+        .input-row { display: flex; gap: 12px; flex: 1; }
         .input-row input[type=text] { flex: 1; padding: 12px 18px !important; border: 1px solid rgba(200,170,120,0.3) !important; border-radius: 12px !important; font-size: 15px; background: rgba(255,255,255,0.7) !important; color: #3d2b1f !important; transition: all 0.25s; }
         .input-row input:focus { border-color: #a0673f !important; box-shadow: 0 0 0 3px rgba(120,75,42,0.1) !important; outline: none !important; }
-        .input-row button { padding: 12px 28px !important; border-radius: 12px !important; font-size: 15px; background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important; font-weight: 600 !important; border: none !important; cursor: pointer; }
+        .input-row button { padding: 12px 28px !important; border-radius: 12px !important; font-size: 15px; background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important; font-weight: 600 !important; border: none !important; cursor: pointer; display: inline-block !important; box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important; transition: none; flex-shrink: 0; }
+        .input-row button:hover { transform: none !important; padding: 12px 28px !important; background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important; border: none !important; border-radius: 12px !important; box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important; display: inline-block !important; }
+        .finish-form { display: inline-block; flex-shrink: 0; }
         .notice { color: #7a6e60; margin-top: 10px; font-size: 14px; }
         a.btn { color: #784b2a; text-decoration: none; transition: all 0.2s; }
         a.btn:hover { color: #a0673f; }
-        .finish-btn { background: linear-gradient(135deg, #2d5a87, #3a7ab5) !important; color: #fff !important; margin-top: 14px; }
+        .finish-btn { background: linear-gradient(135deg, #2d5a87, #3a7ab5) !important; color: #fff !important; padding: 11px 24px !important; border: none !important; border-radius: 8px !important; cursor: pointer; font-size: 14px; font-weight: 600 !important; box-shadow: 0 4px 12px rgba(45,90,135,0.25) !important; display: inline-block !important; transition: none; }
+        .finish-btn:hover { transform: none !important; padding: 11px 24px !important; background: linear-gradient(135deg, #2d5a87, #3a7ab5) !important; color: #fff !important; border: none !important; border-radius: 8px !important; box-shadow: 0 4px 12px rgba(45,90,135,0.25) !important; display: inline-block !important; }
     </style>
 </head>
 <body>
@@ -79,22 +83,19 @@
         <div th:if="${messages == null || messages.isEmpty()}" style="color:rgba(200,180,150,0.5);text-align:center;">暂无消息</div>
     </div>
 
-    <!-- 输入区：仅状态=2 沟通中 时可发 -->
-    <form class="input-row" th:action="@{'/custom/chat/' + ${order.id}}" method="post"
-          th:if="${order.orderStatus == 2}">
-        <input type="text" name="content" placeholder="输入消息..." required>
-        <button type="submit">发送</button>
-    </form>
+    <!-- 输入区 + 完结按钮：状态=2 时在同一行 -->
+    <div class="action-row" th:if="${order.orderStatus == 2}">
+        <form class="input-row" th:action="@{'/custom/chat/' + ${order.id}}" method="post">
+            <input type="text" name="content" placeholder="输入消息..." required>
+            <button type="submit">发送</button>
+        </form>
+        <form class="finish-form" th:action="@{'/custom/finish/' + ${order.id}}" method="post"
+              onsubmit="return confirm('确认完结此定制需求？完结后将无法再发消息。');">
+            <button type="submit" class="finish-btn">完结需求</button>
+        </form>
+    </div>
     <div class="notice" th:if="${order.orderStatus != 2}">
         当前状态【<span th:text="${order.statusText}"></span>】，不可发送消息。
-    </div>
-
-    <!-- 完结按钮：状态=2 时双方可见 -->
-    <div th:if="${order.orderStatus == 2}" style="margin-top:14px;">
-        <form th:action="@{'/custom/finish/' + ${order.id}}" method="post"
-              onsubmit="return confirm('确认完结此定制需求？完结后将无法再发消息。');">
-        <button type="submit" class="finish-btn">完结需求</button>
-        </form>
     </div>
 
     <p style="margin-top:18px;">

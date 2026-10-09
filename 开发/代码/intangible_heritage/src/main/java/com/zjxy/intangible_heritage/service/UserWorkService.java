@@ -26,7 +26,6 @@ public interface UserWorkService {
     List<UserWork> listByUser(Long userId);
 
     long likeCount(Long workId);
-    UserWork findById(Long id);
 
     void toggleLike(Long userId, Long workId);
 

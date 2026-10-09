@@ -33,20 +33,21 @@
     }
 
     .like-btn{
-      display:inline-flex;
+      display:inline-flex !important;
       align-items:center;
       gap:8px;
-      background:#fff;
-      color:#333;
-      border:1.5px solid #eee;
-      padding:10px 22px;
-      border-radius:24px;
+      background:rgba(255,255,255,0.5) !important;
+      color:#666 !important;
+      border:1.5px solid #eee !important;
+      padding:10px 22px !important;
+      border-radius:24px !important;
       cursor:pointer;
       font-size:15px;
-      transition:all 0.2s;
+      transition:none;
     }
-    .like-btn:hover{border-color:#e6162d;color:#e6162d;transform:translateY(-2px);}
-    .like-btn.liked{background:#fff5f6;color:#e6162d;border-color:#e6162d;}
+    .like-btn:hover{border-color:#e6162d !important;color:#e6162d !important;transform:none !important;}
+    .like-btn:active{transform:none !important;}
+    .like-btn.liked{background:#fff5f6 !important;color:#e6162d !important;border-color:#e6162d !important;}
     .heart{font-size:18px;transition:transform 0.2s;display:inline-block;}
     .like-btn.liked .heart{animation:heartbeat 0.6s;}
     @keyframes heartbeat{
@@ -135,7 +136,7 @@
            alt="头像"/>
       <div class="body">
         <div class="head">
-          <strong th:text="${commentUserMap[c.userId] != null ? commentUserMap[c.userId].nickname : '已注销'}">昵称</strong>
+          <strong th:text="${commentUserMap[c.userId] != null ? commentUserMap[c.userId].username : '已注销'}">昵称</strong>
           <span class="meta" th:text="${#temporals.format(c.createTime,'yyyy-MM-dd HH:mm')}"></span>
         </div>
         <p class="content" th:text="${c.content}">评论内容</p>
@@ -156,7 +157,7 @@
                  th:src="${commentUserMap[r.userId] != null and commentUserMap[r.userId].avatar != null and commentUserMap[r.userId].avatar != '' ? commentUserMap[r.userId].avatar : '/images/default_avatar.png'}"
                  alt="头像"/>
             <div class="r-body">
-              <strong th:text="${commentUserMap[r.userId] != null ? commentUserMap[r.userId].nickname : '已注销'}">昵称</strong>
+              <strong th:text="${commentUserMap[r.userId] != null ? commentUserMap[r.userId].username : '已注销'}">昵称</strong>
               <span class="meta" th:text="${#temporals.format(r.createTime,'yyyy-MM-dd HH:mm')}"></span>
               <p th:text="${r.content}">回复内容</p>
             </div>
