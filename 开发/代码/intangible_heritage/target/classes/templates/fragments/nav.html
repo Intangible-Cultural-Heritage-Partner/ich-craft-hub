@@ -4,14 +4,14 @@
 <style>
     @keyframes navSlideDown { from{opacity:0;transform:translateY(-100%)} to{opacity:1;transform:translateY(0)} }
     .nav-bar{
-        background: linear-gradient(135deg, #3d2010 0%, #5c3317 30%, #6b3e1f 70%, #7a4a28 100%);
+        background: linear-gradient(135deg, #5c3317 0%, #784b2a 40%, #8b5e3c 100%);
         color:#fff;
         padding: 0 3rem;
         height: 72px;
         display:flex;
         gap:1.5rem;
         align-items:center;
-        box-shadow: 0 4px 24px rgba(30,15,5,0.35);
+        box-shadow: 0 4px 24px rgba(92,51,23,0.18);
         position: sticky;
         top: 0;
         z-index: 1000;
@@ -23,6 +23,35 @@
         left:0; right:0; bottom:0;
         height:2px;
         background: linear-gradient(90deg, transparent 5%, #c89060, #e8c9a0, #c89060, transparent 95%);
+    }
+    .nav-bar .nav-arrow{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:34px;
+        height:34px;
+        border-radius:50%;
+        border:1.5px solid rgba(255,255,255,0.3);
+        color:#fff;
+        font-size:16px;
+        cursor:pointer;
+        transition:all 0.25s;
+        text-decoration:none;
+        flex-shrink:0;
+        background:rgba(255,255,255,0.06);
+    }
+    .nav-bar .nav-arrow:hover{
+        background:rgba(255,255,255,0.18);
+        border-color:rgba(255,255,255,0.55);
+        text-decoration:none;
+        color:#fff;
+    }
+    .nav-bar .nav-arrow.back:hover{ transform:translateX(-2px); }
+    .nav-bar .nav-arrow.forward:hover{ transform:translateX(2px); }
+    .nav-arrows{
+        display:flex;
+        gap:6px;
+        flex-shrink:0;
     }
     .nav-bar .brand{
         display:flex;
@@ -130,9 +159,127 @@
         padding-left: 24px;
     }
     .avatar-wrap:hover .dropdown-menu{ display:block; }
+
+    body { background: linear-gradient(160deg, #faf6f0 0%, #f5efe5 30%, #f0e8da 60%, #ece2d2 100%) !important; min-height: 100vh; }
+
+    .page-hero {
+        background: linear-gradient(135deg, #5c3317 0%, #784b2a 25%, #8b5e3c 50%, #a0673f 75%, #b8845a 100%);
+        color: #fff; padding: 56px 8% 64px; position: relative; overflow: hidden;
+    }
+    .page-hero .orb { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
+    .page-hero .orb1 { width: 300px; height: 300px; background: rgba(200,144,96,0.15); right: -3%; top: -20%; animation: phOrb1 8s ease-in-out infinite; }
+    .page-hero .orb2 { width: 220px; height: 220px; background: rgba(232,201,160,0.1); left: 5%; bottom: -30%; animation: phOrb2 11s ease-in-out infinite; }
+    @keyframes phOrb1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,-20px)} }
+    @keyframes phOrb2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,15px)} }
+    .page-hero .hero-inner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+    .page-hero h1 {
+        margin: 0 0 10px; font-size: 32px; letter-spacing: 3px; font-weight: 700;
+        color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .page-hero p { margin: 0; font-size: 16px; color: rgba(255,255,255,0.75); letter-spacing: 1px; }
+    .page-hero .hero-actions { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .page-hero .hero-actions a {
+        display: inline-block; padding: 10px 24px; border-radius: 10px; text-decoration: none;
+        font-size: 14px; font-weight: 500; transition: all 0.25s;
+        background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+        backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    }
+    .page-hero .hero-actions a:hover {
+        background: rgba(255,255,255,0.25); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .page-hero .hero-actions a.primary {
+        background: linear-gradient(135deg, #c89060, #e8c9a0); color: #3d2010; border: none;
+        box-shadow: 0 3px 10px rgba(200,144,96,0.3);
+    }
+    .page-hero .hero-actions a.primary:hover {
+        transform: translateY(-2px); box-shadow: 0 5px 16px rgba(200,144,96,0.4);
+    }
+
+    .page-body { max-width: 1200px; margin: 0 auto; padding: 40px 8%; }}
+
+    .panel, .box, .head, .chat-box, .profile-card, .card, table {
+        background: rgba(255,255,255,0.72) !important;
+        backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+        border: 1px solid rgba(200,170,120,0.18) !important;
+        color: #3d2b1f !important;
+    }
+    .panel, .box { box-shadow: 0 4px 20px rgba(92,51,23,0.08), 0 1px 3px rgba(0,0,0,0.04) !important; }
+
+    h1, h2 { letter-spacing: 1px; }
+    h1 { background: linear-gradient(135deg, #5c3317, #784b2a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    h2, h3 { color: #5c3317 !important; }
+    h3 { color: #6b3e1f !important; }
+    p, small, span { color: #6b5e50; }
+    a { color: #784b2a; }
+    .content h3, .card-body h3 { color: #5c3317 !important; }
+    .content p, .content small, .card-body p { color: #7a6e60 !important; }
+
+    table { border-radius: 12px !important; overflow: hidden; box-shadow: 0 4px 20px rgba(92,51,23,0.08) !important; border-collapse: separate !important; border-spacing: 0 !important; }
+    th { background: linear-gradient(135deg, #784b2a, #8b5e3c) !important; color: #fff !important; font-weight: 600; letter-spacing: 1px; border: none !important; }
+    td { border-bottom: 1px solid rgba(200,170,120,0.15) !important; border-left: none !important; border-right: none !important; border-top: none !important; color: #4a3a2e !important; }
+    tr:hover td { background: rgba(200,170,120,0.08) !important; }
+
+    input[type=text], input[type=password], input[type=email], input[type=number], textarea, select {
+        border: 1px solid rgba(200,170,120,0.3) !important; border-radius: 8px !important; padding: 10px 14px !important;
+        transition: all 0.25s !important; background: rgba(255,255,255,0.8) !important; color: #3d2b1f !important;
+    }
+    input::placeholder { color: rgba(120,100,80,0.45) !important; }
+    input:focus, textarea:focus, select:focus { border-color: #a0673f !important; box-shadow: 0 0 0 3px rgba(160,103,63,0.12) !important; outline: none !important; }
+
+    button, .btn-primary, input[type=submit] {
+        background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important;
+        border: none !important; border-radius: 8px !important; padding: 10px 22px !important;
+        cursor: pointer; transition: all 0.25s; font-weight: 600; letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important;
+    }
+    button:hover, .btn-primary:hover, input[type=submit]:hover {
+        transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.35) !important;
+    }
+    button:active { transform: translateY(0) !important; }
+
+    .links a, .btn-outline, a.btn {
+        background: rgba(255,255,255,0.6) !important; color: #784b2a !important;
+        border: 1px solid rgba(200,170,120,0.3) !important; border-radius: 8px !important;
+        padding: 8px 18px !important; transition: all 0.25s; text-decoration: none !important;
+    }
+    .links a:hover, .btn-outline:hover, a.btn:hover {
+        background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important;
+        transform: translateY(-1px); box-shadow: 0 4px 12px rgba(120,75,42,0.25);
+    }
+
+    @keyframes cardFadeIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+    .card,.func-card,.work,.comment-item { animation: cardFadeIn 0.5s ease both; }
+    .card:nth-child(1),.func-card:nth-child(1),.work:nth-child(1) { animation-delay:0.05s; }
+    .card:nth-child(2),.func-card:nth-child(2),.work:nth-child(2) { animation-delay:0.1s; }
+    .card:nth-child(3),.func-card:nth-child(3),.work:nth-child(3) { animation-delay:0.15s; }
+    .card:nth-child(4),.func-card:nth-child(4),.work:nth-child(4) { animation-delay:0.2s; }
+    .card:nth-child(5),.work:nth-child(5) { animation-delay:0.25s; }
+    .card:nth-child(6),.work:nth-child(6) { animation-delay:0.3s; }
+    .card:nth-child(7),.work:nth-child(7) { animation-delay:0.35s; }
+    .card:nth-child(8),.work:nth-child(8) { animation-delay:0.4s; }
+
+    .toast-container { position:fixed; top:84px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
+    .toast {
+        pointer-events:auto;
+        padding:14px 24px 14px 18px; border-radius:12px; font-size:14px; font-weight:500;
+        box-shadow:0 8px 30px rgba(0,0,0,0.15); display:flex; align-items:center; gap:10px;
+        animation: toastIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+        max-width:360px; line-height:1.5;
+    }
+    .toast.info { background:linear-gradient(135deg,#784b2a,#a0673f); color:#fff; }
+    .toast.success { background:linear-gradient(135deg,#2d7a4f,#3da866); color:#fff; }
+    .toast.error { background:linear-gradient(135deg,#b42318,#dc3545); color:#fff; }
+    .toast.warning { background:linear-gradient(135deg,#b45309,#d97706); color:#fff; }
+    .toast.out { animation: toastOut 0.35s ease both; }
+    @keyframes toastIn { from{opacity:0;transform:translateX(60px)} to{opacity:1;transform:translateX(0)} }
+    @keyframes toastOut { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(60px)} }
 </style>
 
 <div class="nav-bar">
+    <div class="nav-arrows">
+        <a class="nav-arrow back" href="javascript:history.back()" title="后退">←</a>
+        <a class="nav-arrow forward" href="javascript:history.forward()" title="前进">→</a>
+    </div>
     <div class="brand">
         <span class="logo">🏺</span>
         <span>非遗手作共创平台</span>
@@ -141,6 +288,7 @@
         <a th:href="@{/}">首页</a>
         <a th:href="@{/work/list}">非遗展品</a>
         <a th:href="@{/tutorial/list}">手作教程</a>
+        <a th:href="@{/userWork/share}">作品分享</a>
     </div>
 
     <!--头像+下拉菜单-->
@@ -186,5 +334,40 @@
         </div>
     </div>
 </div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script>
+(function(){
+    function showToast(text, type, duration){
+        type = type || 'info';
+        duration = duration || 3000;
+        var container = document.getElementById('toastContainer');
+        if(!container) return;
+        var toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        var icons = {info:'💡',success:'✅',error:'❌',warning:'⚠️'};
+        toast.innerHTML = '<span>' + (icons[type]||'💡') + '</span><span>' + text + '</span>';
+        container.appendChild(toast);
+        setTimeout(function(){
+            toast.classList.add('out');
+            setTimeout(function(){ toast.remove(); }, 350);
+        }, duration);
+    }
+    var params = new URLSearchParams(window.location.search);
+    var msg = params.get('msg');
+    if(msg){
+        var type = 'info';
+        if(msg.indexOf('失败')>=0 || msg.indexOf('错误')>=0 || msg.indexOf('驳回')>=0) type='error';
+        else if(msg.indexOf('成功')>=0 || msg.indexOf('通过')>=0) type='success';
+        else if(msg.indexOf('审核')>=0 || msg.indexOf('暂未')>=0) type='warning';
+        showToast(msg, type, 3500);
+        params.delete('msg');
+        var clean = params.toString();
+        var newUrl = window.location.pathname + (clean ? '?' + clean : '');
+        history.replaceState(null, '', newUrl);
+    }
+    window.showToast = showToast;
+})();
+</script>
 </body>
 </html>

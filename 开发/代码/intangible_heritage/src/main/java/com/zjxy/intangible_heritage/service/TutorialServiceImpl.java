@@ -20,11 +20,13 @@ public class TutorialServiceImpl implements TutorialService {
     private final TutorialRepository tutorialRepository;
     private final Path coverUploadDir;
     private final Path videoUploadDir;
+    private final Path contentImageUploadDir;
 
     public TutorialServiceImpl(TutorialRepository tutorialRepository) {
         this.tutorialRepository = tutorialRepository;
         this.coverUploadDir = Paths.get(System.getProperty("user.dir"), "uploads", "tutorial", "cover");
         this.videoUploadDir = Paths.get(System.getProperty("user.dir"), "uploads", "tutorial", "video");
+        this.contentImageUploadDir = Paths.get(System.getProperty("user.dir"), "uploads", "tutorial", "content");
     }
 
     @Override
@@ -57,32 +59,37 @@ public class TutorialServiceImpl implements TutorialService {
 
     @Override
     public Tutorial create(Long craftsmanId, String title, String description, String category, String tags,
-                           String content, MultipartFile coverFile, String coverUrl,
+                           String content, MultipartFile[] contentImageFiles, String contentImages,
+                           MultipartFile coverFile, String coverUrl,
                            MultipartFile videoFile, String videoUrl) {
         Tutorial tutorial = new Tutorial();
         tutorial.setCraftsmanId(craftsmanId);
         tutorial.setAuditStatus(0);
-        applyFields(tutorial, title, description, category, tags, content, coverFile, coverUrl, videoFile, videoUrl);
+        applyFields(tutorial, title, description, category, tags, content,
+                contentImageFiles, contentImages, coverFile, coverUrl, videoFile, videoUrl);
         return tutorialRepository.save(tutorial);
     }
 
     @Override
     public Tutorial update(Long id, Long craftsmanId, String title, String description, String category, String tags,
-                           String content, MultipartFile coverFile, String coverUrl,
+                           String content, MultipartFile[] contentImageFiles, String contentImages,
+                           MultipartFile coverFile, String coverUrl,
                            MultipartFile videoFile, String videoUrl) {
         Tutorial tutorial = tutorialRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("教程不存在"));
         if (!Objects.equals(tutorial.getCraftsmanId(), craftsmanId)) {
             throw new IllegalStateException("只能编辑自己发布的教程");
         }
-        applyFields(tutorial, title, description, category, tags, content, coverFile, coverUrl, videoFile, videoUrl);
+        applyFields(tutorial, title, description, category, tags, content,
+                contentImageFiles, contentImages, coverFile, coverUrl, videoFile, videoUrl);
         tutorial.setAuditStatus(0);
         tutorial.setAuditRemark(null);
         return tutorialRepository.save(tutorial);
     }
 
     private void applyFields(Tutorial tutorial, String title, String description, String category, String tags,
-                             String content, MultipartFile coverFile, String coverUrl,
+                             String content, MultipartFile[] contentImageFiles, String contentImages,
+                             MultipartFile coverFile, String coverUrl,
                              MultipartFile videoFile, String videoUrl) {
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException("教程标题不能为空");
@@ -92,6 +99,21 @@ public class TutorialServiceImpl implements TutorialService {
         tutorial.setCategory(category == null || category.isBlank() ? "其他" : category.trim());
         tutorial.setTags(trimToNull(tags));
         tutorial.setContent(trimToNull(content));
+
+        java.util.List<String> allImageUrls = new java.util.ArrayList<>();
+        if (contentImages != null && !contentImages.isBlank()) {
+            for (String url : contentImages.split(",")) {
+                String trimmed = url.trim();
+                if (!trimmed.isEmpty()) allImageUrls.add(trimmed);
+            }
+        }
+        if (contentImageFiles != null) {
+            for (MultipartFile f : contentImageFiles) {
+                String saved = saveFile(f, contentImageUploadDir, "/uploads/tutorial/content/");
+                if (saved != null) allImageUrls.add(saved);
+            }
+        }
+        tutorial.setContentImages(allImageUrls.isEmpty() ? null : String.join(",", allImageUrls));
 
         String uploadedCover = saveFile(coverFile, coverUploadDir, "/uploads/tutorial/cover/");
         String submittedCoverUrl = trimToNull(coverUrl);

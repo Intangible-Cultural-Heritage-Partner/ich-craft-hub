@@ -3,6 +3,7 @@ package com.zjxy.intangible_heritage.controller;
 import com.zjxy.intangible_heritage.entity.Tutorial;
 import com.zjxy.intangible_heritage.entity.User;
 import com.zjxy.intangible_heritage.repository.UserRepository;
+import com.zjxy.intangible_heritage.service.FavoriteService;
 import com.zjxy.intangible_heritage.service.TutorialService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class TutorialController {
 
     private final TutorialService tutorialService;
     private final UserRepository userRepository;
+    private final FavoriteService favoriteService;
 
     private static final List<String> CATEGORIES = Arrays.asList(
             "剪纸", "刺绣", "陶艺", "木雕", "扎染", "漆器", "竹编", "皮影", "泥塑", "其他"
@@ -54,6 +56,11 @@ public class TutorialController {
                 return "redirect:/tutorial/list?msg=教程暂未审核通过";
             }
             model.addAttribute("tutorial", tutorial);
+            if (loginUser != null) {
+                model.addAttribute("isFavorited", favoriteService.isFavorited(loginUser.getId(), id, "tutorial"));
+            } else {
+                model.addAttribute("isFavorited", false);
+            }
             userRepository.findById(tutorial.getCraftsmanId())
                     .ifPresent(c -> model.addAttribute("craftsman", c));
             if (tutorial.getTags() != null && !tutorial.getTags().isBlank()) {
@@ -80,6 +87,8 @@ public class TutorialController {
                          @RequestParam(defaultValue = "其他") String category,
                          @RequestParam(required = false) String tags,
                          @RequestParam(required = false) String content,
+                         @RequestParam(required = false) MultipartFile[] contentImageFiles,
+                         @RequestParam(required = false) String contentImages,
                          @RequestParam(required = false) MultipartFile coverFile,
                          @RequestParam(required = false) String coverUrl,
                          @RequestParam(required = false) MultipartFile videoFile,
@@ -91,7 +100,7 @@ public class TutorialController {
         }
         try {
             Tutorial tutorial = tutorialService.create(user.getId(), title, description, category, tags,
-                    content, coverFile, coverUrl, videoFile, videoUrl);
+                    content, contentImageFiles, contentImages, coverFile, coverUrl, videoFile, videoUrl);
             return "redirect:/tutorial/" + tutorial.getId();
         } catch (RuntimeException e) {
             Tutorial formTutorial = new Tutorial();
@@ -100,6 +109,7 @@ public class TutorialController {
             formTutorial.setCategory(category);
             formTutorial.setTags(tags);
             formTutorial.setContent(content);
+            formTutorial.setContentImages(contentImages);
             model.addAttribute("tutorial", formTutorial);
             model.addAttribute("categories", CATEGORIES);
             model.addAttribute("formAction", "/tutorial/create");
@@ -129,6 +139,8 @@ public class TutorialController {
                        @RequestParam(defaultValue = "其他") String category,
                        @RequestParam(required = false) String tags,
                        @RequestParam(required = false) String content,
+                       @RequestParam(required = false) MultipartFile[] contentImageFiles,
+                       @RequestParam(required = false) String contentImages,
                        @RequestParam(required = false) MultipartFile coverFile,
                        @RequestParam(required = false) String coverUrl,
                        @RequestParam(required = false) MultipartFile videoFile,
@@ -138,7 +150,7 @@ public class TutorialController {
         if (user == null) return "redirect:/tutorial/list?msg=请先以匠人身份登录";
         try {
             tutorialService.update(id, user.getId(), title, description, category, tags,
-                    content, coverFile, coverUrl, videoFile, videoUrl);
+                    content, contentImageFiles, contentImages, coverFile, coverUrl, videoFile, videoUrl);
             return "redirect:/tutorial/" + id;
         } catch (RuntimeException e) {
             Tutorial formTutorial = tutorialService.findById(id).orElse(new Tutorial());
@@ -147,6 +159,7 @@ public class TutorialController {
             formTutorial.setCategory(category);
             formTutorial.setTags(tags);
             formTutorial.setContent(content);
+            formTutorial.setContentImages(contentImages);
             model.addAttribute("tutorial", formTutorial);
             model.addAttribute("categories", CATEGORIES);
             model.addAttribute("formAction", "/tutorial/" + id + "/edit");

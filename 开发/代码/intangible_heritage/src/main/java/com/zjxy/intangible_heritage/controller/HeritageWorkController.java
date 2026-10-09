@@ -2,6 +2,7 @@ package com.zjxy.intangible_heritage.controller;
 
 import com.zjxy.intangible_heritage.entity.HeritageWork;
 import com.zjxy.intangible_heritage.entity.User;
+import com.zjxy.intangible_heritage.service.FavoriteService;
 import com.zjxy.intangible_heritage.service.HeritageWorkService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class HeritageWorkController {
 
     private final HeritageWorkService heritageWorkService;
+    private final FavoriteService favoriteService;
 
     @GetMapping("/work/list")
     public String list(Model model, @RequestParam(required = false) String msg) {
@@ -39,6 +41,11 @@ public class HeritageWorkController {
                         return "redirect:/work/list?msg=展品暂未审核通过";
                     }
                     model.addAttribute("work", work);
+                    if (loginUser != null) {
+                        model.addAttribute("isFavorited", favoriteService.isFavorited(loginUser.getId(), id, "work"));
+                    } else {
+                        model.addAttribute("isFavorited", false);
+                    }
                     return "work/detail";
                 })
                 .orElseGet(() -> "redirect:/work/list?msg=展品不存在");

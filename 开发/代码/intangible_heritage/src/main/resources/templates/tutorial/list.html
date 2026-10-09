@@ -5,79 +5,81 @@
     <title>手作教程</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
-        .wrap { padding: 40px 6%; }
-        .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
-        .top h1 { margin: 0 0 6px; color: #784b2a; font-size: 26px; }
-        .top p { margin: 0; color: #888; font-size: 14px; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
+        .wrap { padding: 40px 6%; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .top h1 { margin: 0 0 6px; font-size: 28px; letter-spacing: 2px;
+            background: linear-gradient(135deg, #5c3317, #784b2a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .top p { margin: 0; color: #8a7a6a; font-size: 14px; }
         .top .actions { display: flex; gap: 10px; }
-        .top a { color: #fff; background: #784b2a; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; transition: background 0.2s; display: inline-block; }
-        .top a:hover { background: #5f3a20; }
-        .message { padding: 12px 16px; background: #fff3cd; color: #856404; border-radius: 8px; margin-bottom: 20px; }
+        .top a { color: #fff; background: linear-gradient(135deg, #784b2a, #a0673f); padding: 10px 22px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.25s; display: inline-block; box-shadow: 0 4px 12px rgba(120,75,42,0.25); }
+        .top a:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.35); }
+        .message { padding: 12px 16px; background: rgba(180,83,9,0.1); color: #8a6d3b; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(200,170,120,0.2); }
         .category-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
         .category-bar a {
-            padding: 7px 18px; border-radius: 20px; text-decoration: none;
-            font-size: 14px; border: 1px solid #d8cbbd; color: #784b2a;
-            background: #fff; transition: all 0.2s;
+            padding: 8px 20px; border-radius: 20px; text-decoration: none;
+            font-size: 14px; font-weight: 500; border: 1px solid rgba(200,170,120,0.25); color: #784b2a;
+            background: rgba(255,255,255,0.6); transition: all 0.25s;
         }
-        .category-bar a:hover { background: #f0e6d8; }
-        .category-bar a.active { background: #784b2a; color: #fff; border-color: #784b2a; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 22px; }
+        .category-bar a:hover { background: rgba(200,170,120,0.1); transform: translateY(-1px); }
+        .category-bar a.active { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(120,75,42,0.25); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
         .card {
-            background: #fff; border-radius: 14px; overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 1px solid #f0e6d8;
-            transition: transform 0.25s, box-shadow 0.25s;
-            display: flex; flex-direction: column;
+            background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+            border-radius: 16px; overflow: hidden;
+            box-shadow: 0 4px 20px rgba(92,51,23,0.08), 0 1px 3px rgba(0,0,0,0.04); border: 1px solid rgba(200,170,120,0.18);
+            transition: all 0.35s cubic-bezier(0.16,1,0.3,1); display: flex; flex-direction: column;
         }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 28px rgba(120,75,42,0.15); }
-        .cover-wrap { position: relative; width: 100%; height: 170px; background: linear-gradient(135deg, #eadfce, #d8cbbd); }
+        .card:hover { transform: translateY(-6px); box-shadow: 0 12px 36px rgba(92,51,23,0.12), 0 2px 6px rgba(0,0,0,0.06); border-color: rgba(200,170,120,0.3); }
+        .cover-wrap { position: relative; width: 100%; height: 180px; background: linear-gradient(135deg, #f5efe5, #ece2d2); }
         .cover-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .video-badge {
             position: absolute; top: 10px; right: 10px;
             background: rgba(0,0,0,0.65); color: #fff; font-size: 12px;
-            padding: 3px 8px; border-radius: 4px;
+            padding: 4px 10px; border-radius: 6px; font-weight: 500;
         }
-        .content { padding: 16px 18px; flex: 1; display: flex; flex-direction: column; }
-        .content h3 { margin: 0 0 6px; color: #784b2a; font-size: 17px; }
-        .content .desc { color: #666; font-size: 13px; line-height: 1.5; margin: 0 0 10px; flex: 1;
+        .content { padding: 18px 20px; flex: 1; display: flex; flex-direction: column; }
+        .content h3 { margin: 0 0 8px; color: #5c3317; font-size: 17px; font-weight: 600; }
+        .content .desc { color: #6b5e50; font-size: 13px; line-height: 1.5; margin: 0 0 10px; flex: 1;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-        .tag {
-            display: inline-block; padding: 2px 10px; border-radius: 12px;
-            font-size: 12px; background: #f0e6d8; color: #784b2a;
-        }
-        .tag.cat { background: #784b2a; color: #fff; }
-        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-bottom: 8px; align-self: flex-start; }
-        .status-0 { background: #fff3cd; color: #856404; }
-        .status-1 { background: #d4edda; color: #155724; }
-        .status-2 { background: #f8d7da; color: #721c24; }
-        .reject-reason { color: #842029; background: #f8d7da; padding: 6px 10px; border-radius: 6px; font-size: 12px; margin: 0 0 8px; }
-        .empty-card { background: #fff; padding: 60px 24px; border-radius: 14px; text-align: center; color: #999; border: 1px dashed #d8cbbd; }
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; background: rgba(120,75,42,0.08); color: #784b2a; border: 1px solid rgba(200,170,120,0.15); }
+        .tag.cat { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border: none; }
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-bottom: 8px; align-self: flex-start; font-weight: 500; }
+        .status-0 { background: rgba(180,83,9,0.12); color: #8a6d3b; }
+        .status-1 { background: rgba(45,122,79,0.12); color: #0f5132; }
+        .status-2 { background: rgba(180,35,24,0.12); color: #842029; }
+        .reject-reason { color: #842029; background: rgba(180,35,24,0.08); padding: 6px 10px; border-radius: 8px; font-size: 12px; margin: 0 0 8px; }
+        .empty-card { background: rgba(255,255,255,0.5); backdrop-filter: blur(12px); padding: 60px 24px; border-radius: 16px; text-align: center; color: #8a7a6a; border: 1px dashed rgba(200,170,120,0.3); }
         .empty-card .icon { font-size: 48px; margin-bottom: 12px; }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
-<div class="wrap">
-    <div class="top">
-        <div>
-            <h1 th:text="${mine == true ? '我的教程' : '手作教程'}">手作教程</h1>
-            <p>学习非遗手工技艺，跟随匠人一步步制作传统手作</p>
-        </div>
-        <div class="actions" th:if="${session.loginUser != null and (session.loginUser.role == 'CRAFTSMAN' or session.loginUser.role == '1')}">
-            <a th:href="@{/tutorial/create}">发布教程</a>
+
+<div class="page-hero">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="hero-inner">
+        <h1 th:text="${mine == true ? '我的教程' : '手作教程'}">手作教程</h1>
+        <p>学习非遗手工技艺，跟随匠人一步步制作传统手作</p>
+        <div class="hero-actions" th:if="${session.loginUser != null and (session.loginUser.role == 'CRAFTSMAN' or session.loginUser.role == '1')}">
+            <a th:href="@{/tutorial/create}" class="primary">发布教程</a>
             <a th:href="@{/tutorial/mine}">我的教程</a>
         </div>
     </div>
+</div>
+
+<main class="page-body">
     <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
 
-    <div class="category-bar" th:if="${categories != null}">
-        <a href="javascript:void(0)" data-cat="" th:classappend="${currentCategory == null or currentCategory.isEmpty()} ? 'active'" onclick="loadCategory(this.getAttribute('data-cat'))">全部</a>
-        <a th:each="cat : ${categories}" href="javascript:void(0)" th:data-cat="${cat}"
-           th:text="${cat}" th:classappend="${cat == currentCategory} ? 'active'" onclick="loadCategory(this.getAttribute('data-cat'))"></a>
+    <div class="category-bar" th:if="${categories != null and mine != true}">
+        <a th:href="@{/tutorial/list}" th:classappend="${currentCategory == null or currentCategory.isEmpty()} ? 'active'">全部</a>
+        <a th:each="cat : ${categories}" th:href="@{/tutorial/list(category=${cat})}"
+           th:text="${cat}" th:classappend="${cat == currentCategory} ? 'active'"></a>
     </div>
 
-    <div id="tutorialGrid" class="grid" th:if="${tutorials != null and !tutorials.isEmpty()}">
+    <div class="grid" th:if="${tutorials != null and !tutorials.isEmpty()}">
         <a class="card" th:each="t : ${tutorials}" th:href="@{/tutorial/{id}(id=${t.id})}" style="text-decoration:none;color:inherit;">
             <div class="cover-wrap">
                 <img th:if="${t.coverImg != null and !t.coverImg.isEmpty()}" th:src="${t.coverImg}" th:alt="${t.title}">
@@ -99,53 +101,11 @@
             </div>
         </a>
     </div>
-    <div id="emptyCard" class="empty-card" th:unless="${tutorials != null and !tutorials.isEmpty()}">
+    <div class="empty-card" th:unless="${tutorials != null and !tutorials.isEmpty()}">
         <div class="icon">📖</div>
         <p>暂无教程，敬请期待匠人发布精彩手作教程</p>
     </div>
 </div>
 
-<script th:inline="javascript">
-var isMine = /*[[${mine}]]*/ false;
-function loadCategory(cat) {
-    var base = isMine ? '/tutorial/mine' : '/tutorial/list';
-    var url = cat ? base + '?category=' + encodeURIComponent(cat) : base;
-    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(function(res) { return res.text(); })
-        .then(function(html) {
-            var parser = new DOMParser();
-            var doc = parser.parseFromString(html, 'text/html');
-            var newGrid = doc.getElementById('tutorialGrid');
-            var newEmpty = doc.getElementById('emptyCard');
-            var grid = document.getElementById('tutorialGrid');
-            var empty = document.getElementById('emptyCard');
-            if (newGrid) {
-                if (grid) { grid.outerHTML = newGrid.outerHTML; }
-                else { document.querySelector('.wrap').insertBefore(newGrid, document.querySelector('.empty-card') || null); }
-            } else if (grid) {
-                grid.remove();
-            }
-            if (newEmpty) {
-                if (empty) { empty.outerHTML = newEmpty.outerHTML; }
-                else { document.querySelector('.wrap').appendChild(newEmpty); }
-            } else if (empty) {
-                empty.remove();
-            }
-            // 更新分类高亮
-            document.querySelectorAll('.category-bar a').forEach(function(a) {
-                if (a.getAttribute('data-cat') === cat) {
-                    a.classList.add('active');
-                } else {
-                    a.classList.remove('active');
-                }
-            });
-            // 更新URL但不刷新页面
-            history.pushState({}, '', url);
-        })
-        .catch(function() {
-            window.location.href = url;
-        });
-}
-</script>
 </body>
 </html>

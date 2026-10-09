@@ -4,36 +4,57 @@
     <meta charset="UTF-8">
     <title>定制沟通</title>
     <style>
-        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
-        .wrap{padding:30px 50px;max-width:880px;}
-        h2{color:#784b2a;}
-        .head{background:#fff;padding:18px 24px;border-radius:8px;box-shadow:0 1px 4px #ccc;margin-bottom:16px;}
-        .head h3{margin:0 0 8px 0;color:#5c3a1f;}
-        .head .row{color:#555;font-size:14px;margin:4px 0;}
-        .badge{padding:3px 10px;border-radius:10px;font-size:13px;}
-        .s0{background:#fff3cd;color:#8a6d3b;}
-        .s1{background:#f8d7da;color:#842029;}
-        .s2{background:#d1e7dd;color:#0f5132;}
-        .s3{background:#cfe2ff;color:#084298;}
-        .chat-box{background:#fff;border-radius:8px;box-shadow:0 1px 4px #ccc;height:380px;overflow-y:auto;padding:18px;}
-        .msg{margin:10px 0;padding:8px 14px;border-radius:8px;max-width:70%;word-wrap:break-word;}
-        .mine{margin-left:auto;background:#d1e7dd;}
-        .others{margin-right:auto;background:#f0f0f0;}
-        .sender{font-size:12px;color:#888;margin-bottom:2px;}
-        .time{font-size:11px;color:#aaa;text-align:right;}
-        .input-row{display:flex;gap:10px;margin-top:14px;}
-        input[type=text]{flex:1;padding:8px;border:1px solid #ccc;border-radius:4px;}
-        button{padding:8px 24px;background:#784b2a;color:#fff;border:none;border-radius:4px;cursor:pointer;}
-        button:hover{background:#5c3a1f;}
-        button:disabled{background:#aaa;cursor:not-allowed;}
-        .notice{color:#842029;margin-top:8px;}
-        a.btn{color:#784b2a;}
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
+        .wrap { padding: 30px 6%; max-width: 880px; margin: 0 auto; position: relative; z-index: 1; }
+        h2 { background: linear-gradient(135deg, #5c3317, #784b2a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .head {
+            background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+            padding: 22px 28px; border-radius: 16px; margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(92,51,23,0.08); border: 1px solid rgba(200,170,120,0.18);
+        }
+        .head h3 { margin: 0 0 10px; color: #5c3317; font-size: 20px; letter-spacing: 1px; }
+        .head .row { color: #7a6e60; font-size: 14px; margin: 6px 0; }
+        .badge { padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 500; }
+        .s0 { background: rgba(180,83,9,0.12); color: #8a6d3b; }
+        .s1 { background: rgba(180,35,24,0.12); color: #842029; }
+        .s2 { background: rgba(45,122,79,0.12); color: #0f5132; }
+        .s3 { background: rgba(42,122,226,0.12); color: #1a5cb0; }
+        .chat-box {
+            background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+            border-radius: 16px; height: 420px; overflow-y: auto; padding: 24px;
+            box-shadow: 0 4px 20px rgba(92,51,23,0.08); border: 1px solid rgba(200,170,120,0.18);
+            scroll-behavior: smooth;
+        }
+        .msg { margin: 12px 0; padding: 12px 18px; border-radius: 16px; max-width: 72%; word-wrap: break-word; position: relative; }
+        .mine { margin-left: auto; background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-bottom-right-radius: 4px; }
+        .others { margin-right: auto; background: rgba(120,75,42,0.06); color: #3d2b1f; border-bottom-left-radius: 4px; }
+        .sender { font-size: 12px; opacity: 0.7; margin-bottom: 4px; }
+        .mine .sender { color: rgba(255,255,255,0.7); }
+        .time { font-size: 11px; opacity: 0.5; text-align: right; margin-top: 4px; }
+        .input-row { display: flex; gap: 12px; margin-top: 16px; }
+        .input-row input[type=text] { flex: 1; padding: 12px 18px !important; border: 1px solid rgba(200,170,120,0.3) !important; border-radius: 12px !important; font-size: 15px; background: rgba(255,255,255,0.7) !important; color: #3d2b1f !important; transition: all 0.25s; }
+        .input-row input:focus { border-color: #a0673f !important; box-shadow: 0 0 0 3px rgba(120,75,42,0.1) !important; outline: none !important; }
+        .input-row button { padding: 12px 28px !important; border-radius: 12px !important; font-size: 15px; background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important; font-weight: 600 !important; border: none !important; cursor: pointer; }
+        .notice { color: #7a6e60; margin-top: 10px; font-size: 14px; }
+        a.btn { color: #784b2a; text-decoration: none; transition: all 0.2s; }
+        a.btn:hover { color: #a0673f; }
+        .finish-btn { background: linear-gradient(135deg, #2d5a87, #3a7ab5) !important; color: #fff !important; margin-top: 14px; }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
 
-<div class="wrap">
+<div class="page-hero" style="padding:36px 8% 44px;">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="hero-inner">
+        <h1>定制沟通</h1>
+        <p>与对方在线沟通定制需求细节</p>
+    </div>
+</div>
+
+<div class="page-body" style="padding-top:24px;">
     <div class="head">
         <h3>定制沟通 · 单号 #<span th:text="${order.id}"></span></h3>
         <div class="row">对方：<span th:text="${other?.username}"></span></div>
@@ -55,7 +76,7 @@
             <div th:text="${m.content}"></div>
             <div class="time" th:text="${m.sendTime}"></div>
         </div>
-        <div th:if="${messages == null || messages.isEmpty()}" style="color:#aaa;text-align:center;">暂无消息</div>
+        <div th:if="${messages == null || messages.isEmpty()}" style="color:rgba(200,180,150,0.5);text-align:center;">暂无消息</div>
     </div>
 
     <!-- 输入区：仅状态=2 沟通中 时可发 -->
@@ -72,7 +93,7 @@
     <div th:if="${order.orderStatus == 2}" style="margin-top:14px;">
         <form th:action="@{'/custom/finish/' + ${order.id}}" method="post"
               onsubmit="return confirm('确认完结此定制需求？完结后将无法再发消息。');">
-            <button type="submit" style="background:#084298;">完结需求</button>
+        <button type="submit" class="finish-btn">完结需求</button>
         </form>
     </div>
 
@@ -91,7 +112,7 @@
     function renderMessages(list) {
         const box = document.getElementById('chatBox');
         if (!list || list.length === 0) {
-            box.innerHTML = '<div style="color:#aaa;text-align:center;">暂无消息</div>';
+            box.innerHTML = '<div style="color:rgba(200,180,150,0.5);text-align:center;">暂无消息</div>';
             return;
         }
         box.innerHTML = list.map(m => {
@@ -121,5 +142,6 @@
     }
     setInterval(poll, 5000);
 </script>
+
 </body>
 </html>

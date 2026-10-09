@@ -19,10 +19,12 @@ public interface TutorialService {
     Optional<Tutorial> findById(Long id);
 
     Tutorial create(Long craftsmanId, String title, String description, String category, String tags,
-                    String content, MultipartFile coverFile, String coverUrl,
+                    String content, MultipartFile[] contentImageFiles, String contentImages,
+                    MultipartFile coverFile, String coverUrl,
                     MultipartFile videoFile, String videoUrl);
 
     Tutorial update(Long id, Long craftsmanId, String title, String description, String category, String tags,
-                    String content, MultipartFile coverFile, String coverUrl,
+                    String content, MultipartFile[] contentImageFiles, String contentImages,
+                    MultipartFile coverFile, String coverUrl,
                     MultipartFile videoFile, String videoUrl);
 }

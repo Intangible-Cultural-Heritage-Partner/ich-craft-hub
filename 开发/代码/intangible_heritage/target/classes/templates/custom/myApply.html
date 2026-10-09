@@ -4,30 +4,52 @@
     <meta charset="UTF-8">
     <title>我的定制申请</title>
     <style>
-        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
-        .wrap{padding:30px 50px;}
-        h2{color:#784b2a;}
-        .msg{color:#2e7d32;margin-bottom:10px;}
-        table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 4px #ccc;}
-        th,td{border:1px solid #e0d8c8;padding:10px;text-align:left;}
-        th{background:#784b2a;color:#fff;}
-        tr:hover{background:#faf6ee;}
-        .badge{padding:3px 10px;border-radius:10px;font-size:13px;}
-        .s0{background:#fff3cd;color:#8a6d3b;}
-        .s1{background:#f8d7da;color:#842029;}
-        .s2{background:#d1e7dd;color:#0f5132;}
-        .s3{background:#cfe2ff;color:#084298;}
-        a.btn{color:#784b2a;}
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
+        .wrap { padding: 36px 6%; max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+        .page-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
+        h2 { background: linear-gradient(135deg, #5c3317, #784b2a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 24px; letter-spacing: 1px; margin: 0; }
+        .msg { color: #0f5132; margin-bottom: 14px; font-size: 14px; }
+        .new-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 22px; background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff;
+            border: none; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600;
+            box-shadow: 0 4px 12px rgba(120,75,42,0.25); transition: all 0.25s;
+        }
+        .new-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.35); color: #fff; }
+        table { border-collapse: separate; border-spacing: 0; width: 100%; border-radius: 14px; overflow: hidden;
+            background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+            box-shadow: 0 4px 20px rgba(92,51,23,0.08); border: 1px solid rgba(200,170,120,0.18); }
+        th { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; padding: 14px 16px; text-align: left; font-weight: 600; letter-spacing: 0.5px; font-size: 14px; }
+        td { padding: 12px 16px; border-bottom: 1px solid rgba(200,170,120,0.12); font-size: 14px; color: #3d2b1f; }
+        tr:hover td { background: rgba(120,75,42,0.04); }
+        .badge { padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 500; display: inline-block; }
+        .s0 { background: rgba(180,83,9,0.12); color: #8a6d3b; }
+        .s1 { background: rgba(180,35,24,0.12); color: #842029; }
+        .s2 { background: rgba(45,122,79,0.12); color: #0f5132; }
+        .s3 { background: rgba(42,122,226,0.12); color: #1a5cb0; }
+        a.btn { color: #784b2a; text-decoration: none; font-weight: 500; transition: all 0.2s; }
+        a.btn:hover { color: #a0673f; }
+        .empty { color: #7a6e60; text-align: center; padding: 48px; font-size: 15px; }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
 
-<div class="wrap">
-    <h2>我发起的定制申请</h2>
-    <p class="msg" th:text="${msg}"></p>
+<div class="page-hero">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="hero-inner">
+        <h1>我的定制申请</h1>
+        <p>查看我发起的所有定制申请及处理进度</p>
+        <div class="hero-actions">
+            <a th:href="@{/custom/apply}" class="primary">+ 发起新申请</a>
+        </div>
+    </div>
+</div>
 
-    <p><a th:href="@{/custom/apply}" class="btn">+ 发起新申请</a></p>
+<div class="page-body">
+    <p class="msg" th:text="${msg}"></p>
 
     <div th:if="${orders != null && !orders.isEmpty()}">
         <table>
@@ -59,7 +81,8 @@
             </tr>
         </table>
     </div>
-    <p th:if="${orders == null || orders.isEmpty()}">暂无申请记录。</p>
+    <p class="empty" th:if="${orders == null || orders.isEmpty()}">暂无申请记录，点击右上角发起新申请</p>
 </div>
+
 </body>
 </html>

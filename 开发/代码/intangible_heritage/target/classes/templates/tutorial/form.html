@@ -5,19 +5,19 @@
     <title>发布教程</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
-        .wrap { max-width: 800px; margin: 36px auto; padding: 0 20px; }
-        .panel { background: #fff; padding: 32px; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border: 1px solid #f0e6d8; }
-        .panel h1 { color: #784b2a; margin: 0 0 6px; font-size: 24px; }
-        .panel .subtitle { color: #999; font-size: 14px; margin: 0 0 24px; padding-bottom: 18px; border-bottom: 1px solid #f0e6d8; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
+        .wrap { max-width: 800px; margin: 36px auto; padding: 0 20px; position: relative; z-index: 1; }
+        .panel { background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); padding: 32px; border-radius: 16px; box-shadow: 0 4px 20px rgba(92,51,23,0.08); border: 1px solid rgba(200,170,120,0.18); }
+        .panel h1 { background: linear-gradient(135deg, #5c3317, #784b2a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0 0 6px; font-size: 24px; }
+        .panel .subtitle { color: #7a6e60; font-size: 14px; margin: 0 0 24px; padding-bottom: 18px; border-bottom: 1px solid rgba(200,170,120,0.15); }
         .panel label { display: block; margin-top: 18px; color: #784b2a; font-weight: 500; font-size: 15px; }
         .panel input, .panel textarea, .panel select {
             width: 100%; box-sizing: border-box; margin-top: 8px;
-            padding: 11px 14px; border: 1px solid #d8cbbd; border-radius: 8px;
+            padding: 11px 14px; border: 1px solid rgba(200,170,120,0.3); border-radius: 8px;
             font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-            background: #fff;
+            background: rgba(255,255,255,0.7); color: #3d2b1f;
         }
-        .panel input:focus, .panel textarea:focus, .panel select:focus { border-color: #784b2a; box-shadow: 0 0 0 3px rgba(120,75,42,0.1); }
+        .panel input:focus, .panel textarea:focus, .panel select:focus { border-color: #a0673f; box-shadow: 0 0 0 3px rgba(120,75,42,0.1); }
         .panel textarea { min-height: 120px; resize: vertical; }
         .panel select { cursor: pointer; }
         .panel button, .panel a {
@@ -25,24 +25,50 @@
             border: 0; border-radius: 8px; text-decoration: none;
             font-size: 15px; cursor: pointer; transition: all 0.2s;
         }
-        .panel button { color: #fff; background: linear-gradient(135deg, #784b2a, #a0673f); box-shadow: 0 4px 12px rgba(120,75,42,0.3); }
-        .panel button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.4); }
-        .panel a { color: #784b2a; border: 1px solid #784b2a; background: #fff; }
-        .panel a:hover { background: #784b2a; color: #fff; }
-        .message { color: #b42318; background: #fef0f0; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; }
-        .hint { color: #999; font-size: 13px; margin-top: 6px; }
+        .panel button { color: #fff; background: linear-gradient(135deg, #784b2a, #a0673f); box-shadow: 0 4px 12px rgba(120,75,42,0.25); font-weight: 600; }
+        .panel button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.35); }
+        .panel a { color: #784b2a; border: 1px solid rgba(200,170,120,0.3); background: rgba(255,255,255,0.6); }
+        .panel a:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; }
+        .message { color: #842029; background: rgba(180,35,24,0.08); padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; }
+        .hint { color: #7a6e60; font-size: 13px; margin-top: 6px; }
         .tag-input-wrap { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
         .tag-input-wrap input { flex: 1; min-width: 200px; }
         .quick-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
         .quick-tags span {
             padding: 4px 12px; border-radius: 14px; font-size: 13px;
-            background: #f0e6d8; color: #784b2a; cursor: pointer;
-            border: 1px solid #d8cbbd; transition: all 0.2s; user-select: none;
+            background: rgba(120,75,42,0.06); color: #784b2a; cursor: pointer;
+            border: 1px solid rgba(200,170,120,0.2); transition: all 0.2s; user-select: none;
         }
-        .quick-tags span:hover { background: #784b2a; color: #fff; }
-        .quick-tags span.selected { background: #784b2a; color: #fff; border-color: #784b2a; }
-        .section-divider { border: 0; border-top: 1px dashed #d8cbbd; margin: 28px 0 8px; }
-        .section-label { color: #784b2a; font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+        .quick-tags span:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; }
+        .quick-tags span.selected { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; }
+        .section-divider { border: 0; border-top: 1px dashed rgba(200,170,120,0.25); margin: 28px 0 8px; }
+        .section-label { color: #5c3317; font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+        .content-img-upload { margin-top: 12px; }
+        .content-img-upload .upload-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 20px; border: 2px dashed rgba(200,170,120,0.3); border-radius: 8px;
+            color: #784b2a; font-size: 14px; cursor: pointer; transition: all 0.2s;
+            background: rgba(120,75,42,0.04);
+        }
+        .content-img-upload .upload-btn:hover { border-color: #a0673f; background: rgba(120,75,42,0.08); }
+        .content-img-preview {
+            display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;
+        }
+        .content-img-preview .img-item {
+            position: relative; width: 140px; height: 140px;
+            border-radius: 8px; overflow: hidden; border: 1px solid rgba(200,170,120,0.2);
+        }
+        .content-img-preview .img-item img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .content-img-preview .img-item .del-btn {
+            position: absolute; top: 4px; right: 4px;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(180,35,24,0.85); color: #fff;
+            font-size: 14px; line-height: 22px; text-align: center;
+            cursor: pointer; display: none; transition: opacity 0.2s;
+        }
+        .content-img-preview .img-item:hover .del-btn { display: block; }
     </style>
 </head>
 <body>
@@ -99,9 +125,19 @@
             <label>图文正文
                 <textarea name="content" rows="12" th:text="${tutorial.content}" placeholder="详细的手作步骤说明，支持文字描述每一步操作"></textarea>
             </label>
+            <div class="content-img-upload">
+                <label style="margin-top:0">教程配图（可上传多张）</label>
+                <div class="upload-btn" onclick="document.getElementById('contentImgInput').click()">
+                    📷 选择图片
+                </div>
+                <input type="file" id="contentImgInput" name="contentImageFiles" accept="image/*" multiple style="display:none">
+                <input type="hidden" name="contentImages" id="contentImagesHidden" th:value="${tutorial.contentImages}">
+                <div class="content-img-preview" id="contentImgPreview"></div>
+                <p class="hint">支持上传多张配图，与文字配合展示教程步骤</p>
+            </div>
             <p class="hint">视频和图文至少填写一项，让学习者有完整的学习资料</p>
 
-            <p class="hint" th:if="${tutorial.id != null}" style="color: #b45309;">注意：编辑保存后，教程将重新进入审核流程。</p>
+            <p class="hint" th:if="${tutorial.id != null}" style="color: #784b2a;">注意：编辑保存后，教程将重新进入审核流程。</p>
 
             <button type="submit">发布教程</button>
             <a th:href="@{/tutorial/list}">取消</a>
@@ -132,7 +168,58 @@
         document.querySelectorAll('.quick-tags span').forEach(function(el) {
             if (vals.indexOf(el.textContent) !== -1) el.classList.add('selected');
         });
+        renderExistingContentImages();
+    });
+
+    var contentImgPreview = document.getElementById('contentImgPreview');
+    var contentImagesHidden = document.getElementById('contentImagesHidden');
+    var contentImgInput = document.getElementById('contentImgInput');
+
+    function getExistingUrls() {
+        var val = contentImagesHidden.value;
+        if (!val || !val.trim()) return [];
+        return val.split(',').map(function(s){return s.trim();}).filter(function(s){return s;});
+    }
+    function setExistingUrls(urls) {
+        contentImagesHidden.value = urls.length ? urls.join(',') : '';
+    }
+    function addPreviewItem(src, isExisting) {
+        var item = document.createElement('div');
+        item.className = 'img-item';
+        var img = document.createElement('img');
+        img.src = src;
+        item.appendChild(img);
+        if (isExisting) {
+            var del = document.createElement('div');
+            del.className = 'del-btn';
+            del.textContent = '×';
+            del.onclick = function() {
+                var urls = getExistingUrls();
+                urls = urls.filter(function(u){ return u !== src; });
+                setExistingUrls(urls);
+                item.remove();
+            };
+            item.appendChild(del);
+        }
+        contentImgPreview.appendChild(item);
+    }
+    function renderExistingContentImages() {
+        var urls = getExistingUrls();
+        urls.forEach(function(url){ addPreviewItem(url, true); });
+    }
+    contentImgInput.addEventListener('change', function() {
+        var files = this.files;
+        for (var i = 0; i < files.length; i++) {
+            (function(file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    addPreviewItem(e.target.result, false);
+                };
+                reader.readAsDataURL(file);
+            })(files[i]);
+        }
     });
 </script>
+
 </body>
 </html>
