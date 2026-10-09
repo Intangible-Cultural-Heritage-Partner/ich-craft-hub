@@ -5,132 +5,86 @@
     <title>个人中心</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Microsoft Yahei", sans-serif; background: #f8f5f0; color: #333; }
-        .container { padding: 30px 6%; }
-        .layout { display: grid; grid-template-columns: 300px 1fr; gap: 24px; max-width: 1100px; margin: 0 auto; }
-
-        /* 左侧个人信息卡片 */
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
+        .container { padding: 36px 6%; position: relative; z-index: 1; }
+        .layout { display: grid; grid-template-columns: 300px 1fr; gap: 28px; max-width: 1100px; margin: 0 auto; }
         .profile-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 32px 24px;
-            text-align: center;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            height: fit-content;
+            background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+            border-radius: 18px; padding: 36px 24px; text-align: center;
+            box-shadow: 0 4px 20px rgba(92,51,23,0.08); border: 1px solid rgba(200,170,120,0.18); height: fit-content;
         }
         .avatar {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #f0e6d8;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 16px;
+            width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
+            border: 4px solid rgba(200,170,120,0.3); box-shadow: 0 4px 16px rgba(92,51,23,0.1); margin-bottom: 18px;
+            transition: all 0.3s;
         }
-        .username { font-size: 22px; font-weight: bold; color: #333; margin: 0 0 8px; }
-        .role-badge {
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-        .role-0 { background: #eaf3ff; color: #2a7ae2; }
-        .role-1 { background: #fff3e0; color: #e67e22; }
-        .role-2 { background: #fde8e8; color: #c0392b; }
-        .info-row {
-            text-align: left;
-            padding: 10px 0;
-            border-top: 1px solid #f0ece5;
-        }
-        .info-label { font-size: 13px; color: #999; margin-bottom: 4px; }
-        .info-value { font-size: 15px; color: #444; word-break: break-all; }
-        .intro-text { font-size: 14px; color: #666; line-height: 1.6; white-space: pre-wrap; }
-
-        /* 右侧内容区 */
+        .avatar:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(120,75,42,0.15); }
+        .username { font-size: 22px; font-weight: bold; color: #5c3317; margin: 0 0 8px; }
+        .role-badge { display: inline-block; padding: 5px 16px; border-radius: 20px; font-size: 13px; margin-bottom: 20px; font-weight: 500; }
+        .role-0 { background: rgba(42,122,226,0.12); color: #1a5cb0; }
+        .role-1 { background: rgba(120,75,42,0.12); color: #784b2a; }
+        .role-2 { background: rgba(180,35,24,0.12); color: #842029; }
+        .info-row { text-align: left; padding: 12px 0; border-top: 1px solid rgba(200,170,120,0.12); }
+        .info-label { font-size: 13px; color: #7a6e60; margin-bottom: 4px; }
+        .info-value { font-size: 15px; color: #3d2b1f; word-break: break-all; }
+        .intro-text { font-size: 14px; color: #5a4a3a; line-height: 1.6; white-space: pre-wrap; }
         .content { display: flex; flex-direction: column; gap: 24px; }
         .card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 28px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+            border-radius: 18px; padding: 28px;
+            box-shadow: 0 4px 20px rgba(92,51,23,0.08); border: 1px solid rgba(200,170,120,0.18);
         }
         .card h3 {
-            margin: 0 0 20px;
-            color: #784b2a;
-            font-size: 18px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f0e6d8;
+            margin: 0 0 20px; font-size: 18px; letter-spacing: 1px; padding-bottom: 14px; border-bottom: 2px solid rgba(200,170,120,0.15);
+            color: #5c3317;
         }
 
         /* 展品网格 */
         .works { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-        .work {
-            padding: 16px;
-            background: #faf7f2;
-            border-radius: 8px;
-            border: 1px solid #f0e6d8;
-            transition: transform 0.2s;
-        }
-        .work:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .work strong { color: #784b2a; display: block; margin-bottom: 8px; }
-        .work p { color: #777; font-size: 13px; margin: 0 0 12px; line-height: 1.5; min-height: 40px; }
+        .work { padding: 16px; background: rgba(120,75,42,0.04); border-radius: 12px; border: 1px solid rgba(200,170,120,0.15); transition: all 0.25s; }
+        .work:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(92,51,23,0.08); }
+        .work strong { color: #5c3317; display: block; margin-bottom: 8px; }
+        .work p { color: #7a6e60; font-size: 13px; margin: 0 0 12px; line-height: 1.5; min-height: 40px; }
         .work a { color: #784b2a; text-decoration: none; font-size: 14px; }
-        .work a:hover { text-decoration: underline; }
+        .work a:hover { color: #a0673f; }
         .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-bottom: 6px; }
-        .status-0 { background: #fff3cd; color: #856404; }
-        .status-1 { background: #d4edda; color: #155724; }
-        .status-2 { background: #f8d7da; color: #721c24; }
-        .empty { color: #999; text-align: center; padding: 24px; }
+        .status-0 { background: rgba(180,83,9,0.12); color: #8a6d3b; }
+        .status-1 { background: rgba(45,122,79,0.12); color: #0f5132; }
+        .status-2 { background: rgba(180,35,24,0.12); color: #842029; }
+        .empty { color: #7a6e60; text-align: center; padding: 24px; }
 
         /* 功能链接列表 */
         .func-list { list-style: none; padding: 0; margin: 0; }
         .func-list li { margin-bottom: 12px; }
         .func-list a {
-            display: block;
-            padding: 12px 18px;
-            background: #faf7f2;
-            border: 1px solid #f0e6d8;
-            border-radius: 8px;
-            color: #784b2a;
-            text-decoration: none;
-            transition: all 0.2s;
+            display: block; padding: 12px 18px; background: rgba(120,75,42,0.04);
+            border: 1px solid rgba(200,170,120,0.15); border-radius: 10px;
+            color: #784b2a; text-decoration: none; transition: all 0.25s; font-weight: 500;
         }
-        .func-list a:hover { background: #784b2a; color: #fff; border-color: #784b2a; }
-        .func-list .admin a { color: #c0392b; border-color: #fde8e8; background: #fff5f5; }
-        .func-list .admin a:hover { background: #c0392b; color: #fff; border-color: #c0392b; }
+        .func-list a:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; transform: translateX(4px); }
+        .func-list .admin a { color: #842029; border-color: rgba(180,35,24,0.2); background: rgba(180,35,24,0.06); }
+        .func-list .admin a:hover { background: linear-gradient(135deg, #b42318, #dc3545); color: #fff; border-color: transparent; }
 
         .logout-btn {
-            display: inline-block;
-            margin-top: 16px;
-            padding: 10px 24px;
-            background: #c0392b;
-            color: #fff;
-            border-radius: 6px;
-            text-decoration: none;
-            transition: background 0.2s;
+            display: inline-block; margin-top: 16px; padding: 10px 24px;
+            background: linear-gradient(135deg, #b42318, #dc3545); color: #fff;
+            border-radius: 10px; text-decoration: none; transition: all 0.25s; font-weight: 500;
+            box-shadow: 0 4px 12px rgba(180,35,24,0.2);
         }
-        .logout-btn:hover { background: #a93226; }
+        .logout-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(180,35,24,0.3); }
 
         .work-links { margin-bottom: 16px; }
         .work-links a { color: #784b2a; text-decoration: none; margin-right: 16px; }
-        .work-links a:hover { text-decoration: underline; }
+        .work-links a:hover { color: #a0673f; }
 
         /* 编辑按钮 */
         .edit-btn {
-            display: inline-block;
-            margin-top: 16px;
-            padding: 8px 20px;
-            background: #784b2a;
-            color: #fff;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 14px;
-            cursor: pointer;
-            border: none;
-            transition: background 0.2s;
+            display: inline-block; margin-top: 16px; padding: 10px 22px;
+            background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff;
+            border-radius: 10px; text-decoration: none; font-size: 14px; cursor: pointer; border: none;
+            transition: all 0.25s; font-weight: 600; box-shadow: 0 4px 12px rgba(120,75,42,0.25);
         }
-        .edit-btn:hover { background: #5e3a20; }
+        .edit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.35); }
 
         /* 编辑模态框 */
         .modal-overlay {
@@ -138,46 +92,51 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(4px);
         }
         .modal-overlay.active { display: flex; }
         .modal {
-            background: #fff;
-            border-radius: 12px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px) saturate(150%);
+            border-radius: 16px;
             padding: 30px;
             width: 460px;
             max-width: 90%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 60px rgba(92,51,23,0.15);
+            border: 1px solid rgba(200,170,120,0.2);
         }
         .modal h3 {
             margin: 0 0 20px;
-            color: #784b2a;
+            color: #5c3317;
             padding-bottom: 12px;
-            border-bottom: 2px solid #f0e6d8;
+            border-bottom: 2px solid rgba(200,170,120,0.15);
         }
         .modal .field { margin-bottom: 16px; }
-        .modal label { display: block; margin-bottom: 6px; color: #555; font-size: 14px; }
+        .modal label { display: block; margin-bottom: 6px; color: #784b2a; font-size: 14px; }
         .modal input, .modal textarea {
             width: 100%;
             padding: 9px 12px;
-            border: 1px solid #d8cbbd;
+            border: 1px solid rgba(200,170,120,0.3);
             border-radius: 6px;
             font-size: 14px;
             outline: none;
             box-sizing: border-box;
+            background: rgba(255,255,255,0.7);
+            color: #3d2b1f;
         }
-        .modal input:focus, .modal textarea:focus { border-color: #784b2a; }
+        .modal input:focus, .modal textarea:focus { border-color: #a0673f; box-shadow: 0 0 0 3px rgba(120,75,42,0.1); }
         .modal textarea { min-height: 80px; resize: vertical; }
         .modal .avatar-preview {
             width: 100px; height: 100px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #f0e6d8;
+            border: 3px solid rgba(200,170,120,0.3);
         }
         .modal .role-readonly {
             display: inline-block;
@@ -189,27 +148,28 @@
         .modal .btn-save {
             flex: 1;
             padding: 11px;
-            background: #784b2a;
+            background: linear-gradient(135deg, #784b2a, #a0673f);
             color: #fff;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-size: 15px;
+            font-weight: 600;
         }
-        .modal .btn-save:hover { background: #5e3a20; }
+        .modal .btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(120,75,42,0.25); }
         .modal .btn-cancel {
             flex: 1;
             padding: 11px;
-            background: #f0e6d8;
+            background: rgba(255,255,255,0.6);
             color: #784b2a;
-            border: none;
+            border: 1px solid rgba(200,170,120,0.3);
             border-radius: 6px;
             cursor: pointer;
             font-size: 15px;
         }
-        .modal .btn-cancel:hover { background: #e0d0b8; }
-        .modal .hint { font-size: 12px; color: #999; margin-top: 4px; }
-        .profile-msg { color: #27ae60; font-size: 14px; margin-bottom: 10px; text-align: center; }
+        .modal .btn-cancel:hover { background: rgba(120,75,42,0.08); }
+        .modal .hint { font-size: 12px; color: #7a6e60; margin-top: 4px; }
+        .profile-msg { color: #0f5132; font-size: 14px; margin-bottom: 10px; text-align: center; }
 
         @media (max-width: 768px) {
             .layout { grid-template-columns: 1fr; }
@@ -218,7 +178,17 @@
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
-<div class="container">
+
+<div class="page-hero">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="hero-inner">
+        <h1>个人中心</h1>
+        <p>管理个人信息，查看我的收藏与互动</p>
+    </div>
+</div>
+
+<div class="page-body" style="padding-top:32px;">
     <div class="layout">
         <!-- 左侧：个人信息卡片 -->
         <aside class="profile-card">
@@ -274,6 +244,45 @@
                 <p class="empty" th:unless="${myWorks != null and !myWorks.isEmpty()}">你还没有发布非遗展品，点击上方链接开始创作吧。</p>
             </section>
 
+            <!-- 我收藏的展品 -->
+            <section class="card">
+                <h3>❤️ 我收藏的展品</h3>
+                <div class="works" th:if="${favWorks != null and !favWorks.isEmpty()}">
+                    <div class="work" th:each="work : ${favWorks}">
+                        <strong th:text="${work.title}">展品标题</strong>
+                        <p th:text="${work.description != null && !work.description.isEmpty()} ? ${work.description} : '暂无介绍'">作品介绍</p>
+                        <a th:href="@{/work/{id}(id=${work.id})}">查看详情 →</a>
+                    </div>
+                </div>
+                <p class="empty" th:unless="${favWorks != null and !favWorks.isEmpty()}">还没有收藏任何展品，去展品列表逛逛吧。</p>
+            </section>
+
+            <!-- 我收藏的教程 -->
+            <section class="card">
+                <h3>❤️ 我收藏的教程</h3>
+                <div class="works" th:if="${favTutorials != null and !favTutorials.isEmpty()}">
+                    <div class="work" th:each="t : ${favTutorials}">
+                        <strong th:text="${t.title}">教程标题</strong>
+                        <p th:text="${t.description != null && !t.description.isEmpty()} ? ${t.description} : '暂无简介'">教程简介</p>
+                        <a th:href="@{/tutorial/{id}(id=${t.id})}">查看详情 →</a>
+                    </div>
+                </div>
+                <p class="empty" th:unless="${favTutorials != null and !favTutorials.isEmpty()}">还没有收藏任何教程，去教程列表逛逛吧。</p>
+            </section>
+
+            <!-- 我点赞的作品 -->
+            <section class="card">
+                <h3>👍 我点赞的作品</h3>
+                <div class="works" th:if="${likedWorks != null and !likedWorks.isEmpty()}">
+                    <div class="work" th:each="w : ${likedWorks}">
+                        <strong th:text="${w.title}">作品标题</strong>
+                        <p th:text="${w.description != null && !w.description.isEmpty()} ? ${w.description} : '暂无描述'">作品描述</p>
+                        <a th:href="@{/userWork/{id}(id=${w.id})}">查看详情 →</a>
+                    </div>
+                </div>
+                <p class="empty" th:unless="${likedWorks != null and !likedWorks.isEmpty()}">还没有点赞任何作品，去作品分享逛逛吧。</p>
+            </section>
+
             <!-- 其他功能 -->
             <section class="card">
                 <h3>快捷功能</h3>
@@ -286,7 +295,6 @@
                     </li>
                     <li><a th:href="@{/custom/myApply}">🎨 我的定制申请</a></li>
                     <li><a th:href="@{/userWork/myPublish}">✋ 我发布的手作作品</a></li>
-                    <li><a th:href="@{/tutorial/myCollect}">📚 我收藏的教程</a></li>
                 </ul>
                 <a class="logout-btn" th:href="@{/logout}">退出登录</a>
             </section>
@@ -356,5 +364,6 @@
         }
     }
 </script>
+
 </body>
 </html>

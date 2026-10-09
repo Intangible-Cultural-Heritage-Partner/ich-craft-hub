@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="footer">
+<style>
+    .site-footer {
+        background: linear-gradient(135deg, #5c3317 0%, #784b2a 50%, #8b5e3c 100%);
+        color: rgba(255,240,220,0.75);
+        padding: 40px 6% 28px;
+        margin-top: 48px;
+        position: relative;
+        z-index: 1;
+    }
+    .site-footer::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent 5%, rgba(200,144,96,0.3), rgba(232,201,160,0.2), rgba(200,144,96,0.3), transparent 95%);
+    }
+    .footer-inner {
+        max-width: 1100px; margin: 0 auto;
+        display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px;
+    }
+    .footer-col h4 {
+        color: #c89060; font-size: 15px; margin: 0 0 14px;
+        letter-spacing: 2px; font-weight: 600;
+    }
+    .footer-col p { font-size: 13px; line-height: 1.8; margin: 0; }
+    .footer-col a {
+        display: block; color: rgba(255,240,220,0.6); text-decoration: none;
+        font-size: 13px; padding: 3px 0; transition: all 0.2s;
+    }
+    .footer-col a:hover { color: #c89060; padding-left: 6px; }
+    .footer-bottom {
+        text-align: center; padding-top: 24px; margin-top: 28px;
+        border-top: 1px solid rgba(200,144,96,0.1);
+        font-size: 12px; color: rgba(255,240,220,0.4);
+        max-width: 1100px; margin-left: auto; margin-right: auto;
+    }
+    @media (max-width: 640px) {
+        .footer-inner { grid-template-columns: 1fr; }
+    }
+</style>
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-col">
+            <h4>🏺 非遗手作共创平台</h4>
+            <p>传承非遗技艺，连接匠人与爱好者，<br>让传统手作在数字时代焕发新生。</p>
+        </div>
+        <div class="footer-col">
+            <h4>快速导航</h4>
+            <a th:href="@{/}">首页</a>
+            <a th:href="@{/work/list}">非遗展品</a>
+            <a th:href="@{/tutorial/list}">手作教程</a>
+            <a th:href="@{/userWork/share}">作品分享</a>
+        </div>
+        <div class="footer-col">
+            <h4>关于我们</h4>
+            <a th:href="@{/craftsman/apply}">申请成为匠人</a>
+            <a th:href="@{/custom/apply}">定制服务</a>
+            <a th:href="@{/login}">登录 / 注册</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        © 2026 非遗手作数字展示与共创平台 · 传承匠心，共创未来
+    </div>
+</footer>
+</body>
+</html>

@@ -175,6 +175,34 @@ LOCK TABLES `custom_order` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `favorite`
+--
+
+DROP TABLE IF EXISTS `favorite`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `favorite` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL,
+  `target_id` bigint NOT NULL,
+  `target_type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_target` (`user_id`,`target_id`,`target_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='收藏表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `favorite`
+--
+
+LOCK TABLES `favorite` WRITE;
+/*!40000 ALTER TABLE `favorite` DISABLE KEYS */;
+INSERT INTO `favorite` VALUES (1,1,2,'tutorial','2026-10-08 22:59:53'),(2,3,1,'tutorial','2026-10-08 23:08:28'),(3,4,1,'tutorial','2026-10-09 00:16:05');
+/*!40000 ALTER TABLE `favorite` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `heritage_work`
 --
 
@@ -256,10 +284,11 @@ CREATE TABLE `tutorial` (
   `audit_status` tinyint NOT NULL DEFAULT '0' COMMENT '0待审核 1审核通过 2驳回',
   `audit_remark` varchar(200) DEFAULT NULL,
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `content_images` text COMMENT '图文教程配图，多张图片URL逗号分隔',
   PRIMARY KEY (`id`),
   KEY `craftsman_id` (`craftsman_id`),
   CONSTRAINT `tutorial_ibfk_1` FOREIGN KEY (`craftsman_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='手作教程';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='手作教程';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -268,7 +297,7 @@ CREATE TABLE `tutorial` (
 
 LOCK TABLES `tutorial` WRITE;
 /*!40000 ALTER TABLE `tutorial` DISABLE KEYS */;
-INSERT INTO `tutorial` VALUES (1,1,'剪纸','sdrtyujk','剪纸','入门,亲子,节日','/uploads/tutorial/cover/72a223c7-de8c-4751-a2e1-21d956439457.jpg','asdfgh',NULL,1,NULL,'2026-10-07 12:37:50');
+INSERT INTO `tutorial` VALUES (1,1,'剪纸','sdrtyujk','剪纸','入门,亲子,节日','/uploads/tutorial/cover/72a223c7-de8c-4751-a2e1-21d956439457.jpg','asdfgh',NULL,1,NULL,'2026-10-07 12:37:50',NULL),(2,1,'中国传统刺绣','asxdcfghjk','刺绣','零基础,装饰','/uploads/tutorial/cover/c3e04574-dbd1-42bb-a080-c14295d0339e.jpg','第一步\r\n第二步',NULL,1,NULL,'2026-10-08 22:48:07','/uploads/tutorial/content/504789cd-8900-4e2f-ba42-7d11f61dfea3.jpeg,/uploads/tutorial/content/63e58ee6-aff5-4bb6-bf06-5f81f8f0f8b2.jpg');
 /*!40000 ALTER TABLE `tutorial` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -291,7 +320,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `phone` (`phone`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -300,7 +329,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'xujinze','258066','11111111111',1,'/images/default_avatar.png','sdftgyhj','2026-10-07 10:59:31'),(2,'admin','admin123','13800000000',2,'/images/default_avatar.png',NULL,'2026-10-07 12:35:16');
+INSERT INTO `user` VALUES (1,'xujinze','258066','11111111111',1,'/images/default_avatar.png','sdftgyhj','2026-10-07 10:59:31'),(2,'admin','admin123','13800000000',2,'/images/default_avatar.png',NULL,'2026-10-07 12:35:16'),(3,'xiaomi','258066','11111111112',0,'/images/default_avatar.png',NULL,'2026-10-08 23:08:08'),(4,'huawei','258066','11111111113',0,'/images/default_avatar.png',NULL,'2026-10-08 23:59:02');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -324,7 +353,7 @@ CREATE TABLE `user_work` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `user_work_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='普通用户分享手作作品';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='普通用户分享手作作品';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -333,7 +362,61 @@ CREATE TABLE `user_work` (
 
 LOCK TABLES `user_work` WRITE;
 /*!40000 ALTER TABLE `user_work` DISABLE KEYS */;
+INSERT INTO `user_work` VALUES (1,3,'xiaojianzhi',NULL,'/uploads/userwork/images/41621234-6bea-4bef-b44d-5fc38c69b9cb.jpg','kanyu',1,NULL,'2026-10-08 23:57:25');
 /*!40000 ALTER TABLE `user_work` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user_work_comment`
+--
+
+DROP TABLE IF EXISTS `user_work_comment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_work_comment` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `work_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户作品评论表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_work_comment`
+--
+
+LOCK TABLES `user_work_comment` WRITE;
+/*!40000 ALTER TABLE `user_work_comment` DISABLE KEYS */;
+INSERT INTO `user_work_comment` VALUES (1,1,3,'怎么样','2026-10-08 23:57:34'),(2,1,4,'可以呀','2026-10-08 23:59:38');
+/*!40000 ALTER TABLE `user_work_comment` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user_work_like`
+--
+
+DROP TABLE IF EXISTS `user_work_like`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_work_like` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL,
+  `work_id` bigint NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_work` (`user_id`,`work_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户作品点赞表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_work_like`
+--
+
+LOCK TABLES `user_work_like` WRITE;
+/*!40000 ALTER TABLE `user_work_like` DISABLE KEYS */;
+INSERT INTO `user_work_like` VALUES (3,1,1),(1,3,1),(2,4,1);
+/*!40000 ALTER TABLE `user_work_like` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -353,4 +436,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-10-07 14:09:46
+-- Dump completed on 2026-10-09 12:52:06

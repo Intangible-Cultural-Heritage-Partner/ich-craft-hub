@@ -39,6 +39,10 @@ public class Tutorial {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    /** 图文教程配图，多张图片URL逗号分隔 */
+    @Column(name = "content_images", columnDefinition = "TEXT")
+    private String contentImages;
+
     /** 教程视频地址，可以为空 */
     @Column(name = "video_url")
     private String videoUrl;

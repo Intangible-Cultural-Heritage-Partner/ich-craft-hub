@@ -5,34 +5,53 @@
     <title th:text="${work.title} + ' - 非遗展品'">非遗展品详情</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; background: #f8f5f0; color: #333; }
-        .wrap { max-width: 980px; margin: 36px auto; padding: 0 20px; }
-        .panel { background: #fff; padding: 36px; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border: 1px solid #f0e6d8; }
-        h1 { color: #784b2a; margin: 0 0 8px; font-size: 26px; }
-        .craftsman-info { color: #999; font-size: 14px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #f0e6d8; }
-        .reject-notice { color: #842029; background: #f8d7da; padding: 14px 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #dc3545; }
-        .reject-notice strong { display: block; margin-bottom: 4px; }
-        .hero { width: 100%; max-height: 460px; object-fit: cover; border-radius: 12px; margin-bottom: 20px; background: #eadfce; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-top: 16px; }
-        .gallery img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; cursor: pointer; transition: transform 0.2s; }
-        .gallery img:hover { transform: scale(1.03); }
-        .section { margin-top: 28px; line-height: 1.8; white-space: pre-wrap; }
-        .section h2 { color: #784b2a; font-size: 19px; margin: 0 0 12px; padding-left: 12px; border-left: 4px solid #784b2a; }
-        .section div { color: #555; font-size: 15px; }
-        .links { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
-        .links a {
-            color: #784b2a; text-decoration: none;
-            padding: 8px 18px; border: 1px solid #784b2a;
-            border-radius: 8px; font-size: 14px;
-            transition: all 0.2s;
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
+        .wrap { max-width: 980px; margin: 36px auto; padding: 0 20px; position: relative; z-index: 1; }
+        .panel {
+            background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+            padding: 40px; border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(92,51,23,0.08), 0 1px 3px rgba(0,0,0,0.04);
+            border: 1px solid rgba(200,170,120,0.18);
         }
-        .links a:hover { background: #784b2a; color: #fff; }
+        h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: 2px;
+            background: linear-gradient(135deg, #5c3317, #784b2a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .craftsman-info { color: #8a7a6a; font-size: 14px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(200,170,120,0.2); display: flex; gap: 16px; align-items: center; }
+        .reject-notice { color: #842029; background: rgba(180,35,24,0.08); padding: 14px 16px; border-radius: 10px; margin-bottom: 16px; border-left: 4px solid rgba(220,53,69,0.5); }
+        .reject-notice strong { display: block; margin-bottom: 4px; }
+        .hero { width: 100%; max-height: 480px; object-fit: cover; border-radius: 14px; margin-bottom: 24px; background: #f0e8da; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-top: 20px; }
+        .gallery img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; cursor: pointer; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .gallery img:hover { transform: scale(1.04); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+        .section { margin-top: 32px; line-height: 1.8; white-space: pre-wrap; }
+        .section h2 { color: #5c3317; font-size: 19px; margin: 0 0 14px; padding-left: 14px; border-left: 4px solid #a0673f; letter-spacing: 1px; }
+        .section div { color: #4a3a2e; font-size: 15px; }
+        .links { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+        .links a { color: #784b2a; text-decoration: none; padding: 10px 20px; border: 1px solid rgba(200,170,120,0.3); border-radius: 10px; font-size: 14px; transition: all 0.25s; font-weight: 500; }
+        .links a:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(120,75,42,0.25); }
+        .fav-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 22px; border-radius: 10px; font-size: 15px; font-weight: 500;
+            cursor: pointer; transition: all 0.25s; text-decoration: none;
+            border: 1px solid rgba(200,170,120,0.3); color: #784b2a; background: rgba(255,255,255,0.6);
+        }
+        .fav-btn:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(120,75,42,0.25); }
+        .fav-btn.favorited { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; }
+        .fav-btn.favorited:hover { background: linear-gradient(135deg, #a0673f, #784b2a); }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
-<main class="wrap">
-    <article class="panel">
+
+<div class="page-hero" style="padding:40px 8% 48px;">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="hero-inner">
+        <h1 th:text="${work.title}">展品详情</h1>
+        <p th:if="${craftsman != null}" th:text="'匠人：' + ${craftsman.username}"></p>
+    </div>
+</div>
+
+<main class="page-body" style="padding-top:28px;">
         <h1 th:text="${work.title}">展品标题</h1>
         <p class="craftsman-info" th:text="${work.craftsman != null ? '发布匠人：' + work.craftsman.username : ''}">发布匠人</p>
         <div class="reject-notice" th:if="${work.auditStatus == 2 or (work.auditStatus == 0 and work.auditRemark != null)}">
@@ -51,6 +70,17 @@
         <div class="gallery" th:if="${work.imageList != null and !work.imageList.isBlank()}">
             <img th:each="image : ${#strings.arraySplit(work.imageList, ',')}" th:src="${image}" alt="展品图片">
         </div>
+        <div style="margin-top:24px;" th:if="${session.loginUser != null}">
+            <form method="post" th:action="@{/favorite/toggle}" style="display:inline;">
+                <input type="hidden" name="targetId" th:value="${work.id}">
+                <input type="hidden" name="targetType" value="work">
+                <input type="hidden" name="redirect" th:value="'/work/' + ${work.id}">
+                <button type="submit" class="fav-btn" th:classappend="${isFavorited} ? 'favorited' : ''">
+                    <span th:if="${isFavorited}">❤️ 已收藏</span>
+                    <span th:unless="${isFavorited}">🤍 收藏</span>
+                </button>
+            </form>
+        </div>
         <div class="links">
             <a th:href="@{/tutorial/list}">查看手作教程</a>
             <a th:href="@{/work/mine}">查看用户作品</a>
@@ -60,5 +90,6 @@
         </div>
     </article>
 </main>
+
 </body>
 </html>

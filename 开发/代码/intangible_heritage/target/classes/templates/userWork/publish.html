@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>发布作品</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
+        .wrap { max-width: 700px; margin: 36px auto; padding: 0 20px; position: relative; z-index: 1; }
+        .panel { background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); padding: 32px; border-radius: 16px; box-shadow: 0 4px 20px rgba(92,51,23,0.08); border: 1px solid rgba(200,170,120,0.18); }
+        .panel h1 { color: #5c3317; margin: 0 0 6px; font-size: 24px; }
+        .panel .subtitle { color: #7a6e60; font-size: 14px; margin: 0 0 24px; padding-bottom: 18px; border-bottom: 1px solid rgba(200,170,120,0.15); }
+        .panel label { display: block; margin-top: 18px; color: #784b2a; font-weight: 500; font-size: 15px; }
+        .panel input, .panel textarea {
+            width: 100%; margin-top: 8px; padding: 11px 14px;
+            border: 1px solid rgba(200,170,120,0.3); border-radius: 8px; font-size: 14px; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: rgba(255,255,255,0.7); color: #3d2b1f;
+        }
+        .panel input:focus, .panel textarea:focus { border-color: #a0673f; box-shadow: 0 0 0 3px rgba(120,75,42,0.1); }
+        .panel textarea { min-height: 100px; resize: vertical; }
+        .panel button, .panel a {
+            display: inline-block; margin-top: 24px; padding: 12px 28px;
+            border: 0; border-radius: 8px; text-decoration: none; font-size: 15px; cursor: pointer; transition: all 0.2s;
+        }
+        .panel button { color: #fff; background: linear-gradient(135deg, #784b2a, #a0673f); box-shadow: 0 4px 12px rgba(120,75,42,0.25); font-weight: 600; }
+        .panel button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.35); }
+        .panel a { color: #784b2a; border: 1px solid rgba(200,170,120,0.3); background: rgba(255,255,255,0.6); }
+        .panel a:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; }
+        .message { color: #842029; background: rgba(180,35,24,0.1); padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; }
+        .hint { color: #7a6e60; font-size: 13px; margin-top: 6px; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+<main class="wrap">
+    <section class="panel">
+        <h1>发布手作作品</h1>
+        <p class="subtitle">分享你的练习成果，与大家一起交流进步</p>
+        <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
+        <form action="/userWork/publish" method="post" enctype="multipart/form-data">
+            <label>作品标题
+                <input type="text" name="title" required maxlength="100" th:value="${title}" placeholder="给你的作品起个名字">
+            </label>
+            <label>作品描述
+                <textarea name="description" maxlength="500" rows="4" th:text="${description}" placeholder="介绍一下你的作品，用了什么技艺、灵感来源等"></textarea>
+            </label>
+            <label>封面图片
+                <input type="file" name="coverFile" accept="image/*">
+            </label>
+            <label>作品图片（可多张）
+                <input type="file" name="imageFiles" accept="image/*" multiple>
+            </label>
+            <p class="hint">支持上传多张图片展示作品细节</p>
+            <button type="submit">发布作品</button>
+            <a th:href="@{/userWork/share}">取消</a>
+        </form>
+    </section>
+</main>
+
+</body>
+</html>

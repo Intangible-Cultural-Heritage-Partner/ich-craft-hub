@@ -4,31 +4,47 @@
     <meta charset="UTF-8">
     <title>发给我的定制</title>
     <style>
-        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
-        .wrap{padding:30px 50px;}
-        h2{color:#784b2a;}
-        .msg{color:#2e7d32;margin-bottom:10px;}
-        table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 4px #ccc;}
-        th,td{border:1px solid #e0d8c8;padding:10px;text-align:left;}
-        th{background:#784b2a;color:#fff;}
-        tr:hover{background:#faf6ee;}
-        .badge{padding:3px 10px;border-radius:10px;font-size:13px;}
-        .s0{background:#fff3cd;color:#8a6d3b;}
-        .s1{background:#f8d7da;color:#842029;}
-        .s2{background:#d1e7dd;color:#0f5132;}
-        .s3{background:#cfe2ff;color:#084298;}
-        form{display:inline-block;margin-right:8px;}
-        input[type=text]{width:200px;padding:5px;border:1px solid #ccc;border-radius:4px;}
-        button{padding:5px 12px;border:none;border-radius:4px;cursor:pointer;}
-        .accept{background:#0f5132;color:#fff;}
-        .reject{background:#842029;color:#fff;}
-        a.btn{color:#784b2a;}
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: rgba(232,201,160,0.95); }
+        .wrap { padding: 36px 6%; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        h2 { background: linear-gradient(135deg, #e8c9a0, #c89060); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 24px; letter-spacing: 1px; margin: 0 0 24px; }
+        .msg { color: #a8e6c3; margin-bottom: 14px; font-size: 14px; }
+        table { border-collapse: separate; border-spacing: 0; width: 100%; border-radius: 14px; overflow: hidden;
+            background: rgba(30,20,12,0.65); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); border: 1px solid rgba(200,144,96,0.12); }
+        th { background: linear-gradient(135deg, #3d2010, #5c3317); color: #e8c9a0; padding: 14px 16px; text-align: left; font-weight: 600; letter-spacing: 0.5px; font-size: 14px; }
+        td { padding: 12px 16px; border-bottom: 1px solid rgba(200,144,96,0.1); font-size: 14px; vertical-align: middle; color: rgba(232,201,160,0.9); }
+        tr:hover td { background: rgba(200,144,96,0.06); }
+        .badge { padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 500; display: inline-block; }
+        .s0 { background: rgba(180,83,9,0.25); color: #e8c9a0; }
+        .s1 { background: rgba(180,35,24,0.25); color: #f8d7da; }
+        .s2 { background: rgba(45,122,79,0.25); color: #a8e6c3; }
+        .s3 { background: rgba(42,122,226,0.25); color: #8ab4f8; }
+        form { display: inline-block; margin-right: 6px; vertical-align: middle; }
+        input[type=text] { width: 160px; padding: 8px 12px; border: 1px solid rgba(200,144,96,0.25); border-radius: 8px; font-size: 13px; background: rgba(30,20,12,0.6); color: #e8c9a0; transition: all 0.25s; }
+        input:focus { border-color: #c89060; box-shadow: 0 0 0 3px rgba(200,144,96,0.15); outline: none; }
+        .accept { background: linear-gradient(135deg, #2d7a4f, #3da866) !important; color: #fff; padding: 8px 16px !important; border: none !important; border-radius: 8px !important; cursor: pointer; font-size: 13px; transition: all 0.25s; box-shadow: 0 2px 8px rgba(45,122,79,0.25) !important; }
+        .accept:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(45,122,79,0.35) !important; }
+        .reject { background: linear-gradient(135deg, #b42318, #dc3545) !important; color: #fff; padding: 8px 16px !important; border: none !important; border-radius: 8px !important; cursor: pointer; font-size: 13px; transition: all 0.25s; box-shadow: 0 2px 8px rgba(180,35,24,0.25) !important; }
+        .reject:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(180,35,24,0.35) !important; }
+        a.btn { color: #c89060; text-decoration: none; font-weight: 500; transition: all 0.2s; }
+        a.btn:hover { color: #e8c9a0; }
+        .empty { color: rgba(200,180,150,0.5); text-align: center; padding: 48px; font-size: 15px; }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
 
-<div class="wrap">
+<div class="page-hero">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="hero-inner">
+        <h1>定制订单管理</h1>
+        <p>查看收到的定制申请，与用户沟通需求</p>
+    </div>
+</div>
+
+<div class="page-body">
     <h2>发给我的定制申请</h2>
     <p class="msg" th:text="${msg}"></p>
 
@@ -73,7 +89,8 @@
             </tr>
         </table>
     </div>
-    <p th:if="${orders == null || orders.isEmpty()}">暂无收到的申请。</p>
+    <p class="empty" th:if="${orders == null || orders.isEmpty()}">暂无收到的定制申请</p>
 </div>
+
 </body>
 </html>
