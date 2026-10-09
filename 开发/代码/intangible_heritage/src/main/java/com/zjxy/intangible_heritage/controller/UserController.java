@@ -1,6 +1,7 @@
 package com.zjxy.intangible_heritage.controller;
 
 import com.zjxy.intangible_heritage.entity.User;
+import com.zjxy.intangible_heritage.service.FileUploadUtil;
 import com.zjxy.intangible_heritage.service.UserService;
 import com.zjxy.intangible_heritage.util.CaptchaUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -19,14 +21,13 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
+    private final FileUploadUtil fileUploadUtil;    // ← 这一行必须有
 
-    // GET：跳转登录页面 浏览器点击登录链接
     @GetMapping("/login")
-    public String toLoginPage(){
+    public String toLoginPage() {
         return "login";
     }
 
-    // POST：登录表单提交
     @PostMapping("/login")
     public String doLogin(@RequestParam String account,
                           @RequestParam String password,
@@ -100,9 +101,30 @@ public class UserController {
         return "login";
     }
 
-    //退出登录
+    @PostMapping("/user/updateProfile")
+    public String updateProfile(@RequestParam String nickname,
+                                @RequestParam(required = false) String intro,
+                                @RequestParam(required = false) MultipartFile avatarFile,
+                                HttpSession session) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/login";
+        }
+
+        String avatarPath = null;
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            avatarPath = fileUploadUtil.save(avatarFile, "avatar");
+        }
+
+        User updated = userService.update(loginUser.getId(), nickname, intro, avatarPath);
+        if (updated != null) {
+            session.setAttribute("loginUser", updated);
+        }
+        return "redirect:/user/userCenter";
+    }
+
     @GetMapping("/logout")
-    public String logout(HttpSession session){
+    public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/";
     }

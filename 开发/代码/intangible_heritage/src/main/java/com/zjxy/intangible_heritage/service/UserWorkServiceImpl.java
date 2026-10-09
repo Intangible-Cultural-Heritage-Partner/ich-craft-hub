@@ -6,6 +6,7 @@ import com.zjxy.intangible_heritage.entity.UserWorkLike;
 import com.zjxy.intangible_heritage.repository.UserWorkCommentRepository;
 import com.zjxy.intangible_heritage.repository.UserWorkLikeRepository;
 import com.zjxy.intangible_heritage.repository.UserWorkRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,11 +14,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserWorkServiceImpl implements UserWorkService {
 
     private final UserWorkRepository userWorkRepository;
@@ -38,11 +41,20 @@ public class UserWorkServiceImpl implements UserWorkService {
 
     @Override
     public List<UserWork> findAllPassed() {
+    public UserWork publish(UserWork userWork) {
+        userWork.setAuditStatus(0);
+        userWork.setCreateTime(LocalDateTime.now());
+        return userWorkRepository.save(userWork);
+    }
+
+    @Override
+    public List<UserWork> listApproved() {
         return userWorkRepository.findByAuditStatusOrderByCreateTimeDesc(1);
     }
 
     @Override
     public List<UserWork> findByUserId(Long userId) {
+    public List<UserWork> listByUser(Long userId) {
         return userWorkRepository.findByUserIdOrderByCreateTimeDesc(userId);
     }
 
@@ -114,12 +126,16 @@ public class UserWorkServiceImpl implements UserWorkService {
     @Override
     public long commentCount(Long workId) {
         return commentRepository.countByWorkId(workId);
+    public UserWork findById(Long id) {
+        return userWorkRepository.findById(id).orElse(null);
     }
 
     @Override
     public UserWorkComment addComment(Long workId, Long userId, String content) {
         if (content == null || content.isBlank()) throw new IllegalArgumentException("评论内容不能为空");
         return commentRepository.save(new UserWorkComment(workId, userId, content.trim()));
+    public void deleteById(Long id) {
+        userWorkRepository.deleteById(id);
     }
 
     @Override

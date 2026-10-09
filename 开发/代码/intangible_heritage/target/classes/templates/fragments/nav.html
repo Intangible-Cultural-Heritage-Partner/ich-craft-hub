@@ -117,6 +117,20 @@
         box-shadow: 0 4px 16px rgba(200,144,96,0.4);
         border-color: rgba(255,255,255,0.9);
     }
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid #eee;
+        object-fit: cover;
+        display: block;
+        transition: border-color 0.2s;
+        background: #f0f0f0;
+    }
+    .avatar-wrap:hover .avatar-img {
+        border-color: #e6162d;
+    }
+
+    /* 下拉菜单：从容器底部无缝开始，不要 margin-top、不要 overflow:hidden */
     .dropdown-menu{
         display:none;
         position:absolute;
@@ -141,7 +155,18 @@
         transform: rotate(45deg);
         border-left:1px solid rgba(240,230,216,0.6);
         border-top:1px solid rgba(240,230,216,0.6);
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: #fff;
+        min-width: 170px;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        z-index: 999;
+        padding: 6px 0;
     }
+
     .dropdown-menu a{
         display:block;
         color:#5c3317;
@@ -234,6 +259,16 @@
     }
     button:hover, .btn-primary:hover, input[type=submit]:hover {
         transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.35) !important;
+        display: block;
+        color: #333;
+        padding: 10px 18px;
+        font-size: 14px;
+        text-decoration: none;
+        transition: background 0.15s, color 0.15s;
+    }
+    .dropdown-menu a:hover{
+        background: #fff5f6;
+        color: #e6162d;
     }
     button:active { transform: translateY(0) !important; }
 
@@ -241,6 +276,8 @@
         background: rgba(255,255,255,0.6) !important; color: #784b2a !important;
         border: 1px solid rgba(200,170,120,0.3) !important; border-radius: 8px !important;
         padding: 8px 18px !important; transition: all 0.25s; text-decoration: none !important;
+    .avatar-wrap:hover .dropdown-menu{
+        display: block;
     }
     .links a:hover, .btn-outline:hover, a.btn:hover {
         background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important;

@@ -11,8 +11,10 @@ public interface UserWorkRepository extends JpaRepository<UserWork, Long> {
     List<UserWork> findAllByOrderByCreateTimeDesc();
 
     /** 按审核状态查询 */
+    // 所有审核通过的作品，按时间倒序
     List<UserWork> findByAuditStatusOrderByCreateTimeDesc(Integer auditStatus);
 
     /** 按用户id查询 */
+    // 我发布的作品
     List<UserWork> findByUserIdOrderByCreateTimeDesc(Long userId);
 }

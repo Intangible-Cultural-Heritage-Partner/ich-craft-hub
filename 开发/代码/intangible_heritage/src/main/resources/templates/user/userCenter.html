@@ -39,6 +39,22 @@
             color: #5c3317;
         }
 
+        /* 统计栏 来自页2 */
+        .stats{
+            display: flex;
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(12px) saturate(150%);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(92,51,23,0.08);
+            border: 1px solid rgba(200,170,120,0.18);
+            overflow: hidden;
+        }
+        .stats .stat{flex: 1; text-align: center; padding: 20px 0; cursor: pointer; transition: background 0.2s; text-decoration: none; color: inherit;}
+        .stats .stat:hover{background: rgba(120,75,42,0.04);}
+        .stats .stat:not(:last-child){border-right: 1px solid rgba(200,170,120,0.12);}
+        .stats .num{font-size: 22px; font-weight: 700; color: #784b2a; display: block; margin-bottom: 4px;}
+        .stats .label{font-size: 12px; color: #7a6e60;}
+
         /* 展品网格 */
         .works { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
         .work { display: block; padding: 16px; background: rgba(120,75,42,0.04); border-radius: 12px; border: 1px solid rgba(200,170,120,0.15); transition: all 0.25s; text-decoration: none; color: inherit; }
@@ -218,6 +234,22 @@
 
         <!-- 右侧：功能区 -->
         <main class="content">
+            <!-- 页2 统计模块：我的作品 / 我的点赞 / 我的评论 -->
+            <div class="stats">
+                <a class="stat" th:href="@{/userWork/my}">
+                    <span class="num" th:text="${myWorksCount != null ? myWorksCount : 0}">0</span>
+                    <span class="label">我的作品</span>
+                </a>
+                <a class="stat" th:href="@{/userWork/myLikes}">
+                    <span class="num" th:text="${myLikesCount != null ? myLikesCount : 0}">0</span>
+                    <span class="label">我的点赞</span>
+                </a>
+                <a class="stat" th:href="@{/userWork/myComments}">
+                    <span class="num" th:text="${myCommentsCount != null ? myCommentsCount : 0}">0</span>
+                    <span class="label">我的评论</span>
+                </a>
+            </div>
+
             <!-- 我的非遗展品（仅匠人可见） -->
             <section class="card" th:if="${user != null and (user.role == 'CRAFTSMAN' or user.role == '1')}">
                 <h3>我的非遗展品</h3>

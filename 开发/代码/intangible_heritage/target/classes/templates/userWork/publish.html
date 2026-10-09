@@ -42,9 +42,6 @@
             <label>作品标题
                 <input type="text" name="title" required maxlength="100" th:value="${title}" placeholder="给你的作品起个名字">
             </label>
-            <label>作品描述
-                <textarea name="description" maxlength="500" rows="4" th:text="${description}" placeholder="介绍一下你的作品，用了什么技艺、灵感来源等"></textarea>
-            </label>
             <label>封面图片
                 <input type="file" name="coverFile" accept="image/*">
             </label>
@@ -52,6 +49,12 @@
                 <input type="file" name="imageFiles" accept="image/*" multiple>
             </label>
             <p class="hint">支持上传多张图片展示作品细节</p>
+            <label>视频（可选，建议 100MB 以内）
+                <input type="file" name="videoFile" accept="video/*">
+            </label>
+            <label>作品描述
+                <textarea name="description" maxlength="500" rows="4" th:text="${description}" placeholder="讲讲这个作品的创作过程..."></textarea>
+            </label>
             <button type="submit">发布作品</button>
             <a th:href="@{/userWork/share}">取消</a>
         </form>

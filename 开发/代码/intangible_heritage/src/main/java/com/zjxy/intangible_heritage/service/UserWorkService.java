@@ -17,12 +17,16 @@ public interface UserWorkService {
 
     UserWork publish(Long userId, String title, String description,
                      MultipartFile coverFile, MultipartFile[] imageFiles);
+    UserWork publish(UserWork userWork);
 
     void delete(Long id, Long userId);
+    List<UserWork> listApproved();
 
     boolean isLiked(Long userId, Long workId);
+    List<UserWork> listByUser(Long userId);
 
     long likeCount(Long workId);
+    UserWork findById(Long id);
 
     void toggleLike(Long userId, Long workId);
 
@@ -33,4 +37,5 @@ public interface UserWorkService {
     UserWorkComment addComment(Long workId, Long userId, String content);
 
     List<UserWork> findLikedWorks(Long userId);
+    void deleteById(Long id);
 }

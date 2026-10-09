@@ -44,4 +44,21 @@ public class UserServiceImpl implements UserService {
     public boolean existsByPhone(String phone) {
         return userRepository.existsByPhone(phone);
     }
+    @Override
+    public User update(Long id, String nickname, String intro, String avatar) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return null;
+        }
+        if (nickname != null && !nickname.isEmpty()) {
+            user.setNickname(nickname);
+        }
+        if (intro != null) {
+            user.setIntro(intro);
+        }
+        if (avatar != null && !avatar.isEmpty()) {
+            user.setAvatar(avatar);
+        }
+        return userRepository.save(user);
+    }
 }

@@ -1,5 +1,6 @@
 package com.zjxy.intangible_heritage.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -22,6 +23,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(new RoleInterceptor())
                 .addPathPatterns("/custom/**", "/admin/**");
     }
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -34,11 +37,13 @@ public class WebConfig implements WebMvcConfigurer {
         if (!uploadLocation.endsWith("/")) {
             uploadLocation += "/";
         }
+        String absolutePath = System.getProperty("user.dir") + "/" + uploadDir + "/";
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(uploadLocation);
 
         // 项目内置的默认头像等图片资源（src/main/resources/images/）
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/images/");
+                .addResourceLocations("file:" + absolutePath);
     }
 }
