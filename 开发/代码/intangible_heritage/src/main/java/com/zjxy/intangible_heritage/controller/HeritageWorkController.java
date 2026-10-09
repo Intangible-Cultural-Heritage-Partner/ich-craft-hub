@@ -49,16 +49,14 @@ public class HeritageWorkController {
                         return "redirect:/work/list?msg=展品暂未审核通过";
                     }
                     List<String> galleryImages = new ArrayList<>();
-                     addImageIfPresent(galleryImages, work.getCoverImg());
-                     if (work.getImageList() != null) {
-                         Arrays.stream(work.getImageList().split("[,\\r\\n]+"))
-                                 .map(String::trim)
-                                 .forEach(image -> addImageIfPresent(galleryImages, image));
-                     }
-                     model.addAttribute("work", work);
-                     model.addAttribute("galleryImages", galleryImages);
-                     return "work/detail";
+                    addImageIfPresent(galleryImages, work.getCoverImg());
+                    if (work.getImageList() != null) {
+                        Arrays.stream(work.getImageList().split("[,\\r\\n]+"))
+                                .map(String::trim)
+                                .forEach(image -> addImageIfPresent(galleryImages, image));
+                    }
                     model.addAttribute("work", work);
+                    model.addAttribute("galleryImages", galleryImages);
                     if (loginUser != null) {
                         model.addAttribute("isFavorited", favoriteService.isFavorited(loginUser.getId(), id, "work"));
                     } else {
@@ -169,7 +167,7 @@ public class HeritageWorkController {
             return "redirect:/work/list?msg=请先以匠人身份登录";
         }
         try {
-            HeritageWork work = heritageWorkService.update(id, user, title, description, skillBackground,
+            heritageWorkService.update(id, user, title, description, skillBackground,
                     modelUrl, modelFile, coverFile, coverUrl, imageFiles, imageUrls, category, removeModel);
             return "redirect:/work/" + id;
         } catch (RuntimeException exception) {

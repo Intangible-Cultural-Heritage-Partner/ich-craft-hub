@@ -22,6 +22,7 @@
         .msg { color: #842029; background: rgba(180,35,24,0.08); padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; border: 1px solid rgba(180,35,24,0.15); }
         .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
         .card {
+            display: block; text-decoration: none; color: inherit;
             background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
             border-radius: 14px; overflow: hidden;
             border: 1px solid rgba(200,170,120,0.18); transition: transform 0.25s, box-shadow 0.25s;
@@ -39,13 +40,13 @@
         .status-1 { background: rgba(45,122,79,0.12); color: #0f5132; }
         .status-2 { background: rgba(180,35,24,0.12); color: #842029; }
         .card-actions { display: flex; gap: 8px; margin-top: 10px; }
-        .card-actions a, .card-actions form { font-size: 13px; }
+        .card-actions a, .card-actions .delete-link { font-size: 13px; }
         .card-actions a { color: #784b2a; text-decoration: none; }
         .card-actions a:hover { color: #a0673f; }
-        .card-actions form button {
+        .card-actions .delete-link {
             color: #b42318; background: none; border: none; cursor: pointer; font-size: 13px; padding: 0;
         }
-        .card-actions form button:hover { text-decoration: underline; }
+        .card-actions .delete-link:hover { text-decoration: underline; }
         .empty { text-align: center; padding: 60px 24px; color: #8a7a6a; }
         .empty .icon { font-size: 48px; margin-bottom: 12px; }
     </style>
@@ -71,7 +72,7 @@
 <div class="page-body">
     <p class="msg" th:if="${msg != null}" th:text="${msg}"></p>
     <div class="cards" th:if="${works != null and !works.isEmpty()}">
-        <div class="card" th:each="w : ${works}">
+        <a class="card" th:each="w : ${works}" th:href="@{/userWork/{id}(id=${w.id})}">
             <img class="card-cover" th:if="${w.coverImg != null}" th:src="${w.coverImg}" alt="封面">
             <div class="card-cover" th:if="${w.coverImg == null}" style="display:flex;align-items:center;justify-content:center;font-size:40px;">🎨</div>
             <div class="card-body">
@@ -84,15 +85,24 @@
                     <span>❤️ <span th:text="${@userWorkServiceImpl.likeCount(w.id)}">0</span></span>
                     <span>💬 <span th:text="${@userWorkServiceImpl.commentCount(w.id)}">0</span></span>
                 </div>
-                <div class="card-actions">
-                    <a th:href="@{/userWork/{id}(id=${w.id})}">查看详情</a>
-                    <form th:if="${mine != null and mine and session.loginUser != null and session.loginUser.id == w.userId}" method="post" th:action="@{/userWork/{id}/delete(id=${w.id})}">
-                        <button type="submit" onclick="return confirm('确定删除该作品？')">删除</button>
-                    </form>
+                <div class="card-actions" th:if="${mine != null and mine and session.loginUser != null and session.loginUser.id == w.userId}">
+                    <span class="delete-link" th:attr="data-id=${w.id}" onclick="deleteWork(event, this)">删除</span>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
+    <script>
+    function deleteWork(event, el) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!confirm('确定删除该作品？')) return;
+        var form = document.createElement('form');
+        form.method = 'post';
+        form.action = '/userWork/' + el.dataset.id + '/delete';
+        document.body.appendChild(form);
+        form.submit();
+    }
+    </script>
     <div class="empty" th:unless="${works != null and !works.isEmpty()}">
         <div class="icon">🎨</div>
         <p>暂无分享作品，快来上传你的第一件手作吧</p>

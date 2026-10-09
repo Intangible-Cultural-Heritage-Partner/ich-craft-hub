@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>非遗作品展示</title>
+    <title>非遗展品</title>
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
@@ -34,8 +34,9 @@
         .content small { color: #8a7a6a; font-size: 12px; display: block; margin-bottom: 8px; }
         .content p { color: #6b5e50; font-size: 14px; line-height: 1.5; margin: 0 0 14px; flex: 1; }
         .content .actions { display: flex; gap: 14px; align-items: center; }
-        .content .actions a { color: #784b2a; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-        .content .actions a:hover { color: #a0673f; }
+        .content .actions a, .content .actions .edit-link { color: #784b2a; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .content .actions a:hover, .content .actions .edit-link:hover { color: #a0673f; }
+        .content .actions .edit-link { cursor: pointer; }
         .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-bottom: 8px; align-self: flex-start; font-weight: 500; }
         .content .reject-reason { color: #842029; background: rgba(180,35,24,0.08); padding: 8px 10px; border-radius: 8px; font-size: 13px; margin: 0 0 10px; }
         .status-0 { background: rgba(180,83,9,0.12); color: #8a6d3b; }
@@ -43,6 +44,14 @@
         .status-2 { background: rgba(180,35,24,0.12); color: #842029; }
         .empty-card { background: rgba(255,255,255,0.5); backdrop-filter: blur(12px); padding: 60px 24px; border-radius: 16px; text-align: center; color: #8a7a6a; margin-top: 24px; border: 1px dashed rgba(200,170,120,0.3); }
         .empty-card .icon { font-size: 48px; margin-bottom: 12px; }
+    </style>
+    <style>
+        .category-filter { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+        .category-filter select, .category-filter button { padding: 10px 14px; border: 1px solid #784b2a; border-radius: 8px; font: inherit; }
+        .category-filter select { background: #fff; color: #333; }
+        .category-filter button { background: #784b2a; color: #fff; cursor: pointer; }
+        .category-filter :focus-visible { outline: 3px solid #a0673f; outline-offset: 3px; }
+        .category-label { color: #784b2a; font-size: 13px; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -63,8 +72,17 @@
 
 <main class="page-body">
     <p class="message" th:if="${msg != null}" th:text="${msg}"></p>
+    <form class="category-filter" method="get" th:action="${mine == true ? '/work/mine' : '/work/list'}">
+        <label for="category-filter">非遗分类</label>
+        <select id="category-filter" name="category">
+            <option value="">全部分类</option>
+            <option th:each="category : ${categoryOptions}" th:value="${category}"
+                    th:text="${category}" th:selected="${category == selectedCategory}">分类</option>
+        </select>
+        <button type="submit">筛选</button>
+    </form>
     <div class="grid" th:if="${works != null and !works.isEmpty()}">
-        <article class="card" th:each="work : ${works}">
+        <a class="card" th:each="work : ${works}" th:href="@{/work/{id}(id=${work.id})}" style="text-decoration:none;color:inherit;">
             <img class="cover" th:if="${work.coverImg != null and !work.coverImg.isBlank()}" th:src="${work.coverImg}" th:alt="${work.title}">
             <div class="placeholder" th:unless="${work.coverImg != null and !work.coverImg.isBlank()}">暂无封面</div>
             <div class="content">
@@ -78,18 +96,25 @@
                 <p class="reject-reason" th:if="${mine == true and work.auditStatus == 2 and work.auditRemark != null}"
                    th:text="'驳回理由：' + ${work.auditRemark}"></p>
                 <h3 th:text="${work.title}">展品标题</h3>
+                <span class="category-label" th:text="${work.category}">其他</span>
                 <small th:text="${work.craftsman != null ? '匠人：' + work.craftsman.username : '匠人作品'}">匠人作品</small>
                 <p th:text="${work.description != null ? work.description : '暂无作品介绍'}">作品介绍</p>
                 <div class="actions">
-                    <a th:href="@{/work/{id}(id=${work.id})}">查看详情</a>
-                    <a th:if="${session.loginUser != null and work.craftsman != null and session.loginUser.id == work.craftsman.id}"
-                       th:href="@{/work/{id}/edit(id=${work.id})}">编辑</a>
+                    <span class="edit-link" th:if="${session.loginUser != null and work.craftsman != null and session.loginUser.id == work.craftsman.id}"
+                          th:attr="data-id=${work.id}" onclick="goEdit(event, this)">编辑</span>
                 </div>
             </div>
-        </article>
+        </a>
     </div>
+    <script>
+    function goEdit(event, el) {
+        event.preventDefault();
+        event.stopPropagation();
+        location.href = '/work/' + el.dataset.id + '/edit';
+    }
+    </script>
     <div class="empty-card" th:unless="${works != null and !works.isEmpty()}">
-        暂无展品，匠人可以从“发布展品”开始添加。
+        <span th:text="${selectedCategory != null and !selectedCategory.isBlank() ? '该分类暂无展品，请切换其他分类。' : '暂无展品，匠人可以从“发布展品”开始添加。'}">暂无展品</span>
     </div>
 </main>
 

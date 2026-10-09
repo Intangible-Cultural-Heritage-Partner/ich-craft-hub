@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${work != null} ? '编辑非遗展品' : '发布非遗展品'">发布非遗展品</title>
+    <title>展品发布</title>
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
@@ -16,20 +16,7 @@
             padding: 11px 14px; border: 1px solid rgba(200,170,120,0.3); border-radius: 8px;
             font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
             background: rgba(255,255,255,0.7); color: #3d2b1f;
-        body {
-            margin: 0;
-            font-family: "Microsoft Yahei", sans-serif;
-            background-color: #f8f5f0;
-            background: rgba(255,255,255,0.7); color: #3d2b1f;
         }
-        .wrap { padding: 30px 60px; max-width: 720px; }
-        h2 { color:#784b2a; }
-        .box { background:#fff; padding:26px 30px; border-radius:10px; }
-        .field { margin-bottom:18px; }
-        .field label { display:block; margin-bottom:6px; color:#444; font-weight:bold; }
-        .field input[type=text], .field textarea {
-            width:100%; box-sizing:border-box; padding:9px 12px;
-            border:1px solid #ccc; border-radius:6px; font-size:14px;
         .panel input:focus, .panel textarea:focus { border-color: #a0673f; box-shadow: 0 0 0 3px rgba(120,75,42,0.1); }
         .panel textarea { min-height: 120px; resize: vertical; }
         .panel button, .panel a {
@@ -45,51 +32,14 @@
         .reject-notice { color: #842029; background: rgba(180,35,24,0.1); padding: 14px 16px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid rgba(180,35,24,0.5); }
         .reject-notice strong { display: block; margin-bottom: 4px; }
         .hint { color: #7a6e60; font-size: 13px; margin-top: 6px; }
-        .field textarea { min-height:90px; resize:vertical; }
-        .hint { color:#999; font-size:12px; margin-top:4px; }
-        .cur { color:#666; font-size:12px; margin-top:4px; }
-        .msg { color:#c0392b; margin-bottom:14px; }
-        button {
-            background:#784b2a; color:#fff; border:none; padding:11px 26px;
-            border-radius:6px; font-size:15px; cursor:pointer;
-        }
-        button:hover { background:#5d3a20; }
+    </style>
+    <style>
+        .panel select { width: 100%; padding: 12px; border: 1px solid #d8cbbd; border-radius: 8px; background: #fff; color: #333; font: inherit; }
+        .panel select:focus-visible { outline: 3px solid #a0673f; outline-offset: 2px; }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
-
-<div class="wrap">
-    <h2 th:text="${work != null} ? '编辑非遗展品' : '发布非遗展品'">发布非遗展品</h2>
-    <div class="box">
-        <p class="msg" th:if="${msg}" th:text="${msg}"></p>
-
-        <!-- 发布走 /heritageWork/publish，编辑走 /heritageWork/edit/{id}；两者共用本表单 -->
-        <form th:action="${work != null} ? @{'/heritageWork/edit/' + ${work.id}} : @{/heritageWork/publish}"
-              method="post" enctype="multipart/form-data">
-
-            <div class="field">
-                <label>作品标题 *</label>
-                <input type="text" name="title" required th:value="${work != null} ? ${work.title} : ''">
-            </div>
-
-            <div class="field">
-                <label>非遗分类 *</label>
-                <input type="text" name="category" required placeholder="如：剪纸、木雕、苏绣"
-                       th:value="${work != null} ? ${work.category} : ''">
-            </div>
-
-            <div class="field">
-                <label>封面图</label>
-                <input type="file" name="coverImgFile" accept="image/*">
-                <div class="hint">jpg / png / webp / gif</div>
-                <div class="cur" th:if="${work != null and work.coverImg != null}">
-                    当前封面已存在，不选则保留原图
-                </div>
-            </div>
-
-            <div class="field">
-                <label>作品图片（可多选）</label>
 <main class="wrap">
     <section class="panel">
         <h1 th:text="${work.id == null ? '发布非遗展品' : '编辑非遗展品'}">发布非遗展品</h1>
@@ -104,39 +54,49 @@
             <label>展品标题
                 <input type="text" name="title" required maxlength="100" th:value="${work.title}">
             </label>
+            <label>非遗分类
+                <select name="category" required>
+                    <option th:each="category : ${categoryOptions}" th:value="${category}"
+                            th:text="${category}" th:selected="${category == work.category}">其他</option>
+                </select>
+            </label>
             <label>封面图片
                 <input type="file" name="coverFile" accept="image/*">
             </label>
-            <label>展品图片（可多选）
+            <label>封面图片 URL（可多选）
+                <input type="url" name="coverUrl" placeholder="未上传文件时使用此地址">
+            </label>
+            <label>展品图片文件
                 <input type="file" name="imageFiles" accept="image/*" multiple>
-                <div class="hint">可一次选择多张，无3D模型时用于图片画廊</div>
-                <div class="cur" th:if="${work != null and work.imageList != null}">
-                    已有作品图，重新上传将覆盖
-                </div>
-            </div>
-
-            <div class="field">
-                <label>3D模型文件</label>
-                <input type="file" name="modelFile" accept=".glb,.gltf">
-                <div class="hint">.glb / .gltf，上传后详情页可旋转查看（可选）</div>
-                <div class="cur" th:if="${work != null and work.modelUrl != null}">
-                    已有3D模型，不选则保留
-                </div>
-            </div>
-
-            <div class="field">
-                <label>技艺背景</label>
-                <textarea name="skillBackground" th:text="${work != null} ? ${work.skillBackground} : ''"></textarea>
-            </div>
-
-            <div class="field">
-                <label>作品描述</label>
-                <textarea name="description" th:text="${work != null} ? ${work.description} : ''"></textarea>
-            </div>
-
-            <button type="submit" th:text="${work != null} ? '保存修改' : '提交发布'">提交发布</button>
+            </label>
+            <label>展品图片 URL
+                <textarea name="imageUrls" placeholder="多个地址使用逗号或换行分隔"></textarea>
+            </label>
+            <p class="hint">同时填写文件和 URL 时，上传文件优先保存。</p>
+            <label>3D 模型文件（GLB / GLTF）
+                <input type="file" name="modelFile" accept=".glb,.gltf,model/gltf-binary,model/gltf+json">
+            </label>
+            <label>3D 模型 URL
+                <input type="text" name="modelUrl" placeholder="https://example.com/exhibit.glb 或 /models/exhibit.glb" th:value="${work.modelUrl}">
+            </label>
+            <p class="hint">优先使用单文件 GLB；同时填写文件和 URL 时，上传文件优先保存。GLTF 的 .bin 和纹理文件必须保持相对路径可访问。</p>
+            <p class="hint" th:if="${work.modelUrl != null and !work.modelUrl.isBlank()}">当前模型地址：<span th:text="${work.modelUrl}"></span></p>
+            <label th:if="${work.id != null}">
+                <input type="checkbox" name="removeModel" value="true" th:checked="${removeModel == true}" style="width:auto;">
+                移除当前模型关联
+            </label>
+            <p class="hint" th:if="${work.id != null}">留空保留原模型；勾选移除会忽略模型 URL，但不会删除文件。请勿同时上传新模型。</p>
+            <label>作品介绍
+                <textarea name="description" th:text="${work.description}"></textarea>
+            </label>
+            <label>技艺背景
+                <textarea name="skillBackground" th:text="${work.skillBackground}"></textarea>
+            </label>
+            <p class="hint" th:if="${work.id != null}" style="color: #7a6e60;">注意：编辑保存后，展品将重新进入审核流程，审核通过前不会在公开列表展示。</p>
+            <button type="submit">保存展品</button>
+            <a th:href="@{/work/list}">取消</a>
         </form>
-    </div>
-</div>
+    </section>
+</main>
 </body>
 </html>

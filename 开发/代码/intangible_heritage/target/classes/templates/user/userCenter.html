@@ -41,12 +41,10 @@
 
         /* 展品网格 */
         .works { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-        .work { padding: 16px; background: rgba(120,75,42,0.04); border-radius: 12px; border: 1px solid rgba(200,170,120,0.15); transition: all 0.25s; }
+        .work { display: block; padding: 16px; background: rgba(120,75,42,0.04); border-radius: 12px; border: 1px solid rgba(200,170,120,0.15); transition: all 0.25s; text-decoration: none; color: inherit; }
         .work:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(92,51,23,0.08); }
         .work strong { color: #5c3317; display: block; margin-bottom: 8px; }
         .work p { color: #7a6e60; font-size: 13px; margin: 0 0 12px; line-height: 1.5; min-height: 40px; }
-        .work a { color: #784b2a; text-decoration: none; font-size: 14px; }
-        .work a:hover { color: #a0673f; }
         .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-bottom: 6px; }
         .status-0 { background: rgba(180,83,9,0.12); color: #8a6d3b; }
         .status-1 { background: rgba(45,122,79,0.12); color: #0f5132; }
@@ -228,7 +226,7 @@
                     <a th:href="@{/work/mine}">查看全部</a>
                 </div>
                 <div class="works" th:if="${myWorks != null and !myWorks.isEmpty()}">
-                    <div class="work" th:each="work : ${myWorks}">
+                    <a class="work" th:each="work : ${myWorks}" th:href="@{/work/{id}(id=${work.id})}">
                         <span class="status-badge" th:classappend="'status-' + ${work.auditStatus}">
                             <span th:switch="${work.auditStatus}">
                                 <span th:case="0">审核中</span>
@@ -238,8 +236,7 @@
                         </span>
                         <strong th:text="${work.title}">展品标题</strong>
                         <p th:text="${work.description != null && !work.description.isEmpty()} ? ${work.description} : '暂无作品介绍'">作品介绍</p>
-                        <a th:href="@{/work/{id}(id=${work.id})}">查看详情 →</a>
-                    </div>
+                    </a>
                 </div>
                 <p class="empty" th:unless="${myWorks != null and !myWorks.isEmpty()}">你还没有发布非遗展品，点击上方链接开始创作吧。</p>
             </section>
@@ -248,11 +245,10 @@
             <section class="card">
                 <h3>❤️ 我收藏的展品</h3>
                 <div class="works" th:if="${favWorks != null and !favWorks.isEmpty()}">
-                    <div class="work" th:each="work : ${favWorks}">
+                    <a class="work" th:each="work : ${favWorks}" th:href="@{/work/{id}(id=${work.id})}">
                         <strong th:text="${work.title}">展品标题</strong>
                         <p th:text="${work.description != null && !work.description.isEmpty()} ? ${work.description} : '暂无介绍'">作品介绍</p>
-                        <a th:href="@{/work/{id}(id=${work.id})}">查看详情 →</a>
-                    </div>
+                    </a>
                 </div>
                 <p class="empty" th:unless="${favWorks != null and !favWorks.isEmpty()}">还没有收藏任何展品，去展品列表逛逛吧。</p>
             </section>
@@ -261,11 +257,10 @@
             <section class="card">
                 <h3>❤️ 我收藏的教程</h3>
                 <div class="works" th:if="${favTutorials != null and !favTutorials.isEmpty()}">
-                    <div class="work" th:each="t : ${favTutorials}">
+                    <a class="work" th:each="t : ${favTutorials}" th:href="@{/tutorial/{id}(id=${t.id})}">
                         <strong th:text="${t.title}">教程标题</strong>
                         <p th:text="${t.description != null && !t.description.isEmpty()} ? ${t.description} : '暂无简介'">教程简介</p>
-                        <a th:href="@{/tutorial/{id}(id=${t.id})}">查看详情 →</a>
-                    </div>
+                    </a>
                 </div>
                 <p class="empty" th:unless="${favTutorials != null and !favTutorials.isEmpty()}">还没有收藏任何教程，去教程列表逛逛吧。</p>
             </section>
@@ -274,11 +269,10 @@
             <section class="card">
                 <h3>👍 我点赞的作品</h3>
                 <div class="works" th:if="${likedWorks != null and !likedWorks.isEmpty()}">
-                    <div class="work" th:each="w : ${likedWorks}">
+                    <a class="work" th:each="w : ${likedWorks}" th:href="@{/userWork/{id}(id=${w.id})}">
                         <strong th:text="${w.title}">作品标题</strong>
                         <p th:text="${w.description != null && !w.description.isEmpty()} ? ${w.description} : '暂无描述'">作品描述</p>
-                        <a th:href="@{/userWork/{id}(id=${w.id})}">查看详情 →</a>
-                    </div>
+                    </a>
                 </div>
                 <p class="empty" th:unless="${likedWorks != null and !likedWorks.isEmpty()}">还没有点赞任何作品，去作品分享逛逛吧。</p>
             </section>

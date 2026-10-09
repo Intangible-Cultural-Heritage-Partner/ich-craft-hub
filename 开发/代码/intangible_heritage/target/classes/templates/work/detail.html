@@ -2,10 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${work.title} + ' - 非遗展品详情'">非遗展品详情</title>
-    <!-- Google model-viewer：用于展示 3D 模型（.glb/.gltf），支持旋转缩放 -->
-    <script type="module"
-            src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${work.title} + ' - 非遗展品'">非遗展品详情</title>
     <style>
         * { box-sizing: border-box; }
         body { margin: 0; font-family: "Microsoft Yahei", "PingFang SC", sans-serif; color: #3d2b1f; }
@@ -36,91 +34,210 @@
             padding: 10px 22px; border-radius: 10px; font-size: 15px; font-weight: 500;
             cursor: pointer; transition: all 0.25s; text-decoration: none;
             border: 1px solid rgba(200,170,120,0.3); color: #784b2a; background: rgba(255,255,255,0.6);
-        body {
-            margin: 0;
-            font-family: "Microsoft Yahei", sans-serif;
-            background-color: #f8f5f0;
         }
-        .wrap { padding: 30px 60px; max-width: 1000px; }
-        h1 { color:#784b2a; margin-bottom: 6px; }
-        .cat {
-            display:inline-block; font-size:13px; color:#784b2a;
-            background:#f3ece3; padding:3px 12px; border-radius:12px;
-        }
-        .viewer, .gallery { margin-top: 20px; }
-        model-viewer {
-            width: 100%;
-            height: 460px;
-            background: #efeae3;
-            border-radius: 10px;
-        }
-        .gallery img {
-            width: 180px; height: 180px; object-fit: cover;
-            border-radius: 8px; margin: 6px; box-shadow: 0 1px 4px #ccc;
-        }
-        .cover-single {
-            max-width: 100%; border-radius: 10px; margin-top: 20px;
-        }
-        .section { background:#fff; padding:20px 24px; border-radius:10px; margin-top:22px; }
-        .section h3 { color:#784b2a; margin-top:0; }
-        .section p { color:#444; line-height:1.7; white-space:pre-wrap; }
-        .jump-bar { margin-top:26px; }
-        .jump-bar a {
-            display:inline-block; margin-right:14px; padding:10px 18px;
-            background:#784b2a; color:#fff; text-decoration:none; border-radius:6px;
-        }
-        .jump-bar a:hover { background:#5d3a20; }
-        .back { display:inline-block; margin-top:20px; color:#784b2a; }
         .fav-btn:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(120,75,42,0.25); }
         .fav-btn.favorited { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; border-color: transparent; }
         .fav-btn.favorited:hover { background: linear-gradient(135deg, #a0673f, #784b2a); }
+
+        /* 页2新增功能组件，沿用页1色系 */
+        .breadcrumb { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; color: #8a7a6a; font-size: 13px; }
+        .breadcrumb .separator { color: #b8a997; }
+        .preview-badge { margin-left: auto; padding: 4px 11px; border: 1px solid rgba(200,170,120,0.3); border-radius: 20px; color: #784b2a; font-size: 12px; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+        .tabs { display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: rgba(200,170,120,0.12); }
+        .tab { display: inline-flex; min-height: 44px; align-items: center; gap: 7px; border: 0; border-radius: 7px; padding: 10px 17px; background: transparent; color: #784b2a; font: inherit; font-size: 14px; cursor: pointer; }
+        .tab[aria-selected="true"] { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; }
+        .mode-note { color: #8a7a6a; font-size: 12px; }
+        .photo-panel[hidden], .model-panel[hidden] { display: none; }
+        .hero-button { display: block; position: relative; width: 100%; height: clamp(290px, 32vw, 410px); overflow: hidden; border: 0; border-radius: 14px; padding: 0; background: #f0e8da; cursor: pointer; }
+        .hero-button img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; transition: transform .25s ease; }
+        .photo-label, .zoom-label { position: absolute; background: rgba(255, 255, 255, 0.82); color: #5c3317; font-size: 12px; }
+        .photo-label { top: 16px; left: 16px; padding: 5px 11px; border: 1px solid rgba(200,170,120,0.25); border-radius: 18px; }
+        .zoom-label { right: 14px; bottom: 14px; padding: 7px 12px; border-radius: 8px; cursor: zoom-in; }
+        .hero-nav { position: absolute; z-index: 2; top: calc(50% - 22px); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 0 !important; border-radius: 50% !important; background: rgba(255,255,255,0.3) !important; color: #5c3317 !important; padding: 0 !important; box-shadow: none !important; font-size: 26px; line-height: 1; cursor: pointer; transition: background .2s ease; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+        .hero-nav, .hero-nav:hover, .hero-nav:active { transform: none !important; }
+        .hero-nav:hover { background: rgba(255,255,255,0.55) !important; box-shadow: none !important; }
+        .hero-prev { left: 14px; }
+        .hero-next { right: 14px; }
+        .thumbs { display: grid; grid-template-columns: repeat(auto-fill, 112px); gap: 10px; margin-top: 12px; }
+        .thumb { width: 112px; border: 2px solid rgba(200,170,120,0.35) !important; border-radius: 9px !important; padding: 4px !important; background: rgba(255,255,255,0.78) !important; box-shadow: none !important; color: #3d2b1f !important; cursor: pointer; }
+        .thumb:hover { border-color: #a0673f !important; box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important; }
+        .thumb[aria-pressed="true"] { border-color: #784b2a !important; }
+        .thumb-image { display: block; height: 68px; overflow: hidden; border-radius: 5px; background: #f0e8da; }
+        .thumb-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+        .helper { margin: 9px 0 0; color: #8a7a6a; font-size: 12px; }
+        .empty-gallery { display: flex; height: clamp(290px, 32vw, 410px); align-items: center; justify-content: center; border: 1px dashed rgba(200,170,120,0.35); border-radius: 14px; background: rgba(240,232,218,0.5); color: #5c3317; text-align: center; }
+        .model-stage { position: relative; height: clamp(290px, 32vw, 410px); overflow: hidden; border: 1px solid rgba(200,170,120,0.25); border-radius: 14px; background: radial-gradient(ellipse at 50% 40%, rgba(255,255,255,0.72), rgba(240,232,218,0.7)); }
+        .model-tag { position: absolute; z-index: 3; top: 16px; left: 16px; padding: 5px 10px; border: 1px solid rgba(200,170,120,0.3); border-radius: 18px; background: rgba(255,255,255,0.82); color: #5c3317; font-size: 12px; }
+        .model-state { display: flex; height: 100%; align-items: center; justify-content: center; flex-direction: column; padding: 40px 24px; text-align: center; color:#5c3317;}
+        .model-state[hidden] { display: none; }
+        .model-ready { position: absolute; inset: 0; }
+        #model-canvas-container { position: absolute; inset: 0; }
+        .model-canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+        .model-canvas:active { cursor: grabbing; }
+        .model-controls { position: absolute; z-index: 3; right: 14px; bottom: 14px; display: flex; gap: 7px; }
+        .model-control { border: 1px solid rgba(120, 75, 42, .28); border-radius: 7px; padding: 7px 10px; background: rgba(255, 255, 255, .85); color: #5c3317; font: inherit; font-size: 12px; cursor: pointer; }
+        .model-control:hover, .model-control:focus-visible { border-color: #784b2a; background: #fff; }
+        .model-progress { position: absolute; z-index: 3; right: 16px; bottom: 16px; left: 16px; height: 5px; overflow: hidden; border-radius: 999px; background: rgba(120, 75, 42, .14); }
+        .model-progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: #784b2a; transition: width .2s ease; }
+        .model-hint { position: absolute; right: 16px; bottom: 16px; left: 16px; color: #5c3317; font-size: 12px; text-align: center; pointer-events: none; }
+        .facts { display: grid; grid-template-columns: 70px 1fr; gap: 10px; margin: 2px 0 22px; font-size: 13px; }
+        .facts dt { color: #8a7a6a; }
+        .facts dd { margin: 0; color: #3d2b1f; }
+        .primary-action { width: 100%; border: 0; border-radius: 10px; padding: 13px 18px; background: linear-gradient(135deg, #784b2a, #a0673f); box-shadow: 0 4px 12px rgba(120,75,42,0.2); color: #fff; font: inherit; font-size: 15px; cursor: pointer; margin-top:12px;}
+        .back-link { display: block; padding: 13px; color: #784b2a; font-size: 13px; text-align: center; text-decoration: none; }
+        .craft-points { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 22px; padding-top: 20px; border-top: 1px solid rgba(200,170,120,0.2); }
+        .craft-point { flex: 1 1 220px; }
+        .craft-point strong { color: #a0673f; font-size: 12px; font-weight: 400; }
+        .craft-point p { margin-top: 5px; font-size: 13px; color:#4a3a2e; }
+        dialog { width: min(1000px, 94vw); max-width: 94vw; border: 1px solid rgba(200,170,120,0.35); border-radius: 14px; padding: 18px; background: rgba(255,255,255,0.88); backdrop-filter: blur(10px); color: #3d2b1f; }
+        dialog::backdrop { background: rgba(50, 34, 20, .55); }
+        .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 14px; }
+        .dialog-close { min-width: 44px; min-height: 44px; border: 1px solid rgba(200,170,120,0.3); border-radius: 8px; background: rgba(255,255,255,0.7); color: #5c3317; font-size: 22px; cursor: pointer; }
+        .dialog-image { height: min(65vh, 630px); overflow: hidden; border-radius: 9px; background: #f0e8da; }
+        .dialog-image img { display: block; width: 100%; height: 100%; object-fit: contain; }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
 
-<div class="wrap">
-    <h1 th:text="${work.title}">作品标题</h1>
-    <span class="cat" th:text="${work.category}">分类</span>
-
-    <!-- 有3D模型：优先用 model-viewer 展示 -->
-    <div class="viewer" th:if="${work.modelUrl != null}">
-        <model-viewer th:attr="src=${work.modelUrl}"
-                      alt="3D模型"
-                      camera-controls
-                      auto-rotate
-                      shadow-intensity="1"
-                      ar>
-        </model-viewer>
-        <p style="color:#888;font-size:13px;">拖动可旋转，滚轮缩放</p>
+<div class="page-hero" style="padding:40px 8% 48px;">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="hero-inner">
+        <h1 th:text="${work.title}">展品详情</h1>
+        <p th:if="${craftsman != null}" th:text="'匠人：' + ${craftsman.username}"></p>
     </div>
-
-    <!-- 无3D模型：展示图片画廊（多图优先，否则封面图） -->
-    <div class="gallery" th:if="${work.modelUrl == null and !#lists.isEmpty(images)}">
-        <img th:each="img : ${images}" th:src="${img}" alt="作品图片">
-    </div>
-    <img class="cover-single"
-         th:if="${work.modelUrl == null and #lists.isEmpty(images) and work.coverImg != null}"
-         th:src="${work.coverImg}" alt="封面图">
-
-    <div class="section" th:if="${work.skillBackground != null and !work.skillBackground.isBlank()}">
-        <h3>技艺背景</h3>
-        <p th:text="${work.skillBackground}">技艺背景介绍</p>
-    </div>
-
-    <div class="section" th:if="${work.description != null and !work.description.isBlank()}">
-        <h3>作品描述</h3>
-        <p th:text="${work.description}">作品描述</p>
-    </div>
-
-    <!-- 预留跳转：手作教程 / 用户作品（教程模块C、用户作品模块E，最后汇总时接入真实链接） -->
-    <div class="jump-bar">
-        <a th:href="@{/tutorial/list}">相关手作教程</a>
-        <a th:href="@{/userWork/share}">看看用户作品</a>
-    </div>
-
-    <a class="back" th:href="@{/work/list}">← 返回展品列表</a>
 </div>
+
+<main class="wrap">
+    <div class="breadcrumb">
+        <span>非遗展品</span>
+        <span class="separator">/</span>
+        <span th:text="${work.category != null ? work.category : '传统技艺'}">传统技艺</span>
+        <span class="separator">/</span>
+        <span>展品详情</span>
+        <span class="preview-badge">图片展廊 · 3D 预览设计</span>
+    </div>
+
+    <div class="reject-notice" th:if="${work.auditStatus == 2 or (work.auditStatus == 0 and work.auditRemark != null)}">
+        <strong th:text="${work.auditStatus == 2 ? '该展品被审核驳回：' : '上次驳回理由（已重新提交，等待再次审核）：'}"></strong>
+        <span th:text="${work.auditRemark != null ? work.auditRemark : '审核未通过，请修改后重新提交'}"></span>
+    </div>
+
+    <article class="panel">
+        <div class="toolbar">
+            <div class="tabs" role="tablist" aria-label="展示方式">
+                <button id="tab-photo" class="tab" type="button" role="tab" aria-selected="true" aria-controls="photo-panel" onclick="setMode('photo')">▧ 图片展廊</button>
+                <button id="tab-model" class="tab" type="button" role="tab" aria-selected="false" aria-controls="model-panel" tabindex="-1" onclick="setMode('model')">◇ 3D 预览</button>
+            </div>
+            <span id="mode-note" class="mode-note" th:text="${galleryImages.isEmpty() ? '暂无图片' : '图片 01 / ' + #numbers.formatInteger(galleryImages.size(), 2)}">图片 01 / 01</span>
+        </div>
+
+        <section aria-label="展品查看区域">
+            <div id="photo-panel" class="photo-panel" role="tabpanel" aria-labelledby="tab-photo">
+                <div th:if="${!galleryImages.isEmpty()}">
+                    <div id="hero-button" class="hero-button" role="button" tabindex="0" onclick="stepPhoto(event, 1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();stepPhoto(event, 1);}" aria-label="切换到下一张展品图片">
+                        <img id="main-photo" th:src="${galleryImages[0]}" th:alt="${work.title}">
+                        <span id="photo-label" class="photo-label">图片 01</span>
+                        <span class="zoom-label" role="button" onclick="zoomPhoto(event)" aria-label="放大查看当前图片">⌕ 放大查看</span>
+                        <button class="hero-nav hero-prev" th:if="${galleryImages.size() > 1}" type="button" onclick="stepPhoto(event, -1)" aria-label="上一张图片">‹</button>
+                        <button class="hero-nav hero-next" th:if="${galleryImages.size() > 1}" type="button" onclick="stepPhoto(event, 1)" aria-label="下一张图片">›</button>
+                    </div>
+                    <div class="thumbs">
+                        <button th:each="image, stat : ${galleryImages}" class="thumb" type="button"
+                                th:attr="data-thumb=${stat.index},data-src=${image},data-label=${'图片 ' + (stat.index + 1)}"
+                                th:aria-pressed="${stat.index == 0}" onclick="selectPhoto(this)">
+                            <span class="thumb-image"><img th:src="${image}" th:alt="${work.title + ' 图片 ' + (stat.index + 1)}"></span>
+                        </button>
+                    </div>
+                    <p id="photo-error" class="helper" role="status" hidden>图片加载失败，请选择其他图片或稍后重试。</p>
+                    <p class="helper">点击左右箭头、大图或缩略图切换图片，点击「放大查看」查看细节。</p>
+                </div>
+                <div class="empty-gallery" th:unless="${!galleryImages.isEmpty()}">
+                    <div><strong>暂时没有上传展品图片</strong><br><span>请先补充封面图或展品图片，图片展廊会在这里展示。</span></div>
+                </div>
+            </div>
+
+            <div id="model-panel" class="model-panel" role="tabpanel" aria-labelledby="tab-model" hidden>
+                <div id="model-stage" class="model-stage" th:attr="data-model-url=${work.modelUrl}">
+                    <span id="model-tag" class="model-tag">3D 预览</span>
+                    <div id="model-loading" class="model-state" hidden>
+                        <div style="font-size:36px;color:#a18462;">◌</div>
+                        <h3>正在加载 3D 模型</h3>
+                        <p id="model-loading-text">首次加载可能需要一点时间。</p>
+                    </div>
+                    <div id="model-empty" class="model-state" hidden>
+                        <div style="font-size:36px;color:#a18462;">◇</div>
+                        <h3>尚未配置真实 3D 模型</h3>
+                        <p>当前页面会展示交互式演示模型，上传真实模型后将优先加载。</p>
+                    </div>
+                    <div id="model-error" class="model-state" hidden>
+                        <div style="font-size:36px;color:#a18462;">!</div>
+                        <h3>3D 模型暂时无法加载</h3>
+                        <p>请检查模型地址、网络连接或文件格式。</p>
+                    </div>
+                    <div id="model-webgl" class="model-state" hidden>
+                        <div style="font-size:36px;color:#a18462;">□</div>
+                        <h3>当前浏览器不支持 WebGL</h3>
+                        <p>请启用硬件加速或更换现代浏览器查看模型。</p>
+                    </div>
+                    <div id="model-ready" class="model-state" hidden>
+                        <div id="model-canvas-container" aria-label="可交互的 3D 展品模型"></div>
+                        <div class="model-controls">
+                            <button id="model-reset" class="model-control" type="button">复位视角</button>
+                            <button id="model-fullscreen" class="model-control" type="button">全屏查看</button>
+                        </div>
+                        <div class="model-hint">拖动旋转 · 滚轮缩放 · 触摸可操作</div>
+                    </div>
+                    <div id="model-progress" class="model-progress" hidden><span id="model-progress-bar"></span></div>
+                </div>
+                <p class="helper">模型由发布者上传或配置 URL。若暂未配置模型，页面会保留图片展廊作为降级展示。</p>
+            </div>
+        </section>
+
+        <div class="craftsman-info" th:text="${work.craftsman != null ? '发布匠人：' + work.craftsman.username : ''}">发布匠人</div>
+        <dl class="facts">
+            <dt>展示方式</dt>
+            <dd>多图浏览 / 真实 3D 预览</dd>
+            <dt>模型状态</dt>
+            <dd id="model-status-fact" th:text="${work.modelUrl != null and !work.modelUrl.isBlank() ? '已配置模型，打开 3D 预览后加载' : '尚未配置 3D 模型'}">尚未配置 3D 模型</dd>
+        </dl>
+        <button class="primary-action" type="button" onclick="setMode('model'); document.getElementById('tab-model').focus();">打开 3D 预览 <span aria-hidden="true">→</span></button>
+        <a class="back-link" href="#craft">了解技艺背景 ↓</a>
+
+        <div class="section">
+            <h2>作品介绍</h2>
+            <div th:text="${work.description != null ? work.description : '暂无介绍'}">作品介绍</div>
+        </div>
+
+        <section id="craft" class="section">
+            <h2>技艺背景</h2>
+            <div th:text="${work.skillBackground != null ? work.skillBackground : '暂无技艺背景介绍'}">技艺背景</div>
+        </section>
+
+        <div style="margin-top:24px;" th:if="${session.loginUser != null}">
+            <form method="post" th:action="@{/favorite/toggle}" style="display:inline;">
+                <input type="hidden" name="targetId" th:value="${work.id}">
+                <input type="hidden" name="targetType" value="work">
+                <input type="hidden" name="redirect" th:value="'/work/' + ${work.id}">
+                <button type="submit" class="fav-btn" th:classappend="${isFavorited} ? 'favorited' : ''">
+                    <span th:if="${isFavorited}">❤️ 已收藏</span>
+                    <span th:unless="${isFavorited}">🤍 收藏</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="links">
+            <a th:href="@{/tutorial/list}">查看手作教程</a>
+            <a th:href="@{/work/mine}">查看用户作品</a>
+            <a th:if="${session.loginUser != null and work.craftsman != null and session.loginUser.id == work.craftsman.id}"
+               th:href="@{/work/{id}/edit(id=${work.id})}">编辑展品</a>
+            <a th:href="@{/work/list}">返回展品列表</a>
+        </div>
+    </article>
+</main>
 
 <dialog id="photo-dialog" aria-labelledby="dialog-title">
     <div class="dialog-head">
@@ -135,7 +252,7 @@
 <script type="importmap">
     {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js"}}
 </script>
-<script>
+<script th:inline="none">
     let selectedPhoto = 0;
     let modelViewerPromise;
     const modelViewer = { scene: null, camera: null, renderer: null, controls: null, root: null, resizeObserver: null, frame: 0, disposed: false, demo: false };
@@ -174,6 +291,14 @@
         note.textContent = note.dataset.photoNote;
         document.getElementById('announcer').textContent = '已选择' + button.dataset.label;
     }
+    function stepPhoto(event, direction) {
+        event.preventDefault();
+        event.stopPropagation();
+        const thumbs = Array.from(document.querySelectorAll('[data-thumb]'));
+        if (thumbs.length < 2) return;
+        const current = Math.max(0, thumbs.findIndex(function (item) { return item.getAttribute('aria-pressed') === 'true'; }));
+        selectPhoto(thumbs[(current + direction + thumbs.length) % thumbs.length]);
+    }
     function setPhotoError(failed) {
         const message = document.getElementById('photo-error');
         const image = document.getElementById('main-photo');
@@ -181,7 +306,7 @@
         if (!message || !image || !button) return;
         message.hidden = !failed;
         image.style.visibility = failed ? 'hidden' : 'visible';
-        button.disabled = failed;
+        button.style.pointerEvents = failed ? 'none' : '';
         if (failed) document.getElementById('announcer').textContent = message.textContent;
     }
     function openPhoto() {
@@ -193,6 +318,11 @@
         const dialog = document.getElementById('photo-dialog');
         if (typeof dialog.showModal === 'function') dialog.showModal();
         document.getElementById('close-dialog').focus();
+    }
+    function zoomPhoto(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        openPhoto();
     }
     function modelViewerStateLabel() {
         if (!document.getElementById('model-ready').hidden) return modelViewer.demo ? '交互式3D演示' : '可交互3D模型';

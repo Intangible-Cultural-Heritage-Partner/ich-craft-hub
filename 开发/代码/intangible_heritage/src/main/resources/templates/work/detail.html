@@ -49,17 +49,22 @@
         .tab[aria-selected="true"] { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; }
         .mode-note { color: #8a7a6a; font-size: 12px; }
         .photo-panel[hidden], .model-panel[hidden] { display: none; }
-        .hero-button { display: block; position: relative; width: 100%; height: clamp(290px, 32vw, 410px); overflow: hidden; border: 0; border-radius: 14px; padding: 0; background: #f0e8da; cursor: zoom-in; }
+        .hero-button { display: block; position: relative; width: 100%; height: clamp(290px, 32vw, 410px); overflow: hidden; border: 0; border-radius: 14px; padding: 0; background: #f0e8da; cursor: pointer; }
         .hero-button img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; transition: transform .25s ease; }
         .photo-label, .zoom-label { position: absolute; background: rgba(255, 255, 255, 0.82); color: #5c3317; font-size: 12px; }
         .photo-label { top: 16px; left: 16px; padding: 5px 11px; border: 1px solid rgba(200,170,120,0.25); border-radius: 18px; }
-        .zoom-label { right: 14px; bottom: 14px; padding: 7px 12px; border-radius: 8px; }
-        .thumbs { display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 10px; margin-top: 12px; }
-        .thumb { min-width: 0; border: 2px solid rgba(200,170,120,0.2); border-radius: 9px; padding: 4px; background: rgba(255,255,255,0.6); cursor: pointer; text-align: left; }
-        .thumb[aria-pressed="true"] { border-color: #784b2a; }
+        .zoom-label { right: 14px; bottom: 14px; padding: 7px 12px; border-radius: 8px; cursor: zoom-in; }
+        .hero-nav { position: absolute; z-index: 2; top: calc(50% - 22px); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 0 !important; border-radius: 50% !important; background: rgba(255,255,255,0.3) !important; color: #5c3317 !important; padding: 0 !important; box-shadow: none !important; font-size: 26px; line-height: 1; cursor: pointer; transition: background .2s ease; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+        .hero-nav, .hero-nav:hover, .hero-nav:active { transform: none !important; }
+        .hero-nav:hover { background: rgba(255,255,255,0.55) !important; box-shadow: none !important; }
+        .hero-prev { left: 14px; }
+        .hero-next { right: 14px; }
+        .thumbs { display: grid; grid-template-columns: repeat(auto-fill, 112px); gap: 10px; margin-top: 12px; }
+        .thumb { width: 112px; border: 2px solid rgba(200,170,120,0.35) !important; border-radius: 9px !important; padding: 4px !important; background: rgba(255,255,255,0.78) !important; box-shadow: none !important; color: #3d2b1f !important; cursor: pointer; }
+        .thumb:hover { border-color: #a0673f !important; box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important; }
+        .thumb[aria-pressed="true"] { border-color: #784b2a !important; }
         .thumb-image { display: block; height: 68px; overflow: hidden; border-radius: 5px; background: #f0e8da; }
         .thumb-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
-        .thumb span:last-child { display: block; padding: 5px 5px 2px; overflow: hidden; color: #5c3317; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
         .helper { margin: 9px 0 0; color: #8a7a6a; font-size: 12px; }
         .empty-gallery { display: flex; height: clamp(290px, 32vw, 410px); align-items: center; justify-content: center; border: 1px dashed rgba(200,170,120,0.35); border-radius: 14px; background: rgba(240,232,218,0.5); color: #5c3317; text-align: center; }
         .model-stage { position: relative; height: clamp(290px, 32vw, 410px); overflow: hidden; border: 1px solid rgba(200,170,120,0.25); border-radius: 14px; background: radial-gradient(ellipse at 50% 40%, rgba(255,255,255,0.72), rgba(240,232,218,0.7)); }
@@ -133,21 +138,22 @@
         <section aria-label="展品查看区域">
             <div id="photo-panel" class="photo-panel" role="tabpanel" aria-labelledby="tab-photo">
                 <div th:if="${!galleryImages.isEmpty()}">
-                    <button id="hero-button" class="hero-button" type="button" onclick="openPhoto()" aria-label="放大查看展品图片">
+                    <div id="hero-button" class="hero-button" role="button" tabindex="0" onclick="stepPhoto(event, 1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();stepPhoto(event, 1);}" aria-label="切换到下一张展品图片">
                         <img id="main-photo" th:src="${galleryImages[0]}" th:alt="${work.title}">
                         <span id="photo-label" class="photo-label">图片 01</span>
-                        <span class="zoom-label">⌕ 放大查看</span>
-                    </button>
+                        <span class="zoom-label" role="button" onclick="zoomPhoto(event)" aria-label="放大查看当前图片">⌕ 放大查看</span>
+                        <button class="hero-nav hero-prev" th:if="${galleryImages.size() > 1}" type="button" onclick="stepPhoto(event, -1)" aria-label="上一张图片">‹</button>
+                        <button class="hero-nav hero-next" th:if="${galleryImages.size() > 1}" type="button" onclick="stepPhoto(event, 1)" aria-label="下一张图片">›</button>
+                    </div>
                     <div class="thumbs">
                         <button th:each="image, stat : ${galleryImages}" class="thumb" type="button"
                                 th:attr="data-thumb=${stat.index},data-src=${image},data-label=${'图片 ' + (stat.index + 1)}"
                                 th:aria-pressed="${stat.index == 0}" onclick="selectPhoto(this)">
                             <span class="thumb-image"><img th:src="${image}" th:alt="${work.title + ' 图片 ' + (stat.index + 1)}"></span>
-                            <span th:text="${'图片 ' + (stat.index + 1)}">图片 1</span>
                         </button>
                     </div>
                     <p id="photo-error" class="helper" role="status" hidden>图片加载失败，请选择其他图片或稍后重试。</p>
-                    <p class="helper">点击缩略图切换，点击大图查看细节。</p>
+                    <p class="helper">点击左右箭头、大图或缩略图切换图片，点击「放大查看」查看细节。</p>
                 </div>
                 <div class="empty-gallery" th:unless="${!galleryImages.isEmpty()}">
                     <div><strong>暂时没有上传展品图片</strong><br><span>请先补充封面图或展品图片，图片展廊会在这里展示。</span></div>
@@ -209,11 +215,6 @@
         <section id="craft" class="section">
             <h2>技艺背景</h2>
             <div th:text="${work.skillBackground != null ? work.skillBackground : '暂无技艺背景介绍'}">技艺背景</div>
-            <div class="craft-points">
-                <div class="craft-point"><strong>01 / 保留熟悉的界面</strong><p>米白底、棕色主色、圆角卡片与原有导航。</p></div>
-                <div class="craft-point"><strong>02 / 逐步增强展示</strong><p>先完善图片展廊，再按需加载真实 3D 模型。</p></div>
-                <div class="craft-point"><strong>03 / 兼容只有图片的展品</strong><p>没有模型时仍可浏览完整的图文资料。</p></div>
-            </div>
         </section>
 
         <div style="margin-top:24px;" th:if="${session.loginUser != null}">
@@ -251,7 +252,7 @@
 <script type="importmap">
     {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js"}}
 </script>
-<script>
+<script th:inline="none">
     let selectedPhoto = 0;
     let modelViewerPromise;
     const modelViewer = { scene: null, camera: null, renderer: null, controls: null, root: null, resizeObserver: null, frame: 0, disposed: false, demo: false };
@@ -290,6 +291,14 @@
         note.textContent = note.dataset.photoNote;
         document.getElementById('announcer').textContent = '已选择' + button.dataset.label;
     }
+    function stepPhoto(event, direction) {
+        event.preventDefault();
+        event.stopPropagation();
+        const thumbs = Array.from(document.querySelectorAll('[data-thumb]'));
+        if (thumbs.length < 2) return;
+        const current = Math.max(0, thumbs.findIndex(function (item) { return item.getAttribute('aria-pressed') === 'true'; }));
+        selectPhoto(thumbs[(current + direction + thumbs.length) % thumbs.length]);
+    }
     function setPhotoError(failed) {
         const message = document.getElementById('photo-error');
         const image = document.getElementById('main-photo');
@@ -297,7 +306,7 @@
         if (!message || !image || !button) return;
         message.hidden = !failed;
         image.style.visibility = failed ? 'hidden' : 'visible';
-        button.disabled = failed;
+        button.style.pointerEvents = failed ? 'none' : '';
         if (failed) document.getElementById('announcer').textContent = message.textContent;
     }
     function openPhoto() {
@@ -309,6 +318,11 @@
         const dialog = document.getElementById('photo-dialog');
         if (typeof dialog.showModal === 'function') dialog.showModal();
         document.getElementById('close-dialog').focus();
+    }
+    function zoomPhoto(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        openPhoto();
     }
     function modelViewerStateLabel() {
         if (!document.getElementById('model-ready').hidden) return modelViewer.demo ? '交互式3D演示' : '可交互3D模型';
