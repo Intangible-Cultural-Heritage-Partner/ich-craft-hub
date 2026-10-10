@@ -1,6 +1,7 @@
 package com.zjxy.intangible_heritage.service;
 
 import com.zjxy.intangible_heritage.entity.CustomOrder;
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface CustomOrderService {
@@ -22,6 +23,15 @@ public interface CustomOrderService {
 
     /** 任一方完结：2 -> 3 需求完结 */
     CustomOrder finish(Long orderId, Long operatorId);
+
+    /** 匠人报价：2 沟通中 -> 4 待付定金（同时写入报价、定金金额） */
+    CustomOrder quote(Long orderId, Long craftsmanId, java.math.BigDecimal quotePrice, String quoteNote);
+
+    /** 申请人拒绝报价：4 -> 2 沟通中 */
+    CustomOrder rejectQuote(Long orderId, Long operatorId);
+
+    /** 匠人标记完工：5 制作中 -> 6 待付尾款 */
+    CustomOrder craftsmanDone(Long orderId, Long operatorId);
 
     /** 取单子详情，同时校验调用方是该单子的申请人或匠人之一 */
     CustomOrder getForUserOrCraftsman(Long orderId, Long currentUserId);

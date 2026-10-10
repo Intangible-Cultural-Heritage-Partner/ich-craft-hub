@@ -20,6 +20,35 @@
         .s1 { background: rgba(180,35,24,0.12); color: #842029; }
         .s2 { background: rgba(45,122,79,0.12); color: #0f5132; }
         .s3 { background: rgba(42,122,226,0.12); color: #1a5cb0; }
+        .s4 { background:rgba(255, 232, 204,0.35); color:#a05a00; }
+        .s5 { background:rgba(226, 213, 248,0.35); color:#5b3a9e; }
+        .s6 { background:rgba(216, 236, 253,0.35); color:#0b5ed7; }
+        .s7 { background:rgba(209, 231, 221,0.35); color:#0f5132; }
+
+        /* 新增报价卡片（沿用页1毛玻璃风格） */
+        .quote-card {
+            background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+            border-radius: 16px; padding:20px 24px; margin-bottom:18px;
+            box-shadow: 0 4px 20px rgba(92,51,23,0.08); border: 1px solid rgba(200,170,120,0.18);
+        }
+        .quote-card h4 { margin:0 0 12px; color:#5c3317; font-size:17px; }
+        .quote-card .row { color:#7a6e60; font-size:14px; margin:7px 0; }
+        .quote-card label { font-size:14px; color:#3d2b1f; margin-right:12px; }
+        .quote-card input {
+            padding:9px 12px; border:1px solid rgba(200,170,120,0.3); border-radius:8px;
+            background:rgba(255,255,255,0.7); font-size:14px; margin:0 8px 8px 4px;
+        }
+        .pay-btn {
+            background: linear-gradient(135deg,#1b7047,#2d9964) !important; color:#fff !important;
+            padding:10px 20px !important; border:none !important; border-radius:10px !important;
+            box-shadow:0 4px 12px rgba(27,112,71,0.22) !important; cursor:pointer; font-weight:600;
+        }
+        .warn-btn {
+            background: linear-gradient(135deg,#a82c1e,#d04030) !important; color:#fff !important;
+            padding:10px 20px !important; border:none !important; border-radius:10px !important;
+            box-shadow:0 4px 12px rgba(168,44,30,0.22) !important; cursor:pointer; font-weight:600;
+        }
+
         .chat-box {
             background: rgba(255,255,255,0.72); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
             border-radius: 16px; height: 420px; overflow-y: auto; padding: 24px;
@@ -33,8 +62,8 @@
         .mine .sender { color: rgba(255,255,255,0.7); }
         .time { font-size: 11px; opacity: 0.5; text-align: right; margin-top: 4px; }
         .action-row { display: flex; gap: 12px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
-        .input-row { display: flex; gap: 12px; flex: 1; }
-        .input-row input[type=text] { flex: 1; padding: 12px 18px !important; border: 1px solid rgba(200,170,120,0.3) !important; border-radius: 12px !important; font-size: 15px; background: rgba(255,255,255,0.7) !important; color: #3d2b1f !important; transition: all 0.25s; }
+        .input-row { display: flex; gap: 12px; flex: 1; flex-wrap:wrap; }
+        .input-row input[type=text] { flex: 1; min-width:220px; padding: 12px 18px !important; border: 1px solid rgba(200,170,120,0.3) !important; border-radius: 12px !important; font-size: 15px; background: rgba(255,255,255,0.7) !important; color: #3d2b1f !important; transition: all 0.25s; }
         .input-row input:focus { border-color: #a0673f !important; box-shadow: 0 0 0 3px rgba(120,75,42,0.1) !important; outline: none !important; }
         .input-row button { padding: 12px 28px !important; border-radius: 12px !important; font-size: 15px; background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important; font-weight: 600 !important; border: none !important; cursor: pointer; display: inline-block !important; box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important; transition: none; flex-shrink: 0; }
         .input-row button:hover { transform: none !important; padding: 12px 28px !important; background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important; border: none !important; border-radius: 12px !important; box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important; display: inline-block !important; }
@@ -58,10 +87,10 @@
     </div>
 </div>
 
-<div class="page-body" style="padding-top:24px;">
+<div class="wrap">
     <div class="head">
         <h3>定制沟通 · 单号 #<span th:text="${order.id}"></span></h3>
-        <div class="row">对方：<span th:text="${other?.username}"></span></div>
+        <div class="row">对方：<span th:text="${other?.nickname}"></span></div>
         <div class="row">作品描述：<span th:text="${order.workDesc}"></span></div>
         <div class="row">状态：
             <span class="badge"
@@ -72,43 +101,111 @@
 
     <p class="notice" th:text="${msg}"></p>
 
+    <!-- ===== 交易业务卡片，来自页2完整状态逻辑 ===== -->
+    <!-- 匠人报价入口（沟通中 status=2） -->
+    <div class="quote-card" th:if="${order.orderStatus == 2 and isCraftsman}">
+        <h4>提交报价</h4>
+        <form th:action="@{'/custom/quote/' + ${order.id}}" method="post">
+            <label>总价（元）
+                <input type="number" name="quotePrice" step="0.01" min="0.01" required>
+            </label>
+            <label>报价说明
+                <input type="text" name="quoteNote" placeholder="工艺、工期、材料等说明（选填）">
+            </label>
+            <button type="submit" class="pay-btn">发送报价</button>
+        </form>
+    </div>
+
+    <!-- 报价确认 status=4 待付定金 -->
+    <div class="quote-card" th:if="${order.orderStatus == 4}">
+        <h4>匠人报价</h4>
+        <div class="row">总价：<b style="color:#c0392b;">¥ <span th:text="${order.quotePrice}"></span></b></div>
+        <div class="row">定金：<b>¥ <span th:text="${order.depositAmount}"></span></b>，完工后支付尾款 ¥ <span th:text="${balanceAmount}"></span></div>
+        <div class="row" th:if="${order.quoteNote != null and !order.quoteNote.isEmpty()}">说明：<span th:text="${order.quoteNote}"></span></div>
+        <div class="action-row" th:if="${!isCraftsman}">
+            <form th:action="@{'/custom/payDeposit/' + ${order.id}}" method="post"
+                  onsubmit="return confirm('确认进入收银台支付定金？');">
+                <button type="submit" class="pay-btn">支付定金</button>
+            </form>
+            <form th:action="@{'/custom/quoteReject/' + ${order.id}}" method="post"
+                  onsubmit="return confirm('拒绝该报价并继续沟通？');">
+                <button type="submit" class="warn-btn">拒绝报价</button>
+            </form>
+        </div>
+        <div class="row" th:if="${isCraftsman}">等待申请人确认报价…（期间可继续在下方聊天）</div>
+    </div>
+
+    <!-- 制作中 status=5 -->
+    <div class="quote-card" th:if="${order.orderStatus == 5}">
+        <h4>订单制作中</h4>
+        <div class="row">定金已支付，匠人正在制作，可在下方聊天同步进度。</div>
+        <div class="action-row" th:if="${isCraftsman}">
+            <form th:action="@{'/custom/done/' + ${order.id}}" method="post"
+                  onsubmit="return confirm('确认已完成制作？确认后等待申请人支付尾款。');">
+                <button type="submit" class="pay-btn">标记完工</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 待付尾款 status=6 -->
+    <div class="quote-card" th:if="${order.orderStatus == 6}">
+        <h4>待付尾款</h4>
+        <div class="row">匠人已完工，尾款金额：<b style="color:#c0392b;">¥ <span th:text="${balanceAmount}"></span></b></div>
+        <div class="action-row" th:if="${!isCraftsman}">
+            <form th:action="@{'/custom/payBalance/' + ${order.id}}" method="post"
+                  onsubmit="return confirm('确认进入收银台支付尾款？');">
+                <button type="submit" class="pay-btn">支付尾款</button>
+            </form>
+        </div>
+        <div class="row" th:if="${isCraftsman}">等待申请人支付尾款…</div>
+    </div>
+
+    <!-- 交易完成 status=7 -->
+    <div class="quote-card" th:if="${order.orderStatus == 7}">
+        <h4>交易完成</h4>
+        <div class="row">总价 ¥<span th:text="${order.quotePrice}"></span> 已付清（定金 ¥<span th:text="${order.depositAmount}"></span> + 尾款 ¥<span th:text="${balanceAmount}"></span>），感谢使用！</div>
+    </div>
+
     <!-- 消息列表 -->
     <div class="chat-box" id="chatBox">
         <div th:each="m : ${messages}"
              th:classappend="${m.senderId == loginUserId ? 'msg mine' : 'msg others'}">
-            <div class="sender" th:text="${m.senderId == loginUserId ? '我' : (other?.username != null ? other.username : '对方')}"></div>
+            <div class="sender" th:text="${m.senderId == loginUserId ? '我' : (other?.nickname != null ? other.nickname : '对方')}"></div>
             <div th:text="${m.content}"></div>
             <div class="time" th:text="${m.sendTime}"></div>
         </div>
         <div th:if="${messages == null || messages.isEmpty()}" style="color:rgba(200,180,150,0.5);text-align:center;">暂无消息</div>
     </div>
 
-    <!-- 输入区 + 完结按钮：状态=2 时在同一行 -->
-    <div class="action-row" th:if="${order.orderStatus == 2}">
+    <!-- 输入区：可发送消息状态：2沟通中 /4待定金 /5制作中 /6待尾款 -->
+    <div class="action-row" th:if="${order.orderStatus == 2 or order.orderStatus == 4 or order.orderStatus == 5 or order.orderStatus == 6}">
         <form class="input-row" th:action="@{'/custom/chat/' + ${order.id}}" method="post">
             <input type="text" name="content" placeholder="输入消息..." required>
             <button type="submit">发送</button>
         </form>
+        <!-- 完结按钮：仅沟通中且没有报价 quotePrice=null 才显示 -->
         <form class="finish-form" th:action="@{'/custom/finish/' + ${order.id}}" method="post"
+              th:if="${order.orderStatus == 2 and order.quotePrice == null}"
               onsubmit="return confirm('确认完结此定制需求？完结后将无法再发消息。');">
             <button type="submit" class="finish-btn">完结需求</button>
         </form>
     </div>
-    <div class="notice" th:if="${order.orderStatus != 2}">
+
+    <div class="notice" th:if="${!(order.orderStatus == 2 or order.orderStatus == 4 or order.orderStatus == 5 or order.orderStatus == 6)}">
         当前状态【<span th:text="${order.statusText}"></span>】，不可发送消息。
     </div>
 
     <p style="margin-top:18px;">
-        <a class="btn" th:href="@{/custom/myApply}" th:if="${session.loginUser != null && (session.loginUser.role == '0' || session.loginUser.role == 'USER')}">返回我的申请</a>
-        <a class="btn" th:href="@{/custom/myCraft}" th:if="${session.loginUser != null && (session.loginUser.role == '1' || session.loginUser.role == 'CRAFTSMAN')}">返回发给我的</a>
+        <a class="btn" th:href="@{/custom/myApply}" th:if="${session.loginUser != null && session.loginUser.role == 'USER'}">返回我的申请</a>
+        <a class="btn" th:href="@{/custom/myCraft}" th:if="${session.loginUser != null && session.loginUser.role == 'CRAFTSMAN'}">返回发给我的</a>
     </p>
 </div>
 
-<!-- AJAX 轮询刷新消息列表，5秒一次 -->
+<!-- AJAX 轮询刷新消息列表，5秒一次，页2逻辑，XSS转义保留 -->
 <script th:inline="javascript">
     const orderId = /*[[${order.id}]]*/ 0;
     const loginUserId = /*[[${loginUserId}]]*/ 0;
-    const otherName = /*[[${other?.username}]]*/ '对方';
+    const otherName = /*[[${other?.nickname}]]*/ '对方';
 
     function renderMessages(list) {
         const box = document.getElementById('chatBox');
@@ -139,7 +236,7 @@
                 const data = await res.json();
                 renderMessages(data);
             }
-        } catch (e) { /* 静默 */ }
+        } catch (e) { /* 静默失败 */ }
     }
     setInterval(poll, 5000);
 </script>

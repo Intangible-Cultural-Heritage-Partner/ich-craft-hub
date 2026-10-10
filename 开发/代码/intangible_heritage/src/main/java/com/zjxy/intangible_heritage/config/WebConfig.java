@@ -18,7 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
         //   - /custom/myCraft 仅 CRAFTSMAN
         //   - /admin/** 仅 ADMIN
         registry.addInterceptor(new RoleInterceptor())
-                .addPathPatterns("/custom/**", "/admin/**");
+                .addPathPatterns("/custom/**", "/admin/**", "/wallet/**");
     }
 
     @Override

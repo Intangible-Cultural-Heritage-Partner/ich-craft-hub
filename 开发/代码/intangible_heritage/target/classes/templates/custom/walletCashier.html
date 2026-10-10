@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>钱包支付</title>
+    <style>
+        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;display:flex;justify-content:center;align-items:center;min-height:100vh;}
+        .cashier{background:#fff;width:430px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1);overflow:hidden;}
+        .head{background:linear-gradient(135deg,#784b2a,#a06a3c);color:#fff;padding:18px 24px;font-size:18px;font-weight:bold;}
+        .body{padding:26px 24px;text-align:center;}
+        .amount{font-size:38px;color:#c0392b;font-weight:bold;margin:6px 0 4px;}
+        .line{color:#666;font-size:14px;margin:8px 0;text-align:left;}
+        .line b{color:#333;}
+        .balance-ok{color:#0f5132;font-weight:bold;}
+        .balance-no{color:#842029;font-weight:bold;}
+        button{width:100%;padding:13px;border:none;border-radius:8px;background:#0f7b4d;color:#fff;font-size:16px;cursor:pointer;margin-top:18px;}
+        button:hover{background:#0b5c3a;}
+        button:disabled{background:#aaa;cursor:not-allowed;}
+        a.link{display:block;margin-top:14px;color:#784b2a;font-size:14px;text-decoration:none;}
+        a.cancel{display:block;margin-top:10px;color:#999;font-size:13px;text-decoration:none;}
+    </style>
+</head>
+<body>
+<div class="cashier">
+    <div class="head">钱包支付 · <span th:text="${payment.payTypeText}"></span></div>
+    <div class="body">
+        <div class="line">定制订单号：<b>#<span th:text="${payment.orderId}"></span></b></div>
+        <div class="line">本次需付：<span class="amount" style="font-size:30px;">¥ <span th:text="${#numbers.formatDecimal(payment.amount,1,2)}"></span></span></div>
+        <div class="line">钱包余额：
+            <span th:if="${enough}" class="balance-ok">¥ <span th:text="${#numbers.formatDecimal(balance,1,2)}"></span>（余额充足）</span>
+            <span th:unless="${enough}" class="balance-no">¥ <span th:text="${#numbers.formatDecimal(balance,1,2)}"></span>（余额不足，请先充值）</span>
+        </div>
+        <div class="line" th:if="${enough}">支付后余额：<b>¥ <span th:text="${#numbers.formatDecimal(balance.subtract(payment.amount),1,2)}"></span></b>，款项实时划转至匠人钱包</div>
+
+        <form th:if="${enough}" th:action="@{'/custom/walletPay/' + ${payment.outTradeNo}}" method="post"
+              th:onsubmit="'return confirm(\'确认从钱包支付 ¥' + ${payment.amount} + ' ？\')';">
+            <button type="submit">确认支付</button>
+        </form>
+        <a th:unless="${enough}" class="link" th:href="@{/wallet}">去充值 →</a>
+        <a class="cancel" th:href="@{'/custom/chat/' + ${payment.orderId}}">取消，返回订单</a>
+    </div>
+</div>
+</body>
+</html>

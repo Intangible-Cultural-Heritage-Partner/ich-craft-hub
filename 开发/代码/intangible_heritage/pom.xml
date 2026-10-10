@@ -58,6 +58,12 @@
             <artifactId>hibernate-core</artifactId>
             <!-- 删掉 <version>6.5.3.Final</version> 这一行，让 Spring Boot 自动匹配 -->
         </dependency>
+        <!--支付宝支付SDK（沙箱/正式通用）-->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.38.200.ALL</version>
+        </dependency>
     </dependencies>
 
     <build>

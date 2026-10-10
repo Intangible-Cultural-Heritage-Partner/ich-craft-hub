@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>充值审核</title>
+    <style>
+        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
+        .wrap{padding:30px 50px;}
+        h2{color:#784b2a;}
+        .msg{color:#2e7d32;margin-bottom:10px;}
+        table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 4px #ccc;}
+        th,td{border:1px solid #e0d8c8;padding:10px;text-align:left;}
+        th{background:#784b2a;color:#fff;}
+        tr:hover{background:#faf6ee;}
+        form{display:inline-block;margin-right:8px;}
+        input[type=text]{width:200px;padding:5px;border:1px solid #ccc;border-radius:4px;}
+        button{padding:5px 14px;border:none;border-radius:4px;cursor:pointer;}
+        .pass{background:#0f5132;color:#fff;}
+        .reject{background:#842029;color:#fff;}
+        .empty{color:#999;margin-top:14px;}
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <h2>用户充值审核</h2>
+    <p class="msg" th:text="${msg}"></p>
+
+    <div th:if="${pendings != null && !pendings.isEmpty()}">
+        <table>
+            <tr>
+                <th>申请ID</th><th>用户</th><th>充值金额</th><th>申请时间</th><th>操作</th>
+            </tr>
+            <tr th:each="t : ${pendings}">
+                <td th:text="${t.id}"></td>
+                <td th:text="${userNames.get(t.userId)}"></td>
+                <td style="color:#c0392b;font-weight:bold;">¥ <span th:text="${#numbers.formatDecimal(t.amount,1,2)}"></span></td>
+                <td th:text="${#temporals.format(t.createTime,'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <form th:action="@{'/admin/recharge/audit/' + ${t.id}}" method="post"
+                          onsubmit="return confirm('确认通过该笔充值申请？');">
+                        <input type="hidden" name="approved" value="1">
+                        <button class="pass" type="submit">审核通过</button>
+                    </form>
+                    <form th:action="@{'/admin/recharge/audit/' + ${t.id}}" method="post">
+                        <input type="hidden" name="approved" value="0">
+                        <input type="text" name="rejectReason" placeholder="驳回理由（选填）">
+                        <button class="reject" type="submit">驳回</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <p class="empty" th:if="${pendings == null || pendings.isEmpty()}">暂无待审核的充值申请。</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的钱包</title>
+    <style>
+        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
+        .wrap{padding:30px 50px;max-width:900px;}
+        h2{color:#784b2a;}
+        .msg{color:#2e7d32;margin-bottom:10px;}
+        .card{background:#fff;border-radius:10px;box-shadow:0 1px 4px #ccc;padding:22px 26px;margin-bottom:18px;}
+        .balance{font-size:38px;color:#c0392b;font-weight:bold;margin:8px 0;}
+        .balance small{font-size:15px;color:#999;font-weight:normal;}
+        .recharge-row{display:flex;gap:10px;align-items:center;}
+        .recharge-row input{padding:8px 10px;border:1px solid #ccc;border-radius:4px;width:180px;}
+        button{padding:8px 22px;background:#0f7b4d;color:#fff;border:none;border-radius:4px;cursor:pointer;}
+        button:hover{background:#0b5c3a;}
+        table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 4px #ccc;}
+        th,td{border:1px solid #e0d8c8;padding:10px;text-align:left;font-size:14px;}
+        th{background:#784b2a;color:#fff;}
+        tr:hover{background:#faf6ee;}
+        .tag{padding:2px 9px;border-radius:9px;font-size:12px;}
+        .t-RECHARGE{background:#fff3cd;color:#8a6d3b;}
+        .t-PAY_OUT{background:#f8d7da;color:#842029;}
+        .t-PAY_IN{background:#d1e7dd;color:#0f5132;}
+        .pend{color:#8a6d3b;font-weight:bold;}
+        .ok{color:#0f5132;}
+        .no{color:#842029;}
+        .tip{color:#999;font-size:13px;margin-top:6px;}
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="wrap">
+    <h2>我的钱包</h2>
+    <p class="msg" th:text="${msg}"></p>
+
+    <div class="card">
+        <div>账户余额（元）</div>
+        <div class="balance">¥ <span th:text="${#numbers.formatDecimal(account.balance,1,2)}"></span>
+            <small>可用余额，定制支付时直接划转给匠人</small>
+        </div>
+        <form class="recharge-row" th:action="@{/wallet/recharge}" method="post"
+              onsubmit="return confirm('确认提交充值申请？提交后需等待管理员审核到账。');">
+            <input type="number" name="amount" step="0.01" min="0.01" placeholder="充值金额" required>
+            <button type="submit">申请充值</button>
+        </form>
+        <div class="tip">说明：提交充值申请后，由管理员审核，审核通过后金额到账。</div>
+    </div>
+
+    <h3 style="color:#5c3a1f;">交易明细</h3>
+    <div th:if="${transactions != null && !transactions.isEmpty()}">
+        <table>
+            <tr>
+                <th>时间</th><th>类型</th><th>金额</th><th>变动后余额</th><th>状态</th><th>备注</th>
+            </tr>
+            <tr th:each="t : ${transactions}">
+                <td th:text="${#temporals.format(t.createTime,'yyyy-MM-dd HH:mm')}"></td>
+                <td><span class="tag" th:classappend="'t-' + ${t.txType}" th:text="${t.txTypeText}"></span></td>
+                <td>
+                    <span th:if="${t.txType == 'PAY_OUT'}" style="color:#842029;">-¥</span>
+                    <span th:if="${t.txType != 'PAY_OUT'}" style="color:#0f5132;">+¥</span>
+                    <span th:text="${#numbers.formatDecimal(t.amount,1,2)}"></span>
+                </td>
+                <td th:text="${t.balanceAfter != null ? #numbers.formatDecimal(t.balanceAfter,1,2) : '-'}"></td>
+                <td>
+                    <span class="pend" th:if="${t.statusText == '待审核'}">待审核</span>
+                    <span class="ok" th:if="${t.statusText == '已到账' || t.statusText == '已完成'}">已完成</span>
+                    <span class="no" th:if="${t.statusText == '已驳回'}">已驳回</span>
+                </td>
+                <td th:text="${t.remark}"></td>
+            </tr>
+        </table>
+    </div>
+    <p th:if="${transactions == null || transactions.isEmpty()}">暂无交易记录。</p>
+</div>
+</body>
+</html>
