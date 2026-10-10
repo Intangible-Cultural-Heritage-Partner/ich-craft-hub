@@ -23,6 +23,8 @@ public interface WalletService {
     /** 待审核充值列表 */
     List<WalletTransaction> pendingRecharges();
 
+    List<WalletTransaction> auditedRecharges();
+
     /**
      * 钱包支付（同一事务）：
      * 校验余额 → 原子扣减买家 → 加款匠人 → 写双边流水 → 支付流水置已付并推进订单状态。

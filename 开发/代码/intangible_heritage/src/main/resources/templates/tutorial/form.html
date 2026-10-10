@@ -21,14 +21,29 @@
         .panel textarea { min-height: 120px; resize: vertical; }
         .panel select { cursor: pointer; }
         .panel button, .panel a {
-            display: inline-block; margin-top: 24px; padding: 12px 28px;
+            display: inline-block !important; margin-top: 24px; padding: 12px 28px !important;
             border: 0; border-radius: 8px; text-decoration: none;
-            font-size: 15px; cursor: pointer; transition: all 0.2s;
+            font-size: 15px !important; cursor: pointer; transition: none;
         }
-        .panel button { color: #fff; background: linear-gradient(135deg, #784b2a, #a0673f); box-shadow: 0 4px 12px rgba(120,75,42,0.25); font-weight: 600; }
-        .panel button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.35); }
-        .panel a { color: #784b2a; border: 1px solid rgba(200,170,120,0.3); background: rgba(255,255,255,0.6); }
-        .panel a:hover { background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff; }
+        .panel button {
+            color: #fff !important; background: linear-gradient(135deg, #784b2a, #a0673f) !important;
+            box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important; font-weight: 600; transform: none;
+        }
+        .panel button:hover {
+            transform: none !important; display: inline-block !important; padding: 12px 28px !important;
+            color: #fff !important; font-size: 15px !important;
+            background: linear-gradient(135deg, #784b2a, #a0673f) !important;
+            box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important;
+        }
+        .panel a {
+            color: #784b2a !important; border: 1px solid rgba(200,170,120,0.3);
+            background: rgba(255,255,255,0.6) !important;
+        }
+        .panel a:hover {
+            transform: none !important; display: inline-block !important; padding: 12px 28px !important;
+            color: #784b2a !important; font-size: 15px !important;
+            background: rgba(255,255,255,0.6) !important;
+        }
         .message { color: #842029; background: rgba(180,35,24,0.08); padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; }
         .hint { color: #7a6e60; font-size: 13px; margin-top: 6px; }
         .tag-input-wrap { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }

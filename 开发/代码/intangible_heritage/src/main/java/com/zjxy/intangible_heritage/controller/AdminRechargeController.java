@@ -36,8 +36,20 @@ public class AdminRechargeController {
             userNames.computeIfAbsent(t.getUserId(),
                     id -> userRepository.findById(id).map(User::getUsername).orElse("未知用户"));
         }
+        List<WalletTransaction> histories = walletService.auditedRecharges();
+        Map<Long, String> historyNames = new HashMap<>();
+        Map<Long, String> auditorNames = new HashMap<>();
+        for (WalletTransaction t : histories) {
+            historyNames.computeIfAbsent(t.getUserId(),
+                    id -> userRepository.findById(id).map(User::getUsername).orElse("未知用户"));
+            auditorNames.computeIfAbsent(t.getAuditorId(),
+                    id -> userRepository.findById(id).map(User::getUsername).orElse("管理员"));
+        }
         model.addAttribute("pendings", pendings);
         model.addAttribute("userNames", userNames);
+        model.addAttribute("histories", histories);
+        model.addAttribute("historyNames", historyNames);
+        model.addAttribute("auditorNames", auditorNames);
         return "admin/recharge/list";
     }
 

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,12 +34,12 @@ public class HeritageWorkController {
         model.addAttribute("categoryOptions", heritageWorkService.findCategories(null));
         model.addAttribute("selectedCategory", category == null ? "" : category.trim());
         model.addAttribute("mine", false);
-        model.addAttribute("msg", msg);
+        if (msg != null) model.addAttribute("msg", msg);
         return "work/list";
     }
 
     @GetMapping("/work/{id}")
-    public String detail(@PathVariable Long id, Model model, HttpSession session) {
+    public String detail(@PathVariable Long id, Model model, HttpSession session, RedirectAttributes ra) {
         return heritageWorkService.findById(id)
                 .map(work -> {
                     User loginUser = (User) session.getAttribute("loginUser");
@@ -46,7 +47,8 @@ public class HeritageWorkController {
                             && work.getCraftsman().getId().equals(loginUser.getId());
                     boolean isAdmin = loginUser != null && "2".equals(loginUser.getRole());
                     if (work.getAuditStatus() != null && work.getAuditStatus() != 1 && !isOwner && !isAdmin) {
-                        return "redirect:/work/list?msg=展品暂未审核通过";
+                        ra.addFlashAttribute("msg", "展品暂未审核通过");
+                        return "redirect:/work/list";
                     }
                     List<String> galleryImages = new ArrayList<>();
                     addImageIfPresent(galleryImages, work.getCoverImg());
@@ -64,7 +66,10 @@ public class HeritageWorkController {
                     }
                     return "work/detail";
                 })
-                .orElseGet(() -> "redirect:/work/list?msg=展品不存在");
+                .orElseGet(() -> {
+                    ra.addFlashAttribute("msg", "展品不存在");
+                    return "redirect:/work/list";
+                });
     }
 
     private void addImageIfPresent(List<String> images, String image) {
@@ -86,9 +91,10 @@ public class HeritageWorkController {
         model.addAttribute("categoryOptions", options);
     }
     @GetMapping("/work/create")
-    public String createPage(HttpSession session, Model model) {
+    public String createPage(HttpSession session, Model model, RedirectAttributes ra) {
         if (currentCraftsman(session) == null) {
-            return "redirect:/work/list?msg=请先以匠人身份登录";
+            ra.addFlashAttribute("msg", "请先以匠人身份登录");
+            return "redirect:/work/list";
         }
         model.addAttribute("work", new HeritageWork());
         model.addAttribute("formAction", "/work/create");
@@ -107,10 +113,11 @@ public class HeritageWorkController {
                          @RequestParam(required = false) MultipartFile[] imageFiles,
                          @RequestParam(required = false) String imageUrls,
                          HttpSession session,
-                         Model model) {
+                         Model model, RedirectAttributes ra) {
         User user = currentCraftsman(session);
         if (user == null) {
-            return "redirect:/work/list?msg=请先以匠人身份登录";
+            ra.addFlashAttribute("msg", "请先以匠人身份登录");
+            return "redirect:/work/list";
         }
         try {
             HeritageWork work = heritageWorkService.create(user, title, description, skillBackground,
@@ -132,14 +139,16 @@ public class HeritageWorkController {
     }
 
     @GetMapping("/work/{id}/edit")
-    public String editPage(@PathVariable Long id, HttpSession session, Model model) {
+    public String editPage(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes ra) {
         User user = currentCraftsman(session);
         HeritageWork work = heritageWorkService.findById(id).orElse(null);
         if (user == null) {
-            return "redirect:/work/list?msg=请先以匠人身份登录";
+            ra.addFlashAttribute("msg", "请先以匠人身份登录");
+            return "redirect:/work/list";
         }
         if (work == null || work.getCraftsman() == null || !user.getId().equals(work.getCraftsman().getId())) {
-            return "redirect:/work/list?msg=无权编辑该展品";
+            ra.addFlashAttribute("msg", "无权编辑该展品");
+            return "redirect:/work/list";
         }
         model.addAttribute("work", work);
         includeCurrentCategory(model, work);
@@ -161,10 +170,11 @@ public class HeritageWorkController {
                        @RequestParam(required = false) MultipartFile[] imageFiles,
                        @RequestParam(required = false) String imageUrls,
                        HttpSession session,
-                       Model model) {
+                       Model model, RedirectAttributes ra) {
         User user = currentCraftsman(session);
         if (user == null) {
-            return "redirect:/work/list?msg=请先以匠人身份登录";
+            ra.addFlashAttribute("msg", "请先以匠人身份登录");
+            return "redirect:/work/list";
         }
         try {
             heritageWorkService.update(id, user, title, description, skillBackground,
@@ -173,7 +183,8 @@ public class HeritageWorkController {
         } catch (RuntimeException exception) {
             HeritageWork formWork = heritageWorkService.findById(id).orElse(new HeritageWork());
             if (formWork.getCraftsman() == null || !user.getId().equals(formWork.getCraftsman().getId())) {
-                return "redirect:/work/list?msg=无权编辑该展品";
+                ra.addFlashAttribute("msg", "无权编辑该展品");
+                return "redirect:/work/list";
             }
             formWork.setTitle(title);
             formWork.setDescription(description);
@@ -194,10 +205,11 @@ public class HeritageWorkController {
     }
 
     @GetMapping("/work/mine")
-    public String mine(HttpSession session, Model model, @RequestParam(required = false) String category) {
+    public String mine(HttpSession session, Model model, @RequestParam(required = false) String category, RedirectAttributes ra) {
         User user = currentCraftsman(session);
         if (user == null) {
-            return "redirect:/work/list?msg=请先以匠人身份登录";
+            ra.addFlashAttribute("msg", "请先以匠人身份登录");
+            return "redirect:/work/list";
         }
         model.addAttribute("works", heritageWorkService.findByCraftsman(user.getId(), category));
         model.addAttribute("categoryOptions", heritageWorkService.findCategories(user.getId()));

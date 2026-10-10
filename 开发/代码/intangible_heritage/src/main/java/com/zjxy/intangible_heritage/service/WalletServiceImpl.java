@@ -90,6 +90,13 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<WalletTransaction> auditedRecharges() {
+        return walletTransactionRepository
+                .findByTxTypeAndStatusInOrderByAuditTimeDescIdDesc("RECHARGE", List.of(1, 2));
+    }
+
+    @Override
     @Transactional
     public void payByWallet(String outTradeNo, Long payerId) {
         // 1. 校验支付流水与付款人

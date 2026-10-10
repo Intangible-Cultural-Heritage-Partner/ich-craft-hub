@@ -4,55 +4,102 @@
     <meta charset="UTF-8">
     <title>充值审核</title>
     <style>
-        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
-        .wrap{padding:30px 50px;}
-        h2{color:#784b2a;}
-        .msg{color:#2e7d32;margin-bottom:10px;}
-        table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 4px #ccc;}
-        th,td{border:1px solid #e0d8c8;padding:10px;text-align:left;}
-        th{background:#784b2a;color:#fff;}
-        tr:hover{background:#faf6ee;}
+        body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#eaf2fa;}
+        .wrap{max-width:1100px;margin:0 auto;padding:28px 24px 60px;}
+        .page-head{background:linear-gradient(135deg,#6d4325,#9c6b3f);color:#fff;border-radius:14px;padding:22px 30px;margin-bottom:24px;box-shadow:0 4px 14px rgba(109,67,37,0.28);}
+        .page-head h2{color:#fff;margin:0 0 6px;font-size:22px;letter-spacing:1px;}
+        .page-head p{margin:0;font-size:13px;color:#f6ead9;}
+        .msg{color:#2e7d32;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:8px;padding:8px 14px;display:inline-block;margin-bottom:16px;font-size:14px;}
+        .panel{background:#fff;border-radius:12px;padding:20px 22px 24px;box-shadow:0 2px 10px rgba(96,125,139,0.12);margin-bottom:26px;}
+        .panel h3{margin:0 0 16px;color:#5c3317;font-size:17px;padding-left:10px;border-left:4px solid #9c6b3f;line-height:1.3;}
+        .table-wrap{overflow-x:auto;border-radius:10px;box-shadow:0 1px 6px rgba(120,75,42,0.15);}
+        table{border-collapse:separate;border-spacing:0;width:100%;background:#fff !important;}
+        .panel table th{background:linear-gradient(135deg,#784b2a,#9c6b3f) !important;color:#fff !important;padding:12px 14px !important;font-size:14px !important;text-align:left !important;white-space:nowrap;border:none !important;}
+        .panel table td{padding:12px 14px;border-bottom:1px solid #eef3f8;color:#3d4a57;font-size:14px;vertical-align:middle;}
+        .panel table tr:last-child td{border-bottom:none;}
+        .panel tbody tr:hover td{background:#f5faff;}
+        .amount{color:#c0392b;font-weight:bold;white-space:nowrap;}
         form{display:inline-block;margin-right:8px;}
-        input[type=text]{width:200px;padding:5px;border:1px solid #ccc;border-radius:4px;}
-        button{padding:5px 14px;border:none;border-radius:4px;cursor:pointer;}
-        .pass{background:#0f5132;color:#fff;}
-        .reject{background:#842029;color:#fff;}
-        .empty{color:#999;margin-top:14px;}
+        input[type=text]{width:190px;padding:7px 10px;border:1px solid #d4e2f0;border-radius:6px;font-size:13px;outline:none;}
+        input[type=text]:focus{border-color:#9c6b3f;}
+        button{cursor:pointer !important;border:none !important;border-radius:6px !important;font-size:13px !important;padding:7px 16px !important;color:#fff !important;display:inline-block !important;transition:none !important;transform:none !important;box-shadow:none !important;}
+        button:hover{cursor:pointer !important;border:none !important;border-radius:6px !important;font-size:13px !important;padding:7px 16px !important;color:#fff !important;display:inline-block !important;transition:none !important;transform:none !important;box-shadow:none !important;}
+        .pass{background:#2e7d32 !important;}
+        .pass:hover{background:#2e7d32 !important;}
+        .reject{background:#c0392b !important;}
+        .reject:hover{background:#c0392b !important;}
+        .empty{color:#8a97a5;text-align:center;padding:26px 0 10px;font-size:14px;margin:0;}
+        .st-pass{color:#1b7a3d;font-weight:bold;}
+        .st-reject{color:#c0392b;font-weight:bold;}
+        .muted{color:#a5b1bd;}
     </style>
 </head>
 <body>
 <div th:replace="~{fragments/nav :: navbar}"></div>
 
 <div class="wrap">
-    <h2>用户充值审核</h2>
-    <p class="msg" th:text="${msg}"></p>
-
-    <div th:if="${pendings != null && !pendings.isEmpty()}">
-        <table>
-            <tr>
-                <th>申请ID</th><th>用户</th><th>充值金额</th><th>申请时间</th><th>操作</th>
-            </tr>
-            <tr th:each="t : ${pendings}">
-                <td th:text="${t.id}"></td>
-                <td th:text="${userNames.get(t.userId)}"></td>
-                <td style="color:#c0392b;font-weight:bold;">¥ <span th:text="${#numbers.formatDecimal(t.amount,1,2)}"></span></td>
-                <td th:text="${#temporals.format(t.createTime,'yyyy-MM-dd HH:mm')}"></td>
-                <td>
-                    <form th:action="@{'/admin/recharge/audit/' + ${t.id}}" method="post"
-                          onsubmit="return confirm('确认通过该笔充值申请？');">
-                        <input type="hidden" name="approved" value="1">
-                        <button class="pass" type="submit">审核通过</button>
-                    </form>
-                    <form th:action="@{'/admin/recharge/audit/' + ${t.id}}" method="post">
-                        <input type="hidden" name="approved" value="0">
-                        <input type="text" name="rejectReason" placeholder="驳回理由（选填）">
-                        <button class="reject" type="submit">驳回</button>
-                    </form>
-                </td>
-            </tr>
-        </table>
+    <div class="page-head">
+        <h2>用户充值审核</h2>
+        <p>审核用户提交的充值申请，通过后金额将自动计入用户钱包余额</p>
     </div>
-    <p class="empty" th:if="${pendings == null || pendings.isEmpty()}">暂无待审核的充值申请。</p>
+    <p class="msg" th:if="${msg != null and !msg.isEmpty()}" th:text="${msg}"></p>
+
+    <div class="panel" th:if="${pendings != null && !pendings.isEmpty()}">
+        <h3>待审核申请</h3>
+        <div class="table-wrap">
+            <table>
+                <tr>
+                    <th>申请ID</th><th>用户</th><th>充值金额</th><th>申请时间</th><th>操作</th>
+                </tr>
+                <tr th:each="t : ${pendings}">
+                    <td th:text="${t.id}"></td>
+                    <td th:text="${userNames.get(t.userId)}"></td>
+                    <td class="amount">¥ <span th:text="${#numbers.formatDecimal(t.amount,1,2)}"></span></td>
+                    <td th:text="${#temporals.format(t.createTime,'yyyy-MM-dd HH:mm')}"></td>
+                    <td>
+                        <form th:action="@{'/admin/recharge/audit/' + ${t.id}}" method="post"
+                              onsubmit="return confirm('确认通过该笔充值申请？');">
+                            <input type="hidden" name="approved" value="1">
+                            <button class="pass" type="submit">审核通过</button>
+                        </form>
+                        <form th:action="@{'/admin/recharge/audit/' + ${t.id}}" method="post">
+                            <input type="hidden" name="approved" value="0">
+                            <input type="text" name="rejectReason" placeholder="驳回理由（选填）">
+                            <button class="reject" type="submit">驳回</button>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="panel" th:if="${pendings == null || pendings.isEmpty()}">
+        <p class="empty">暂无待审核的充值申请</p>
+    </div>
+
+    <div class="panel">
+        <h3>历史审核记录</h3>
+        <div class="table-wrap" th:if="${histories != null && !histories.isEmpty()}">
+            <table>
+                <tr>
+                    <th>申请ID</th><th>用户</th><th>充值金额</th><th>申请时间</th><th>审核结果</th><th>驳回理由</th><th>审核人</th><th>审核时间</th>
+                </tr>
+                <tr th:each="t : ${histories}">
+                    <td th:text="${t.id}"></td>
+                    <td th:text="${historyNames.get(t.userId)}"></td>
+                    <td class="amount">¥ <span th:text="${#numbers.formatDecimal(t.amount,1,2)}"></span></td>
+                    <td th:text="${#temporals.format(t.createTime,'yyyy-MM-dd HH:mm')}"></td>
+                    <td>
+                        <span th:if="${t.status == 1}" class="st-pass">已通过</span>
+                        <span th:if="${t.status == 2}" class="st-reject">已驳回</span>
+                    </td>
+                    <td><span th:if="${t.status == 2}" th:text="${t.remark}" th:class="${t.remark == null or t.remark == ''} ? 'muted'">—</span><span th:if="${t.status == 1}" class="muted">—</span></td>
+                    <td th:text="${auditorNames.get(t.auditorId)}"></td>
+                    <td th:text="${t.auditTime != null} ? ${#temporals.format(t.auditTime,'yyyy-MM-dd HH:mm')} : '—'"></td>
+                </tr>
+            </table>
+        </div>
+        <p class="empty" th:if="${histories == null || histories.isEmpty()}">暂无已审核的充值记录</p>
+    </div>
 </div>
 </body>
 </html>

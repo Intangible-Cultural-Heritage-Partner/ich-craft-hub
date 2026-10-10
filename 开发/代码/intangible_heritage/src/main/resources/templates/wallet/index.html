@@ -5,20 +5,26 @@
     <title>我的钱包</title>
     <style>
         body{margin:0;font-family:"Microsoft Yahei",sans-serif;background:#f8f5f0;}
-        .wrap{padding:30px 50px;max-width:900px;}
-        h2{color:#784b2a;}
-        .msg{color:#2e7d32;margin-bottom:10px;}
-        .card{background:#fff;border-radius:10px;box-shadow:0 1px 4px #ccc;padding:22px 26px;margin-bottom:18px;}
-        .balance{font-size:38px;color:#c0392b;font-weight:bold;margin:8px 0;}
-        .balance small{font-size:15px;color:#999;font-weight:normal;}
-        .recharge-row{display:flex;gap:10px;align-items:center;}
-        .recharge-row input{padding:8px 10px;border:1px solid #ccc;border-radius:4px;width:180px;}
-        button{padding:8px 22px;background:#0f7b4d;color:#fff;border:none;border-radius:4px;cursor:pointer;}
-        button:hover{background:#0b5c3a;}
-        table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 4px #ccc;}
-        th,td{border:1px solid #e0d8c8;padding:10px;text-align:left;font-size:14px;}
-        th{background:#784b2a;color:#fff;}
-        tr:hover{background:#faf6ee;}
+        .wrap{padding:30px 20px;max-width:860px;margin:0 auto;}
+        h2{color:#784b2a;text-align:center;letter-spacing:2px;margin:6px 0 22px;}
+        .msg{color:#2e7d32;margin-bottom:10px;text-align:center;}
+        .card{background:linear-gradient(135deg,#784b2a,#9c6b3f);border-radius:14px;box-shadow:0 6px 22px rgba(120,75,42,0.28);padding:28px 30px;margin-bottom:22px;color:#fff;}
+        .card .label{color:rgba(255,255,255,0.85);font-size:14px;letter-spacing:1px;}
+        .balance{font-size:46px;font-weight:bold;margin:10px 0 18px;text-align:center;}
+        .balance .cur{font-size:24px;color:#fff;font-weight:normal;vertical-align:8px;margin-right:6px;}
+        .balance .num{color:#ffeb3b;text-shadow:0 0 1px #000,0 2px 4px rgba(0,0,0,0.55),0 0 18px rgba(255,235,59,0.45);letter-spacing:1px;}
+        .balance small{font-size:13px;color:rgba(255,255,255,0.75);font-weight:normal;display:block;margin-top:6px;}
+        .recharge-row{display:flex;gap:10px;align-items:center;justify-content:center;}
+        .recharge-row input{padding:9px 12px;border:1px solid rgba(255,255,255,0.5);border-radius:8px;width:200px;font-size:14px;background:rgba(255,255,255,0.92);color:#5c3317;}
+        .recharge-row input:focus{outline:none;border-color:#ffe9c8;box-shadow:0 0 0 3px rgba(255,233,200,0.35);}
+        button{padding:9px 26px !important;background:linear-gradient(135deg,#0f7b4d,#17925e) !important;color:#fff !important;border:none !important;border-radius:8px !important;cursor:pointer;font-size:14px !important;box-shadow:0 2px 8px rgba(15,123,77,0.3) !important;display:inline-block !important;transform:none !important;transition:none !important;}
+        button:hover{background:linear-gradient(135deg,#0f7b4d,#17925e) !important;color:#fff !important;padding:9px 26px !important;border-radius:8px !important;transform:none !important;box-shadow:0 2px 8px rgba(15,123,77,0.3) !important;display:inline-block !important;}
+        h3.sub{color:#5c3a1f;text-align:center;font-size:17px;letter-spacing:1px;}
+        .table-wrap{border-radius:12px;overflow:hidden;box-shadow:0 4px 18px rgba(120,75,42,0.12);}
+        table{border-collapse:collapse;width:100%;background:#fff;}
+        th,td{border-bottom:1px solid #eee2d0;padding:11px 14px;text-align:left;font-size:14px;}
+        th{background:linear-gradient(135deg,#784b2a,#8b5e3c);color:#fff;letter-spacing:0.5px;}
+        tr:hover td{background:#faf6ee;}
         .tag{padding:2px 9px;border-radius:9px;font-size:12px;}
         .t-RECHARGE{background:#fff3cd;color:#8a6d3b;}
         .t-PAY_OUT{background:#f8d7da;color:#842029;}
@@ -26,7 +32,8 @@
         .pend{color:#8a6d3b;font-weight:bold;}
         .ok{color:#0f5132;}
         .no{color:#842029;}
-        .tip{color:#999;font-size:13px;margin-top:6px;}
+        .tip{color:rgba(255,255,255,0.7);font-size:12px;margin-top:14px;text-align:center;}
+        .empty{color:#999;text-align:center;padding:30px 0;}
     </style>
 </head>
 <body>
@@ -37,8 +44,8 @@
     <p class="msg" th:text="${msg}"></p>
 
     <div class="card">
-        <div>账户余额（元）</div>
-        <div class="balance">¥ <span th:text="${#numbers.formatDecimal(account.balance,1,2)}"></span>
+        <div class="label">账户余额（元）</div>
+        <div class="balance"><span class="cur">¥</span><span class="num" th:text="${#numbers.formatDecimal(account.balance,1,2)}"></span>
             <small>可用余额，定制支付时直接划转给匠人</small>
         </div>
         <form class="recharge-row" th:action="@{/wallet/recharge}" method="post"
@@ -49,8 +56,9 @@
         <div class="tip">说明：提交充值申请后，由管理员审核，审核通过后金额到账。</div>
     </div>
 
-    <h3 style="color:#5c3a1f;">交易明细</h3>
+    <h3 class="sub">交易明细</h3>
     <div th:if="${transactions != null && !transactions.isEmpty()}">
+        <div class="table-wrap">
         <table>
             <tr>
                 <th>时间</th><th>类型</th><th>金额</th><th>变动后余额</th><th>状态</th><th>备注</th>
@@ -72,8 +80,9 @@
                 <td th:text="${t.remark}"></td>
             </tr>
         </table>
+        </div>
     </div>
-    <p th:if="${transactions == null || transactions.isEmpty()}">暂无交易记录。</p>
+    <p class="empty" th:if="${transactions == null || transactions.isEmpty()}">暂无交易记录。</p>
 </div>
 </body>
 </html>

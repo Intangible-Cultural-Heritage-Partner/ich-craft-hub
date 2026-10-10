@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,16 +38,18 @@ public class UserWorkController {
     }
 
     @GetMapping({"/{id}", "/detail/{id}"})
-    public String detail(@PathVariable Long id, HttpSession session, Model model) {
+    public String detail(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes ra) {
         UserWork work = userWorkService.findById(id).orElse(null);
         if (work == null) {
-            return "redirect:/userWork/share?msg=作品不存在";
+            ra.addFlashAttribute("msg", "作品不存在");
+            return "redirect:/userWork/share";
         }
         User loginUser = (User) session.getAttribute("loginUser");
         boolean isOwner = loginUser != null && loginUser.getId().equals(work.getUserId());
         boolean isAdmin = loginUser != null && "2".equals(loginUser.getRole());
         if (work.getAuditStatus() != null && work.getAuditStatus() != 1 && !isOwner && !isAdmin) {
-            return "redirect:/userWork/share?msg=作品暂未审核通过";
+            ra.addFlashAttribute("msg", "作品暂未审核通过");
+            return "redirect:/userWork/share";
         }
 
         model.addAttribute("work", work);

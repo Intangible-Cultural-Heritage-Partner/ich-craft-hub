@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,18 +43,19 @@ public class TutorialController {
         } else {
             model.addAttribute("tutorials", tutorialService.findAll());
         }
-        model.addAttribute("msg", msg);
+        if (msg != null) model.addAttribute("msg", msg);
         return "tutorial/list";
     }
 
     @GetMapping("/tutorial/{id}")
-    public String detail(@PathVariable Long id, Model model, HttpSession session) {
+    public String detail(@PathVariable Long id, Model model, HttpSession session, RedirectAttributes ra) {
         return tutorialService.findById(id).map(tutorial -> {
             User loginUser = (User) session.getAttribute("loginUser");
             boolean isOwner = loginUser != null && loginUser.getId().equals(tutorial.getCraftsmanId());
             boolean isAdmin = loginUser != null && "2".equals(loginUser.getRole());
             if (tutorial.getAuditStatus() != null && tutorial.getAuditStatus() != 1 && !isOwner && !isAdmin) {
-                return "redirect:/tutorial/list?msg=教程暂未审核通过";
+                ra.addFlashAttribute("msg", "教程暂未审核通过");
+                return "redirect:/tutorial/list";
             }
             model.addAttribute("tutorial", tutorial);
             if (loginUser != null) {
@@ -67,13 +69,17 @@ public class TutorialController {
                 model.addAttribute("tagList", Arrays.asList(tutorial.getTags().split("[,，\\s]+")));
             }
             return "tutorial/detail";
-        }).orElseGet(() -> "redirect:/tutorial/list?msg=教程不存在");
+        }).orElseGet(() -> {
+            ra.addFlashAttribute("msg", "教程不存在");
+            return "redirect:/tutorial/list";
+        });
     }
 
     @GetMapping("/tutorial/create")
-    public String createPage(HttpSession session, Model model) {
+    public String createPage(HttpSession session, Model model, RedirectAttributes ra) {
         if (currentCraftsman(session) == null) {
-            return "redirect:/tutorial/list?msg=请先以匠人身份登录";
+            ra.addFlashAttribute("msg", "请先以匠人身份登录");
+            return "redirect:/tutorial/list";
         }
         model.addAttribute("tutorial", new Tutorial());
         model.addAttribute("categories", CATEGORIES);
@@ -93,10 +99,11 @@ public class TutorialController {
                          @RequestParam(required = false) String coverUrl,
                          @RequestParam(required = false) MultipartFile videoFile,
                          @RequestParam(required = false) String videoUrl,
-                         HttpSession session, Model model) {
+                         HttpSession session, Model model, RedirectAttributes ra) {
         User user = currentCraftsman(session);
         if (user == null) {
-            return "redirect:/tutorial/list?msg=请先以匠人身份登录";
+            ra.addFlashAttribute("msg", "请先以匠人身份登录");
+            return "redirect:/tutorial/list";
         }
         try {
             Tutorial tutorial = tutorialService.create(user.getId(), title, description, category, tags,
@@ -119,12 +126,16 @@ public class TutorialController {
     }
 
     @GetMapping("/tutorial/{id}/edit")
-    public String editPage(@PathVariable Long id, HttpSession session, Model model) {
+    public String editPage(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes ra) {
         User user = currentCraftsman(session);
         Tutorial tutorial = tutorialService.findById(id).orElse(null);
-        if (user == null) return "redirect:/tutorial/list?msg=请先以匠人身份登录";
+        if (user == null) {
+            ra.addFlashAttribute("msg", "请先以匠人身份登录");
+            return "redirect:/tutorial/list";
+        }
         if (tutorial == null || !user.getId().equals(tutorial.getCraftsmanId())) {
-            return "redirect:/tutorial/list?msg=无权编辑该教程";
+            ra.addFlashAttribute("msg", "无权编辑该教程");
+            return "redirect:/tutorial/list";
         }
         model.addAttribute("tutorial", tutorial);
         model.addAttribute("categories", CATEGORIES);
@@ -145,9 +156,12 @@ public class TutorialController {
                        @RequestParam(required = false) String coverUrl,
                        @RequestParam(required = false) MultipartFile videoFile,
                        @RequestParam(required = false) String videoUrl,
-                       HttpSession session, Model model) {
+                       HttpSession session, Model model, RedirectAttributes ra) {
         User user = currentCraftsman(session);
-        if (user == null) return "redirect:/tutorial/list?msg=请先以匠人身份登录";
+        if (user == null) {
+            ra.addFlashAttribute("msg", "请先以匠人身份登录");
+            return "redirect:/tutorial/list";
+        }
         try {
             tutorialService.update(id, user.getId(), title, description, category, tags,
                     content, contentImageFiles, contentImages, coverFile, coverUrl, videoFile, videoUrl);
@@ -170,9 +184,12 @@ public class TutorialController {
 
     @GetMapping("/tutorial/mine")
     public String mine(@RequestParam(required = false) String category,
-                       HttpSession session, Model model) {
+                       HttpSession session, Model model, RedirectAttributes ra) {
         User user = currentCraftsman(session);
-        if (user == null) return "redirect:/tutorial/list?msg=请先以匠人身份登录";
+        if (user == null) {
+            ra.addFlashAttribute("msg", "请先以匠人身份登录");
+            return "redirect:/tutorial/list";
+        }
         if (category != null && !category.isBlank() && !"全部".equals(category)) {
             model.addAttribute("tutorials", tutorialService.findByCraftsmanAndCategory(user.getId(), category));
         } else {

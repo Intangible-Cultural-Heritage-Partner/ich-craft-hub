@@ -32,13 +32,15 @@
         .content { padding: 20px; flex: 1; display: flex; flex-direction: column; }
         .content h3 { margin: 0 0 8px; color: #5c3317; font-size: 17px; font-weight: 600; }
         .content small { color: #8a7a6a; font-size: 12px; display: block; margin-bottom: 8px; }
-        .content p { color: #6b5e50; font-size: 14px; line-height: 1.5; margin: 0 0 14px; flex: 1; }
+        .content p { color: #6b5e50; font-size: 14px; line-height: 1.5; margin: 0 0 14px; flex: 1;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .content .actions { display: flex; gap: 14px; align-items: center; }
         .content .actions a, .content .actions .edit-link { color: #784b2a; text-decoration: none; font-size: 14px; font-weight: 500; transition: all 0.2s; }
         .content .actions a:hover, .content .actions .edit-link:hover { color: #a0673f; }
         .content .actions .edit-link { cursor: pointer; }
         .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-bottom: 8px; align-self: flex-start; font-weight: 500; }
-        .content .reject-reason { color: #842029; background: rgba(180,35,24,0.08); padding: 8px 10px; border-radius: 8px; font-size: 13px; margin: 0 0 10px; }
+        .content .reject-reason { color: #842029; background: rgba(180,35,24,0.08); padding: 8px 10px; border-radius: 8px; font-size: 13px; margin: 0 0 10px;
+            display: block; -webkit-line-clamp: unset; overflow: visible; }
         .status-0 { background: rgba(180,83,9,0.12); color: #8a6d3b; }
         .status-1 { background: rgba(45,122,79,0.12); color: #0f5132; }
         .status-2 { background: rgba(180,35,24,0.12); color: #842029; }

@@ -12,22 +12,21 @@
         table { border-collapse: separate; border-spacing: 0; width: 100%; border-radius: 14px; overflow: hidden;
             background: rgba(240,248,255,0.92) !important; backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%);
             box-shadow: 0 4px 20px rgba(26,92,176,0.08) !important; border: 1px solid rgba(100,149,237,0.2) !important; color: #1a3a5c !important; }
-        th { background: linear-gradient(135deg, #784b2a, #8b5e3c) !important; color: #fff !important; padding: 14px 16px; text-align: left; font-weight: 600; letter-spacing: 0.5px; font-size: 14px; }
-        td { padding: 12px 16px; border-bottom: 1px solid rgba(100,149,237,0.1); font-size: 14px; vertical-align: middle; color: #1a3a5c !important; }
+        th { background: linear-gradient(135deg, #784b2a, #8b5e3c) !important; color: #fff !important; padding: 14px 16px; text-align: left; font-weight: 600; letter-spacing: 0.5px; font-size: 14px; white-space: nowrap; }
+        td { padding: 12px 16px; border-bottom: 1px solid rgba(100,149,237,0.1); font-size: 14px; vertical-align: middle; color: #1a3a5c !important; line-height: 1.6; }
         tr:hover td { background: rgba(42,122,226,0.04) !important; }
-        .badge { padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 500; display: inline-block; }
-        .s0 { background: rgba(180,83,9,0.12); color: #8a6d3b; }
-        .s1 { background: rgba(180,35,24,0.12); color: #842029; }
-        .s2 { background: rgba(45,122,79,0.12); color: #0f5132; }
-        .s3 { background: rgba(42,122,226,0.12); color: #1a5cb0; }
+        .badge { font-size: 13px; font-weight: 600; display: inline-block; white-space: nowrap; }
+        .table-wrap { overflow-x: auto; }
+        .s0 { color: #8a6d3b; }
+        .s1 { color: #842029; }
+        .s2 { color: #0f5132; }
+        .s3 { color: #1a5cb0; }
         form { display: inline-block; margin-right: 6px; vertical-align: middle; }
-        input[type=text] { width: 160px; padding: 8px 12px; border: 1px solid rgba(100,149,237,0.3); border-radius: 8px; font-size: 13px; background: rgba(255,255,255,0.8); color: #1a3a5c; transition: all 0.25s; }
-        input:focus { border-color: #2a7ae2; box-shadow: 0 0 0 3px rgba(42,122,226,0.15); outline: none; }
         .accept { background: linear-gradient(135deg, #2d7a4f, #3da866) !important; color: #fff !important; padding: 8px 16px !important; border: none !important; border-radius: 8px !important; cursor: pointer; font-size: 13px; transition: none; box-shadow: 0 2px 8px rgba(45,122,79,0.25) !important; display: inline-block !important; }
         .accept:hover { transform: none !important; padding: 8px 16px !important; color: #fff !important; background: linear-gradient(135deg, #2d7a4f, #3da866) !important; border: none !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(45,122,79,0.25) !important; display: inline-block !important; }
         .reject { background: linear-gradient(135deg, #b42318, #dc3545) !important; color: #fff !important; padding: 8px 16px !important; border: none !important; border-radius: 8px !important; cursor: pointer; font-size: 13px; transition: none; box-shadow: 0 2px 8px rgba(180,35,24,0.25) !important; display: inline-block !important; }
         .reject:hover { transform: none !important; padding: 8px 16px !important; color: #fff !important; background: linear-gradient(135deg, #b42318, #dc3545) !important; border: none !important; border-radius: 8px !important; box-shadow: 0 2px 8px rgba(180,35,24,0.25) !important; display: inline-block !important; }
-        a.btn { color: #1a5cb0; text-decoration: none; font-weight: 500; transition: all 0.2s; }
+        a.btn { color: #1a5cb0; text-decoration: none; font-weight: 500; transition: color 0.2s; white-space: nowrap; background: transparent !important; padding: 0 !important; border: none !important; box-shadow: none !important; display: inline !important; }
         a.btn:hover { color: #2a7ae2; }
         .empty { color: #5a7a9a; text-align: center; padding: 48px; font-size: 15px; }
     </style>
@@ -48,7 +47,7 @@
     <h2>发给我的定制申请</h2>
     <p class="msg" th:text="${msg}"></p>
 
-    <div th:if="${orders != null && !orders.isEmpty()}">
+    <div class="table-wrap" th:if="${orders != null && !orders.isEmpty()}">
         <table style="background: rgba(240,248,255,0.92) !important; border: 1px solid rgba(100,149,237,0.2) !important; color: #1a3a5c !important; box-shadow: 0 4px 20px rgba(26,92,176,0.08) !important;">
             <tr>
                 <th>ID</th>
@@ -75,21 +74,30 @@
                 </td>
                 <td th:text="${o.createTime}"></td>
                 <td>
-                    <!-- 新建态：可接受 / 拒绝 -->
                     <form th:if="${o.orderStatus == 0}" th:action="@{'/custom/accept/' + ${o.id}}" method="post">
                         <button class="accept" type="submit">接受</button>
                     </form>
-                    <form th:if="${o.orderStatus == 0}" th:action="@{'/custom/reject/' + ${o.id}}" method="post">
-                        <input type="text" name="refuseReason" placeholder="拒绝理由"/>
+                    <form th:if="${o.orderStatus == 0}" th:action="@{'/custom/reject/' + ${o.id}}" method="post"
+                          onsubmit="return askRejectReason(this);">
+                        <input type="hidden" name="refuseReason" value="">
                         <button class="reject" type="submit">拒绝</button>
                     </form>
-                    <!-- 其它态：进聊天页 -->
-                    <a th:href="@{'/custom/chat/' + ${o.id}}" class="btn">沟通/查看</a>
+                    <a th:if="${o.orderStatus != 0}" th:href="@{'/custom/chat/' + ${o.id}}" class="btn">沟通/查看</a>
                 </td>
             </tr>
         </table>
     </div>
     <p class="empty" th:if="${orders == null || orders.isEmpty()}">暂无收到的定制申请</p>
 </div>
+
+<script>
+    function askRejectReason(form) {
+        const reason = prompt('请填写拒绝理由：');
+        if (reason === null) return false;
+        if (reason.trim() === '') { alert('拒绝理由不能为空'); return false; }
+        form.querySelector('input[name=refuseReason]').value = reason.trim();
+        return true;
+    }
+</script>
 </body>
 </html>

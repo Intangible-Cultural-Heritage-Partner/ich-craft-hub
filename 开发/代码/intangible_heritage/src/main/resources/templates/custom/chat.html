@@ -90,7 +90,7 @@
 <div class="wrap">
     <div class="head">
         <h3>定制沟通 · 单号 #<span th:text="${order.id}"></span></h3>
-        <div class="row">对方：<span th:text="${other?.nickname}"></span></div>
+        <div class="row">对方：<span th:text="${other?.username}"></span></div>
         <div class="row">作品描述：<span th:text="${order.workDesc}"></span></div>
         <div class="row">状态：
             <span class="badge"
@@ -100,6 +100,16 @@
     </div>
 
     <p class="notice" th:text="${msg}"></p>
+
+    <!-- 待匠人接单提示（status=0 还未同意） -->
+    <div class="quote-card" th:if="${order.orderStatus == 0}">
+        <h4>⏳ 等待匠人确认接单</h4>
+        <div class="row" th:if="${!isCraftsman}">您的定制申请已提交，正在等待匠人确认接单；匠人接受后，双方即可开始在线沟通定制细节与报价。</div>
+        <div class="row" th:if="${isCraftsman}">申请人已提交定制需求，请前往「我的定制订单」接受或拒绝该申请；接受后即可在线沟通与报价。</div>
+        <div class="action-row" th:if="${isCraftsman}">
+            <a class="pay-btn" th:href="@{/custom/myCraft}" style="display:inline-block;text-decoration:none;">前往接单 →</a>
+        </div>
+    </div>
 
     <!-- ===== 交易业务卡片，来自页2完整状态逻辑 ===== -->
     <!-- 匠人报价入口（沟通中 status=2） -->
@@ -170,7 +180,7 @@
     <div class="chat-box" id="chatBox">
         <div th:each="m : ${messages}"
              th:classappend="${m.senderId == loginUserId ? 'msg mine' : 'msg others'}">
-            <div class="sender" th:text="${m.senderId == loginUserId ? '我' : (other?.nickname != null ? other.nickname : '对方')}"></div>
+            <div class="sender" th:text="${m.senderId == loginUserId ? '我' : (other?.username != null ? other.username : '对方')}"></div>
             <div th:text="${m.content}"></div>
             <div class="time" th:text="${m.sendTime}"></div>
         </div>
@@ -205,7 +215,7 @@
 <script th:inline="javascript">
     const orderId = /*[[${order.id}]]*/ 0;
     const loginUserId = /*[[${loginUserId}]]*/ 0;
-    const otherName = /*[[${other?.nickname}]]*/ '对方';
+    const otherName = /*[[${other?.username}]]*/ '对方';
 
     function renderMessages(list) {
         const box = document.getElementById('chatBox');

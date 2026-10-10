@@ -23,11 +23,18 @@
         input:focus, textarea:focus, select:focus { border-color: #a0673f; box-shadow: 0 0 0 3px rgba(120,75,42,0.1); outline: none; }
         .submit-row { margin-top: 28px; display: flex; align-items: center; gap: 16px; padding-left: 124px; }
         .submit-row button {
-            padding: 12px 32px; background: linear-gradient(135deg, #784b2a, #a0673f); color: #fff;
-            border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600;
-            box-shadow: 0 4px 12px rgba(120,75,42,0.25); transition: all 0.25s; letter-spacing: 1px;
+            display: inline-block !important; padding: 12px 32px !important;
+            background: linear-gradient(135deg, #784b2a, #a0673f) !important; color: #fff !important;
+            border: none !important; border-radius: 10px !important; cursor: pointer;
+            font-size: 15px !important; font-weight: 600; transform: none;
+            box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important; transition: none; letter-spacing: 1px;
         }
-        .submit-row button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(120,75,42,0.35); }
+        .submit-row button:hover {
+            transform: none !important; display: inline-block !important; padding: 12px 32px !important;
+            color: #fff !important; font-size: 15px !important; letter-spacing: 1px;
+            background: linear-gradient(135deg, #784b2a, #a0673f) !important;
+            box-shadow: 0 4px 12px rgba(120,75,42,0.25) !important;
+        }
         .submit-row a { color: #784b2a; text-decoration: none; font-size: 14px; transition: all 0.2s; }
         .submit-row a:hover { color: #a0673f; }
         .msg { color: #0f5132; margin-bottom: 14px; font-size: 14px; }
