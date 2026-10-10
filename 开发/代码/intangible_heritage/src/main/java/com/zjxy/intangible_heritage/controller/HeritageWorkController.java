@@ -138,6 +138,27 @@ public class HeritageWorkController {
         }
     }
 
+    @GetMapping("/work/delete/{id}")
+    public String delete(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
+        User user = (User) session.getAttribute("loginUser");
+        if (user == null) {
+            ra.addFlashAttribute("msg", "请先登录");
+            return "redirect:/login";
+        }
+        HeritageWork work = heritageWorkService.findById(id).orElse(null);
+        if (work == null) {
+            ra.addFlashAttribute("msg", "展品不存在");
+            return "redirect:/work/mine";
+        }
+        if (work.getCraftsman() == null || !user.getId().equals(work.getCraftsman().getId())) {
+            ra.addFlashAttribute("msg", "无权删除该展品");
+            return "redirect:/work/mine";
+        }
+        heritageWorkService.deleteById(id);
+        ra.addFlashAttribute("msg", "展品已删除");
+        return "redirect:/work/mine";
+    }
+
     @GetMapping("/work/{id}/edit")
     public String editPage(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes ra) {
         User user = currentCraftsman(session);

@@ -58,6 +58,11 @@ public class TutorialServiceImpl implements TutorialService {
     }
 
     @Override
+    public void deleteById(Long id) {
+        tutorialRepository.deleteById(id);
+    }
+
+    @Override
     public Tutorial create(Long craftsmanId, String title, String description, String category, String tags,
                            String content, MultipartFile[] contentImageFiles, String contentImages,
                            MultipartFile coverFile, String coverUrl,

@@ -50,6 +50,13 @@
         .status-1 { background: rgba(45,122,79,0.12); color: #0f5132; }
         .status-2 { background: rgba(180,35,24,0.12); color: #842029; }
         .reject-reason { color: #842029; background: rgba(180,35,24,0.08); padding: 6px 10px; border-radius: 8px; font-size: 12px; margin: 0 0 8px; }
+        .card-actions { display: flex; gap: 12px; align-items: center; margin-top: 10px; }
+        .card-actions .edit-link, .card-actions .delete-link { font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; }
+        .card-actions .edit-link { color: #784b2a; }
+        .card-actions .edit-link:hover { color: #a0673f; }
+        .card-actions .delete-link { color: #c0392b; }
+        .card-actions .delete-link:hover { color: #842029; }
+        .card-actions .sep { color: #d4c3b1; }
         .empty-card { background: rgba(255,255,255,0.5); backdrop-filter: blur(12px); padding: 60px 24px; border-radius: 16px; text-align: center; color: #8a7a6a; border: 1px dashed rgba(200,170,120,0.3); }
         .empty-card .icon { font-size: 48px; margin-bottom: 12px; }
     </style>
@@ -98,6 +105,11 @@
                     <span class="tag" th:each="tag : ${#strings.arraySplit(t.tags == null ? '' : t.tags, ',')}"
                           th:if="${!tag.trim().isEmpty()}" th:text="${tag.trim()}">标签</span>
                 </div>
+                <div class="card-actions" th:if="${mine == true and session.loginUser != null and session.loginUser.id == t.craftsmanId}">
+                    <span class="edit-link" th:attr="data-id=${t.id}" onclick="goTutorialEdit(event, this)">编辑</span>
+                    <span class="sep">|</span>
+                    <span class="delete-link" th:attr="data-id=${t.id}" onclick="goTutorialDelete(event, this)">删除</span>
+                </div>
             </div>
         </a>
     </div>
@@ -107,5 +119,19 @@
     </div>
 </div>
 
+<script th:inline="none">
+function goTutorialEdit(event, el) {
+    event.preventDefault();
+    event.stopPropagation();
+    location.href = '/tutorial/' + el.dataset.id + '/edit';
+}
+function goTutorialDelete(event, el) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (confirm('确定删除该教程？删除后无法恢复。')) {
+        location.href = '/tutorial/delete/' + el.dataset.id;
+    }
+}
+</script>
 </body>
 </html>

@@ -18,6 +18,8 @@ public interface TutorialService {
 
     Optional<Tutorial> findById(Long id);
 
+    void deleteById(Long id);
+
     Tutorial create(Long craftsmanId, String title, String description, String category, String tags,
                     String content, MultipartFile[] contentImageFiles, String contentImages,
                     MultipartFile coverFile, String coverUrl,

@@ -34,6 +34,8 @@ public interface HeritageWorkService {
 
     Optional<HeritageWork> findById(Long id);
 
+    void deleteById(Long id);
+
     List<HeritageWork> findByCraftsman(Long craftsmanId);
 
     HeritageWork create(User craftsman, String title, String description,

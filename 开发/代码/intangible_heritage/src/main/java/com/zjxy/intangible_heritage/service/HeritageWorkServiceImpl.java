@@ -65,6 +65,11 @@ public class HeritageWorkServiceImpl implements HeritageWorkService {
     }
 
     @Override
+    public void deleteById(Long id) {
+        heritageWorkRepository.deleteById(id);
+    }
+
+    @Override
     public List<HeritageWork> findByCraftsman(Long craftsmanId) {
         return heritageWorkRepository.findByCraftsmanIdWithCraftsman(craftsmanId);
     }

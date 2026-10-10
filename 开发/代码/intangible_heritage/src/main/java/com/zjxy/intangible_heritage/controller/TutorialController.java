@@ -31,6 +31,27 @@ public class TutorialController {
             "剪纸", "刺绣", "陶艺", "木雕", "扎染", "漆器", "竹编", "皮影", "泥塑", "其他"
     );
 
+    @GetMapping("/tutorial/delete/{id}")
+    public String delete(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
+        User user = (User) session.getAttribute("loginUser");
+        if (user == null) {
+            ra.addFlashAttribute("msg", "请先登录");
+            return "redirect:/login";
+        }
+        Tutorial tutorial = tutorialService.findById(id).orElse(null);
+        if (tutorial == null) {
+            ra.addFlashAttribute("msg", "教程不存在");
+            return "redirect:/tutorial/mine";
+        }
+        if (!user.getId().equals(tutorial.getCraftsmanId())) {
+            ra.addFlashAttribute("msg", "无权删除该教程");
+            return "redirect:/tutorial/mine";
+        }
+        tutorialService.deleteById(id);
+        ra.addFlashAttribute("msg", "教程已删除");
+        return "redirect:/tutorial/mine";
+    }
+
     @GetMapping("/tutorial/list")
     public String list(@RequestParam(required = false) String category,
                        @RequestParam(required = false) String msg,
